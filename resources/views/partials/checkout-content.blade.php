@@ -41,18 +41,16 @@
     </div>
 
     {{--
-        target="_top" always — Stripe's hosted checkout page refuses to
-        render inside an iframe (by design, for PCI reasons), so this has
-        to break out to the full browser tab whether this page is being
-        viewed directly or sitting inside someone's embed iframe (see
-        checkout-embed.blade.php).
+        target="_top" — Stripe's hosted checkout page refuses to render
+        inside an iframe (by design, for PCI reasons), so this always
+        breaks out to the full browser tab.
     --}}
     <form method="POST" action="{{ route('checkout.confirm', $pending->token) }}" target="_top" class="mt-6">
         @csrf
 
         <div class="flex items-center gap-3">
             <x-primary-button type="submit">Proceed to Payment</x-primary-button>
-            <a href="{{ $cancelUrl ?? url('/') }}" target="_top" class="text-sm font-medium text-gray-500 hover:text-gray-700">Cancel</a>
+            <a href="{{ route('pricing') }}" target="_top" class="text-sm font-medium text-gray-500 hover:text-gray-700">Cancel</a>
         </div>
     </form>
 </div>

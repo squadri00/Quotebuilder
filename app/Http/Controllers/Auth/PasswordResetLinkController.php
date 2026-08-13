@@ -20,17 +20,6 @@ class PasswordResetLinkController extends Controller
     }
 
     /**
-     * A header/footer-less version of the same form, meant to be dropped
-     * into an <iframe> on someone else's site — see
-     * RegisteredUserController::embedCreate() for the sibling pattern this
-     * mirrors.
-     */
-    public function embedCreate(): View
-    {
-        return view('forgot-password-embed');
-    }
-
-    /**
      * Handle an incoming password reset link request.
      *
      * @throws ValidationException

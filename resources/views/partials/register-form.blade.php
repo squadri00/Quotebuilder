@@ -1,4 +1,4 @@
-<form method="POST" action="{{ route('register') }}" {!! $formTarget ?? '' !!}>
+<form method="POST" action="{{ route('register') }}">
     @csrf
 
     @if ($selectedPlan)
@@ -7,7 +7,7 @@
             <p class="text-sm font-medium text-indigo-900">
                 Selected plan: {{ $selectedPlan->name }} — ${{ number_format($selectedPlan->price, 0) }}/{{ $selectedPlan->billing_interval === 'yearly' ? 'yr' : 'mo' }}
             </p>
-            <a href="{{ $pricingUrl ?? route('pricing') }}" {!! $topTarget ?? '' !!} class="text-xs font-medium text-indigo-700 hover:text-indigo-900 underline">Change plan</a>
+            <a href="{{ route('pricing') }}" class="text-xs font-medium text-indigo-700 hover:text-indigo-900 underline">Change plan</a>
         </div>
     @endif
 
@@ -106,7 +106,7 @@
     </div>
 
     <div class="flex items-center justify-end mt-4">
-        <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ $loginUrl ?? route('login') }}" {!! $linkTarget ?? '' !!}>
+        <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
             {{ __('Already registered?') }}
         </a>
 

@@ -14,8 +14,6 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-gray-50 text-gray-900">
-        @include('checkout._iframe-handoff')
-
         <div class="min-h-screen flex flex-col">
             <header class="border-b border-gray-200 bg-white">
                 <div class="max-w-xl mx-auto px-6 h-16 flex items-center">

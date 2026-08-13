@@ -31,7 +31,6 @@ Route::get('/', function () {
 });
 
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
-Route::get('/embed/pricing', [PricingController::class, 'embed'])->middleware('throttle:public')->name('pricing.embed');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified', 'business.active'])->name('dashboard');
 
@@ -47,10 +46,6 @@ Route::get('/design-preview', function () {
 Route::get('/checkout/{token}', [CheckoutController::class, 'show'])->name('checkout.show');
 Route::post('/checkout/{token}', [CheckoutController::class, 'confirm'])->name('checkout.confirm');
 Route::get('/checkout/{token}/success', [CheckoutController::class, 'success'])->name('checkout.success');
-
-Route::get('/embed/checkout/{token}', [CheckoutController::class, 'embedShow'])
-    ->middleware('throttle:public')
-    ->name('checkout.embed');
 
 // Also no account yet — a team invitation only becomes a real User row
 // once the invitee sets their password here (see AcceptInvitationController).

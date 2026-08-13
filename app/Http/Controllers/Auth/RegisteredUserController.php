@@ -36,22 +36,6 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * A header/footer-less version of the same registration form, meant
-     * to be dropped into an <iframe> on someone else's site (e.g. a
-     * Mobirise HTML block) — see public/embed.js's sibling resize
-     * protocol via partials/_embed-resize. The form itself still posts to
-     * the normal register() route below; only the surrounding page differs.
-     */
-    public function embedCreate(Request $request): View
-    {
-        $selectedPlan = $request->filled('plan')
-            ? Plan::where('is_active', true)->find($request->query('plan'))
-            : null;
-
-        return view('register-embed', compact('selectedPlan'));
-    }
-
-    /**
      * Handle an incoming registration request.
      *
      * @throws ValidationException

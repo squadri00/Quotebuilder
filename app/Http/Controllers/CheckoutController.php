@@ -45,30 +45,6 @@ class CheckoutController extends Controller
     }
 
     /**
-     * A header/footer-less version of the same checkout content, meant to
-     * be dropped into an <iframe> on someone else's site (e.g. a Mobirise
-     * checkout.php wrapper page) — see checkout/_iframe-handoff.blade.php
-     * for how a customer actually lands here from an embedded register
-     * form.
-     */
-    public function embedShow(string $token): View|RedirectResponse
-    {
-        $pending = PendingRegistration::where('token', $token)->firstOrFail();
-
-        if ($pending->isFinalized()) {
-            return redirect()->route('checkout.success', $token);
-        }
-
-        $plan = $pending->plan;
-
-        abort_unless($plan && $plan->is_active && $plan->stripe_price_id, 404, 'This plan is not set up for Stripe billing.');
-
-        $tax = $this->taxForPending($pending, $plan);
-
-        return view('checkout-embed', ['plan' => $plan, 'pending' => $pending, 'tax' => $tax]);
-    }
-
-    /**
      * No request body needed — country/state_province were already
      * captured once on the registration form (required there whenever a
      * paid plan is picked; see partials/register-form.blade.php) and

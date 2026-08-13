@@ -17,28 +17,16 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
-    Route::get('embed/register', [RegisteredUserController::class, 'embedCreate'])
-        ->middleware('throttle:public')
-        ->name('register.embed');
-
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
-
-    Route::get('embed/login', [AuthenticatedSessionController::class, 'embedCreate'])
-        ->middleware('throttle:public')
-        ->name('login.embed');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
         ->name('password.email');
-
-    Route::get('embed/forgot-password', [PasswordResetLinkController::class, 'embedCreate'])
-        ->middleware('throttle:public')
-        ->name('password.request.embed');
 
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
         ->name('password.reset');

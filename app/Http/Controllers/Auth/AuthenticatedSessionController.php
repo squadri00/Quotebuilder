@@ -20,17 +20,6 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * A header/footer-less version of the same login form, meant to be
-     * dropped into an <iframe> on someone else's site — see
-     * RegisteredUserController::embedCreate() for the sibling pattern this
-     * mirrors.
-     */
-    public function embedCreate(): View
-    {
-        return view('login-embed');
-    }
-
-    /**
      * Handle an incoming authentication request.
      */
     public function store(LoginRequest $request): RedirectResponse
