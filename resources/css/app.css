@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Per-business branding. --brand-color is set inline (per request, since
+ * it varies by business) on a page's <html> or wrapping element; these
+ * classes just consume it. The var() fallback means any page that never
+ * sets --brand-color still renders exactly as before — QuoteBuilder's own
+ * indigo (#4f46e5), unchanged.
+ */
+.brand-bg { background-color: var(--brand-color, #4f46e5); }
+.brand-bg:hover { filter: brightness(0.9); }
+.brand-text { color: var(--brand-color, #4f46e5); }
+.brand-text:hover { filter: brightness(0.85); }
+.brand-hover-border:hover { border-color: var(--brand-color, #4f46e5); }
+.brand-checkbox { color: var(--brand-color, #4f46e5); }
+.brand-selected {
+    border-color: var(--brand-color, #4f46e5);
+    background-color: color-mix(in srgb, var(--brand-color, #4f46e5) 12%, white);
+    color: var(--brand-color, #4f46e5);
+}
+.dark .brand-selected {
+    background-color: color-mix(in srgb, var(--brand-color, #4f46e5) 20%, black);
+}
+.brand-active-nav {
+    background-color: color-mix(in srgb, var(--brand-color, #4f46e5) 12%, transparent);
+    color: var(--brand-color, #4f46e5);
+}
+.brand-border { border-color: var(--brand-color, #4f46e5); }

@@ -1,0 +1,147 @@
+checkout.php
+===============
+<iframe id="qb-checkout" src="" title="Checkout" style="width:100%; border:0; display:block;" scrolling="no" frameborder="0" height="700"></iframe>
+<script>
+(function () {
+  var QB_ORIGIN = 'http://localhost';
+
+  // The token identifying which pending signup this is comes from this
+  // page's own URL — set by register.php's checkout-redirect handoff (see
+  // its parent-side message listener) once a paid signup completes.
+  var params = new URLSearchParams(window.location.search);
+  var token = params.get('token');
+  var iframe = document.getElementById('qb-checkout');
+
+  if (!token) {
+    iframe.replaceWith(document.createTextNode('Missing checkout token — please start again from the pricing page.'));
+  } else {
+    iframe.src = QB_ORIGIN + '/quotebuilder/public/embed/checkout/' + encodeURIComponent(token);
+
+    window.addEventListener('message', function (event) {
+      if (event.origin !== QB_ORIGIN) return;
+      if (event.source !== iframe.contentWindow) return;
+      if (!event.data || event.data.type !== 'quotebuilder:resize') return;
+      var h = parseInt(event.data.height, 10);
+      if (h > 0) iframe.style.height = Math.min(h, 4000) + 'px';
+    });
+  }
+
+  // Same reasoning as register.php: if this page is restored from the
+  // back/forward cache (e.g. after paying, then pressing Back), reload it
+  // so the checkout iframe reflects the token's current state (already
+  // paid vs still pending) instead of a stale snapshot.
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+})();
+</script>
+
+
+forgot-password.php
+=================
+
+<iframe id="qb-forgot-password" src="http://localhost/quotebuilder/public/embed/forgot-password" title="Forgot Password" style="width:100%; border:0; display:block;" scrolling="no" frameborder="0" height="700"></iframe>
+<script>
+(function () {
+  var QB_ORIGIN = 'http://localhost';
+  var iframe = document.getElementById('qb-forgot-password');
+
+  window.addEventListener('message', function (event) {
+    if (event.origin !== QB_ORIGIN) return;
+    if (event.source !== iframe.contentWindow) return;
+    if (!event.data || event.data.type !== 'quotebuilder:resize') return;
+    var h = parseInt(event.data.height, 10);
+    if (h > 0) iframe.style.height = Math.min(h, 4000) + 'px';
+  });
+
+  // Same reasoning as register.php/checkout.php: if this page is restored
+  // from the back/forward cache, reload it so the form starts fresh
+  // instead of showing a stale "we've emailed you a link" status.
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+})();
+</script>
+
+register.php
+===============
+<iframe id="qb-register" src="" title="Sign Up" style="width:100%; border:0; display:block;" scrolling="no" frameborder="0" height="700"></iframe>
+<script>
+(function () {
+  var QB_ORIGIN = 'http://localhost';
+
+  // Picks up ?plan=6 from this page's own URL (set by the pricing embed's
+  // Sign Up button) and passes it straight through to the register embed,
+  // so the right plan is pre-selected there too.
+  var params = new URLSearchParams(window.location.search);
+  var plan = params.get('plan');
+  var iframe = document.getElementById('qb-register');
+  iframe.src = QB_ORIGIN + '/quotebuilder/public/embed/register' + (plan ? '?plan=' + encodeURIComponent(plan) : '');
+
+  window.addEventListener('message', function (event) {
+    if (event.origin !== QB_ORIGIN) return;
+    if (event.source !== iframe.contentWindow) return;
+    if (!event.data || !event.data.type) return;
+
+    if (event.data.type === 'quotebuilder:resize') {
+      var h = parseInt(event.data.height, 10);
+      if (h > 0) iframe.style.height = Math.min(h, 4000) + 'px';
+      return;
+    }
+
+    // Sent by Laravel's checkout page when a paid signup lands there
+    // still inside this iframe — see checkout/_iframe-handoff.blade.php.
+    // We do the actual top-level navigation to checkout.php ourselves,
+    // since Laravel has no way to know that page exists on this site.
+    // Using replace() (not href=) so this page's own history entry is
+    // swapped out rather than adding a new one — otherwise pressing Back
+    // from checkout.php would land on this filled-out form mid-submission
+    // instead of cleanly returning to pricing.php.
+    if (event.data.type === 'quotebuilder:checkout-redirect' && event.data.token) {
+      window.location.replace('checkout.php?token=' + encodeURIComponent(event.data.token));
+    }
+  });
+
+  // If the browser restores this page from its back/forward cache (e.g.
+  // the user pressed Back), the iframe would otherwise still be showing
+  // whatever mid-submission Laravel page it last had — reload for a
+  // clean, fresh embed instead.
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+})();
+</script>
+
+
+Login.php
+===============
+<iframe id="qb-login" src="http://localhost/quotebuilder/public/embed/login" title="Log In" style="width:100%; border:0; display:block;" scrolling="no" frameborder="0" height="700"></iframe>
+<script>
+(function () {
+  var QB_ORIGIN = 'http://localhost';
+  var iframe = document.getElementById('qb-login');
+
+  window.addEventListener('message', function (event) {
+    if (event.origin !== QB_ORIGIN) return;
+    if (event.source !== iframe.contentWindow) return;
+    if (!event.data || event.data.type !== 'quotebuilder:resize') return;
+    var h = parseInt(event.data.height, 10);
+    if (h > 0) iframe.style.height = Math.min(h, 4000) + 'px';
+  });
+
+  // Same reasoning as register.php/checkout.php: if this page is restored
+  // from the back/forward cache, reload it so the login iframe starts
+  // fresh instead of showing a stale mid-submission state.
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+})();
+</script>

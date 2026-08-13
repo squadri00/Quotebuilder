@@ -1,0 +1,291 @@
+<?php 
+session_cache_limiter('none');
+session_start();
+ob_start();
+//include "vsadmin/db_conn_open.php";
+//include "vsadmin/inc/languagefile.php";
+//include "vsadmin/includes.php";
+//include "vsadmin/inc/incfunctions.php";
+//include "vsadmin/inc/metainfo.php";
+include "config.php";
+$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+//$url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; do not uncomment this line
+$url = $_SERVER['HTTP_HOST'].'/';
+//echo $url; do not uncomment this line
+?><!DOCTYPE html>
+<html  >
+<head>
+  
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <link rel="shortcut icon" href="assets/images/runwrk20logo201-413x100.png" type="image/x-icon">
+  <meta name="description" content="Understanding your privacy is crucial. Explore our privacy policy to know how we safeguard your information.">
+  
+  
+  <title>SMS Consent Process</title>
+  <link rel="stylesheet" href="assets/web/assets/mobirise-icons2/mobirise2.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/animatecss/animate.css">
+  <link rel="stylesheet" href="assets/dropdown/css/style.css">
+  <link rel="stylesheet" href="assets/socicon/css/styles.css">
+  <link rel="preload" href="https://fonts.googleapis.com/css?family=Inter+Tight:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter+Tight:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap"></noscript>
+  <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css?v=WKkxKf"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css?v=WKkxKf" type="text/css">
+
+  
+  
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TCBDSF5B"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<meta name="theme-color" content="#393193">
+<link rel="manifest" href="manifest.json">
+<script src="sw-connect.js"></script>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-640x1136.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-750x1334.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="assets/images/apple-launch-1242x2208.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="assets/images/apple-launch-1125x2436.png">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="assets/images/apple-launch-1170x2532.png">
+<link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="assets/images/apple-launch-1179x2556.png">
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="assets/images/apple-launch-1290x2796.png">
+<link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-1536x2048.png">
+<link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-1668x2224.png">
+<link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-1668x2388.png">
+<link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-2048x2732.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="">
+<link rel="apple-touch-icon" href="apple-touch-icon.png"></head>
+<body>
+
+<!-- Analytics -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GMYW11JP0V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-GMYW11JP0V');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TCBDSF5B');</script>
+<!-- End Google Tag Manager -->
+<!-- /Analytics -->
+
+
+  
+  <section data-bs-version="5.1" class="menu menu2 cid-voPDJHtzLT" once="menu" id="menu2-mk">
+    
+    <nav class="navbar navbar-dropdown navbar-fixed-top navbar-expand-lg">
+        <div class="container">
+            <div class="navbar-brand">
+                <span class="navbar-logo">
+                    <a href="index.html">
+                        <img src="assets/images/runwrk20logo201-413x100.webp" alt="" style="height: 3rem;">
+                    </a>
+                </span>
+                
+            </div>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbarSupportedContent" data-bs-target="#navbarSupportedContent" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item"><a class="nav-link link text-info text-primary display-4" href="features.html"><span class="mobi-mbri mobi-mbri-smile-face mbr-iconfont mbr-iconfont-btn"></span>Features</a>
+                    </li><li class="nav-item"><a class="nav-link link text-info text-primary display-4" href="pricing.php"><span class="mobi-mbri mobi-mbri-idea mbr-iconfont mbr-iconfont-btn"></span>Pricing</a></li><li class="nav-item"><a class="nav-link link text-info text-primary display-4" href="page8.html"><span class="mobi-mbri mobi-mbri-globe-2 mbr-iconfont mbr-iconfont-btn"></span>Contact</a></li><li class="nav-item"><a class="nav-link link text-info text-primary display-4" href="https://app.meccora.com"><span class="mobi-mbri mobi-mbri-user-2 mbr-iconfont mbr-iconfont-btn"></span>Login</a></li></ul>
+                
+                <div class="navbar-buttons mbr-section-btn"><a class="btn btn-primary display-4" href="#">+1 (866) 798-7860</a></div>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<section data-bs-version="5.1" class="article12 cid-voPDJHHwrY" id="article12-ml">    
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-10">
+
+<div class="container py-5">
+<div class="row justify-content-center">
+<div class="col-lg-10">
+<div class="card shadow">
+<div class="card-body p-5">
+
+<h1>SMS Consent Process</h1>
+<p><strong>Effective Date:</strong> July 8, 2026</p>
+
+<p>This document explains how Workshop Manager CRM manages customer consent for SMS messaging. It is intended to support transparency, regulatory compliance, and Twilio A2P messaging requirements. Workshop Manager CRM is a multi-tenant SaaS platform used by independent automotive repair shops. Each repair shop is responsible for obtaining customer consent before sending SMS messages.</p>
+
+<h2>1. Purpose</h2>
+<p>The Platform is designed exclusively for operational communications related to vehicle service. SMS messages are used to improve customer communication and reduce missed appointments. Marketing campaigns, promotional offers, mass advertising and unrelated messaging are not permitted through this messaging program.</p>
+
+<h2>2. Who Obtains Consent</h2>
+<p>Consent is obtained directly by the participating repair shop during its normal customer interactions. The Platform does not collect consent directly from customers because it does not have a direct business relationship with vehicle owners. Each repair shop is responsible for ensuring that consent is collected in accordance with applicable laws and carrier requirements.</p>
+
+<h2>3. Acceptable Consent Methods</h2>
+<p>Depending on applicable law, consent may be collected through one or more of the following methods:</p>
+<ul>
+<li>Verbal consent during an in-person visit.</li>
+<li>Verbal consent during a telephone conversation.</li>
+<li>A signed repair authorization or service intake form.</li>
+<li>An electronic service agreement or customer portal.</li>
+<li>Another legally permitted method accepted by applicable regulations.</li>
+</ul>
+
+<h2>4. Recording Consent</h2>
+<p>When consent is received, the employee immediately records it in Workshop Manager CRM. The system stores:</p>
+<ul>
+<li>Customer mobile number.</li>
+<li>Consent status.</li>
+<li>Consent method.</li>
+<li>Date and time the consent was recorded.</li>
+<li>Employee ID of the staff member who recorded the consent.</li>
+<li>Optional notes when required by the repair shop.</li>
+</ul>
+
+<p>These records become part of the customer's communication history and may be retained to demonstrate compliance if requested by carriers, regulators or service providers.</p>
+
+<h2>5. Before the First Message</h2>
+<p>Employees are expected to confirm that consent has been recorded before sending the first SMS message. Shops should establish internal procedures to prevent messaging customers whose consent has not been documented.</p>
+
+<h2>6. Types of Messages Covered</h2>
+<p>Consent applies only to transactional automotive service communications, including appointment reminders, maintenance reminders, repair status updates, approval requests, parts availability notifications, vehicle pickup notifications and similar service-related messages.</p>
+
+<h2>7. Marketing Restriction</h2>
+<p>The Platform must not be used to send promotional discounts, coupons, newsletters, referral campaigns, contests, political messages, fundraising requests or unrelated advertising. If a repair shop wishes to conduct marketing campaigns, it must use an appropriate system and obtain any additional consent required by law.</p>
+
+<h2>8. Opt-Out Process</h2>
+<p>Customers may withdraw consent at any time by replying <strong>STOP</strong>. Repair shops may also process opt-out requests received in person, by telephone or by email. Once an opt-out request is received, messaging should stop unless the customer later provides new consent.</p>
+
+<h2>9. HELP Requests</h2>
+<p>Customers may reply <strong>HELP</strong> for messaging assistance. They may also contact the repair shop directly using the contact information provided during their service visit.</p>
+
+<h2>10. Consent Auditing</h2>
+<p>Consent records are retained to support audits, dispute resolution and messaging compliance. Repair shops should periodically review their records to ensure customer information remains accurate and that employees consistently follow the documented consent procedure.</p>
+
+<h2>11. Subscriber Responsibilities</h2>
+<ul>
+<li>Obtain valid customer consent before sending SMS messages.</li>
+<li>Record consent accurately within the CRM.</li>
+<li>Honor all opt-out requests promptly.</li>
+<li>Send only transactional automotive service notifications.</li>
+<li>Comply with applicable laws, carrier rules and Twilio A2P requirements.</li>
+</ul>
+
+<h2>12. Platform Responsibilities</h2>
+<p>Workshop Manager CRM provides tools for recording consent, storing consent information, maintaining messaging logs and supporting compliance. The Platform does not verify whether a repair shop has properly obtained consent and relies on each subscriber to provide truthful and accurate records.</p>
+
+<h2>13. Policy Updates</h2>
+<p>This process may be updated as regulations, carrier requirements or Platform functionality change. The most current version will always be published on this page.</p>
+
+<hr>
+
+<h2>Contact</h2>
+<p><strong>Workshop Manager CRM</strong><br>
+Email: hello@eformics.com<br>
+Website: https://eformics.com</p>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+					<hr>
+					<!-- End  -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<section data-bs-version="5.1" class="footer02 politicsm4_footer02 cid-voPDJHSfCU" once="footers" id="footer02-mm">
+
+	
+
+	
+
+	<div class="container">
+		<div class="row justify-content-center content text-white">
+			<div class="col-9 col-md-12 col-lg-5">
+				<h4 class="align-left mbr-fonts-style display-4">© Meccora.com by Eformics Systems - 2009 - 2026 All
+					Rights Reserved</h4>
+			</div>
+
+			<div class="col-12 col-md-12 col-lg-7 mbr-flex">
+				<div class="item">
+					<div class="card-img"><span class="mbr-iconfont img1 mobi-mbri-pin mobi-mbri"></span>
+					</div>
+					<div class="card-box">
+						<h4 class="item-title align-left mbr-fonts-style display-4"><a href="privacy-policy.html" class="text-white text-primary">Privacy Policy</a>
+						</h4>
+					</div>
+				</div>
+
+				<div class="item">
+					<div class="card-img"><span class="mbr-iconfont img1 mobi-mbri-pin mobi-mbri"></span></div>
+					<div class="card-box">
+						<h4 class="item-title align-left mbr-fonts-style display-4"><a href="terms-and-conditions.html" class="text-white text-primary">Terms of Use</a>
+						</h4>
+					</div>
+				</div>
+
+
+
+
+			</div>
+		</div>
+	</div>
+</section>
+
+
+<script src="assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/smoothscroll/smooth-scroll.js"></script>
+  <script src="assets/ytplayer/index.js"></script>
+  <script src="assets/dropdown/js/navbar-dropdown.js"></script>
+  <script src="assets/theme/js/script.js"></script>
+  
+                              <script>
+                            // Check if the browser supports the beforeinstallprompt event
+                            window.addEventListener('beforeinstallprompt', (event) => {
+                                // Prevent the browser's default install prompt
+                                event.preventDefault();
+
+                                // Show your custom install button
+                                document.getElementById('installButton').style.display = 'block';
+
+                                // Handle the install button click
+                                document.getElementById('installButton').addEventListener('click', () => {
+                                // Trigger the install prompt
+                                event.prompt();
+                                // Wait for the user to respond to the prompt
+                                event.userChoice.then((choiceResult) => {
+                                    if (choiceResult.outcome === 'accepted') {
+                                    console.log('User accepted the install prompt');
+                                    } else {
+                                    console.log('User dismissed the install prompt');
+                                    }
+                                });
+                                });
+                            });
+                            </script>
+
+<script type="text/javascript" src="https://chatterpal.me/build/js/chatpal.js?8.3" integrity="sha384-+YIWcPZjPZYuhrEm13vJJg76TIO/g7y5B14VE35zhQdrojfD9dPemo7q6vnH44FR" crossorigin="anonymous" data-cfasync="false"></script>
+
+  
+ <div id="scrollToTop" class="scrollToTop mbr-arrow-up"><a style="text-align: center;"><i class="mbr-arrow-up-icon mbr-arrow-up-icon-cm cm-icon cm-icon-smallarrow-up"></i></a></div>
+    <input name="animation" type="hidden">
+  </body>
+</html>

@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Custom Garage Storage Cabinet Wall — Build Sheet</title>
+<style>
+  :root {
+    --paper: #faf7f1;
+    --card: #fffdf9;
+    --ink: #241f1a;
+    --ink-soft: #5b5348;
+    --ink-faint: #8a8272;
+    --hairline: #e4dcc9;
+    --brass: #a97c34;
+    --brass-deep: #7c5a24;
+    --brass-bg: #f3e9d6;
+    --logic: #2b615c;
+    --logic-bg: #e7efec;
+    --logic-border: #bfd7d2;
+    --rule: #7a3b3b;
+    --rule-bg: #f3e8e6;
+    --rule-border: #ddc0be;
+    --focus: #1e6f66;
+    font-size: 16px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1b1815;
+      --card: #221e19;
+      --ink: #f1ece2;
+      --ink-soft: #b8ae9c;
+      --ink-faint: #857c6c;
+      --hairline: #38322a;
+      --brass: #d3a25b;
+      --brass-deep: #e8c68a;
+      --brass-bg: #332a1a;
+      --logic: #7fcabd;
+      --logic-bg: #1d2b29;
+      --logic-border: #2c433f;
+      --rule: #d68b8b;
+      --rule-bg: #2e1f1f;
+      --rule-border: #4a2f2f;
+      --focus: #7fcabd;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #1b1815;
+    --card: #221e19;
+    --ink: #f1ece2;
+    --ink-soft: #b8ae9c;
+    --ink-faint: #857c6c;
+    --hairline: #38322a;
+    --brass: #d3a25b;
+    --brass-deep: #e8c68a;
+    --brass-bg: #332a1a;
+    --logic: #7fcabd;
+    --logic-bg: #1d2b29;
+    --logic-border: #2c433f;
+    --rule: #d68b8b;
+    --rule-bg: #2e1f1f;
+    --rule-border: #4a2f2f;
+    --focus: #7fcabd;
+  }
+
+  :root[data-theme="light"] {
+    --paper: #faf7f1;
+    --card: #fffdf9;
+    --ink: #241f1a;
+    --ink-soft: #5b5348;
+    --ink-faint: #8a8272;
+    --hairline: #e4dcc9;
+    --brass: #a97c34;
+    --brass-deep: #7c5a24;
+    --brass-bg: #f3e9d6;
+    --logic: #2b615c;
+    --logic-bg: #e7efec;
+    --logic-border: #bfd7d2;
+    --rule: #7a3b3b;
+    --rule-bg: #f3e8e6;
+    --rule-border: #ddc0be;
+    --focus: #1e6f66;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.55;
+  }
+
+  h1, h2, h3 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    text-wrap: balance;
+    font-weight: 600;
+  }
+
+  .type, .field, .mono, code {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+  }
+
+  a { color: var(--brass-deep); }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .shell {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 48px 28px 96px;
+  }
+
+  .masthead {
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brass-deep);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+
+  .dek {
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  .setup {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 44px;
+  }
+
+  .setup dl {
+    background: var(--card);
+    margin: 0;
+    padding: 16px 18px;
+  }
+
+  .setup dt {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+
+  .setup dd {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  @media (max-width: 760px) {
+    .setup { grid-template-columns: 1fr 1fr; }
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 232px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .index { position: static !important; order: -1; }
+  }
+
+  .index {
+    position: sticky;
+    top: 28px;
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    background: var(--card);
+    padding: 16px;
+  }
+
+  .index h2 {
+    font-family: inherit;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin: 0 0 10px;
+    font-weight: 700;
+  }
+
+  .index ol {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+    counter-reset: idx;
+  }
+
+  .index li { margin: 0; }
+
+  .index a {
+    display: flex;
+    gap: 8px;
+    padding: 5px 6px;
+    border-radius: 6px;
+    font-size: 0.86rem;
+    text-decoration: none;
+    color: var(--ink-soft);
+  }
+
+  .index a:hover { background: var(--brass-bg); color: var(--ink); }
+
+  .index .num {
+    font-family: ui-monospace, monospace;
+    color: var(--brass-deep);
+    font-variant-numeric: tabular-nums;
+    width: 1.4em;
+    flex-shrink: 0;
+  }
+
+  .index .tag {
+    display: inline-block;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--logic-bg);
+    color: var(--logic);
+    margin-left: auto;
+    align-self: center;
+  }
+
+  .index .divider {
+    border: none;
+    border-top: 1px solid var(--hairline);
+    margin: 12px 0;
+  }
+
+  main { min-width: 0; }
+
+  section.intro { margin-bottom: 40px; }
+  section.intro h2 { font-size: 1.15rem; margin: 0 0 10px; }
+  section.intro p { color: var(--ink-soft); max-width: 68ch; }
+  section.intro ol { color: var(--ink-soft); max-width: 68ch; padding-left: 1.2em; }
+  section.intro li { margin-bottom: 6px; }
+
+  .group-title {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin: 40px 0 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .group-title:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+
+  .qcard {
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    background: var(--card);
+    padding: 22px 24px;
+    margin-bottom: 18px;
+    scroll-margin-top: 20px;
+  }
+
+  .qhead { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+
+  .qnum {
+    font-family: Georgia, serif;
+    font-weight: 700;
+    color: var(--brass);
+    font-size: 1.1rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .qmeta { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+
+  .pill {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--hairline);
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .pill.type-single { background: var(--brass-bg); color: var(--brass-deep); border-color: transparent; }
+  .pill.type-number { background: #e6eef7; color: #2e5a8a; border-color: transparent; }
+  .pill.type-text { background: #efe6f4; color: #6b3f88; border-color: transparent; }
+
+  @media (prefers-color-scheme: dark) {
+    .pill.type-number { background: #1b2a3a; color: #8fb6de; }
+    .pill.type-text { background: #2a2032; color: #c6a3dd; }
+  }
+
+  :root[data-theme="dark"] .pill.type-number { background: #1b2a3a; color: #8fb6de; }
+  :root[data-theme="dark"] .pill.type-text { background: #2a2032; color: #c6a3dd; }
+  :root[data-theme="light"] .pill.type-number { background: #e6eef7; color: #2e5a8a; }
+  :root[data-theme="light"] .pill.type-text { background: #efe6f4; color: #6b3f88; }
+
+  .field-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin: 0 0 4px;
+  }
+
+  .typebox {
+    background: var(--brass-bg);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  table.opts { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+
+  table.opts th {
+    text-align: left;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--hairline);
+    font-weight: 600;
+  }
+
+  table.opts td { padding: 8px 0; border-bottom: 1px solid var(--hairline); color: var(--ink); }
+  table.opts tr:last-child td { border-bottom: none; }
+
+  table.opts td.price {
+    font-family: ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+    width: 6em;
+  }
+
+  td.price.pos { color: var(--brass-deep); }
+  td.price.neg { color: var(--logic); }
+  td.price.zero { color: var(--ink-faint); }
+
+  .callout {
+    margin-top: 16px;
+    border-left: 3px solid var(--logic-border);
+    background: var(--logic-bg);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+  }
+
+  .callout .callabel {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--logic);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .callout p { margin: 0; font-size: 0.9rem; color: var(--ink); }
+
+  .callout .steps {
+    margin: 8px 0 0;
+    padding-left: 1.1em;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+  }
+
+  .callout .steps li { margin-bottom: 3px; }
+  .callout .steps .field { color: var(--logic); font-weight: 600; }
+
+  .note { margin-top: 14px; font-size: 0.85rem; color: var(--ink-faint); font-style: italic; }
+
+  .rcard {
+    border: 1px solid var(--rule-border);
+    background: var(--rule-bg);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    scroll-margin-top: 20px;
+  }
+
+  .rhead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+  .rnum { font-family: Georgia, serif; font-weight: 700; color: var(--rule); font-size: 1.05rem; }
+  .rname { font-weight: 600; color: var(--ink); }
+
+  .rgrid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 14px;
+    font-size: 0.9rem;
+  }
+
+  .rgrid .rlabel {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--rule);
+    font-weight: 700;
+    padding-top: 2px;
+    white-space: nowrap;
+  }
+
+  .rgrid .rval { color: var(--ink); }
+  .rgrid .rval .field { color: var(--rule); }
+
+  .closing {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--hairline);
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    max-width: 68ch;
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <p class="eyebrow">Build Sheet · Manual Entry Reference</p>
+    <h1>Custom Garage Storage Cabinet Wall</h1>
+    <p class="dek">Everything you need to type into the Quote Builder by hand — every question, every option and price, every conditional rule, and every pricing rule, in the exact order to enter them.</p>
+  </header>
+
+  <dl class="setup">
+    <dl><dt>Industry</dt><dd>Cabinet &amp; Millwork Shops</dd></dl>
+    <dl><dt>Template Name</dt><dd>Garage Storage Cabinet Systems</dd></dl>
+    <dl><dt>Product Name</dt><dd>Custom Garage Storage Cabinet Wall</dd></dl>
+    <dl><dt>Base Price</dt><dd>$1,800</dd></dl>
+  </dl>
+
+  <div class="layout">
+    <nav class="index" aria-label="Question index">
+      <h2>Questions</h2>
+      <ol>
+        <li><a href="#q1"><span class="num">01</span> Cabinet Layout</a></li>
+        <li><a href="#q2"><span class="num">02</span> Overall Width</a></li>
+        <li><a href="#q3"><span class="num">03</span> Wood Species</a></li>
+        <li><a href="#q4"><span class="num">04</span> Door Style</a></li>
+        <li><a href="#q5"><span class="num">05</span> Finish</a></li>
+        <li><a href="#q6"><span class="num">06</span> Hardware</a></li>
+        <li><a href="#q7"><span class="num">07</span> Drawer Count<span class="tag">if</span></a></li>
+        <li><a href="#q8"><span class="num">08</span> Stain Color<span class="tag">if</span></a></li>
+        <li><a href="#q9"><span class="num">09</span> Lighting &amp; Power</a></li>
+        <li><a href="#q10"><span class="num">10</span> Installation</a></li>
+        <li><a href="#q11"><span class="num">11</span> Site Access<span class="tag">if</span></a></li>
+        <li><a href="#q12"><span class="num">12</span> Countertop</a></li>
+        <li><a href="#q13"><span class="num">13</span> Edge &amp; Trim Profile</a></li>
+        <li><a href="#q14"><span class="num">14</span> Customer Notes</a></li>
+      </ol>
+
+      <hr class="divider">
+
+      <h2>Rules</h2>
+      <ol>
+        <li><a href="#r1"><span class="num">01</span> White Oak Surcharge</a></li>
+        <li><a href="#r2"><span class="num">02</span> Extra Drawer Count</a></li>
+        <li><a href="#r3"><span class="num">03</span> Custom Stain</a></li>
+        <li><a href="#r4"><span class="num">04</span> Full Wall Installation</a></li>
+        <li><a href="#r5"><span class="num">05</span> Butcher Block Handling</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <section class="intro">
+        <h2>How to use this</h2>
+        <p>Build it in this order — a question with conditional logic can only reference a question that already exists <em>above</em> it, so entering them out of order will leave you with nothing to pick from.</p>
+        <ol>
+          <li><strong>Super Admin → Templates → New Template</strong> — name it, set the Industry, save. You'll land straight in its Quote Builder.</li>
+          <li><strong>New Product</strong> — enter the Product Name and Base Price from the panel above.</li>
+          <li>For each question below: <strong>Questions → New Question</strong>, fill in Question Text / Answer Type / Sort Order, then add its Options underneath (<strong>Options → New Option</strong>) with the label and price shown.</li>
+          <li>Where a card has a teal <strong>conditional logic</strong> box, tick <em>"Only if certain earlier answers match"</em> on that question and fill in exactly what the box says.</li>
+          <li>Once all questions are in, go to <strong>Rules</strong> and add the ones below.</li>
+          <li>Click <strong>Publish</strong>, then hit <strong>Preview</strong> to walk through it yourself.</li>
+        </ol>
+      </section>
+
+      <p class="group-title">Questions</p>
+
+      <article class="qcard" id="q1">
+        <div class="qhead">
+          <span class="qnum">01</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 1</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">What cabinet layout do you want?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>Base Cabinet Run</td><td class="price zero">+0</td></tr>
+          <tr><td>Base + Wall Cabinets</td><td class="price pos">+$450</td></tr>
+          <tr><td>Full Wall System</td><td class="price pos">+$750</td></tr>
+          <tr><td>L-Shaped Corner System</td><td class="price pos">+$900</td></tr>
+        </table>
+      </article>
+
+      <article class="qcard" id="q2">
+        <div class="qhead">
+          <span class="qnum">02</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 2</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">What overall cabinet width is required?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>8 ft</td><td class="price zero">+0</td></tr>
+          <tr><td>10 ft</td><td class="price pos">+$180</td></tr>
+          <tr><td>12 ft</td><td class="price pos">+$360</td></tr>
+          <tr><td>14 ft</td><td class="price pos">+$540</td></tr>
+        </table>
+      </article>
+
+      <article class="qcard" id="q3">
+        <div class="qhead">
+          <span class="qnum">03</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 3</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">Which wood species should be used?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>Maple</td><td class="price zero">+0</td></tr>
+          <tr><td>Birch</td><td class="price pos">+$120</td></tr>
+          <tr><td>White Oak</td><td class="price pos">+$450</td></tr>
+          <tr><td>Walnut</td><td class="price pos">+$850</td></tr>
+        </table>
+      </article>
+
+      <article class="qcard" id="q4">
+        <div class="qhead">
+          <span class="qnum">04</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 4</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">Which cabinet door style do you want?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>Slab</td><td class="price zero">+0</td></tr>
+          <tr><td>Shaker</td><td class="price pos">+$180</td></tr>
+          <tr><td>Recessed Panel</td><td class="price pos">+$300</td></tr>
+          <tr><td>Shaker Glass-Front</td><td class="price pos">+$420</td></tr>
+        </table>
+      </article>
+
+      <article class="qcard" id="q5">
+        <div class="qhead">
+          <span class="qnum">05</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 5</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">What finish should be applied?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>Clear Coat</td><td class="price zero">+0</td></tr>
+          <tr><td>Painted</td><td class="price pos">+$250</td></tr>
+          <tr><td>Custom Stain</td><td class="price pos">+$350</td></tr>
+          <tr><td>Two-Tone</td><td class="price pos">+$500</td></tr>
+        </table>
+      </article>
+
+      <article class="qcard" id="q6">
+        <div class="qhead">
+          <span class="qnum">06</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 6</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">Which cabinet hardware package do you want?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>Standard</td><td class="price zero">+0</td></tr>
+          <tr><td>Soft-close</td><td class="price pos">+$120</td></tr>
+          <tr><td>Premium Black</td><td class="price pos">+$180</td></tr>
+          <tr><td>Brass</td><td class="price pos">+$240</td></tr>
+        </table>
+      </article>
+
+      <article class="qcard" id="q7">
+        <div class="qhead">
+          <span class="qnum">07</span>
+          <span class="qmeta"><span class="pill type-number">Number</span><span class="pill">Sort 7</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">How many drawers should the cabinet system include?</div>
+
+        <div class="callout">
+          <p class="callabel">Conditional Logic</p>
+          <p>Drawer configuration is relevant for the larger full-wall cabinet system.</p>
+          <ol class="steps">
+            <li>Tick <span class="field">"Only if certain earlier answers match"</span></li>
+            <li><span class="field">Question:</span> Cabinet Layout</li>
+            <li><span class="field">Comparison:</span> is</li>
+            <li><span class="field">Answer:</span> Full Wall System</li>
+          </ol>
+        </div>
+
+        <p class="note">Enter a whole number such as 4, 6, 8, or 10. The pricing rule below adds a fee when the count is greater than 6.</p>
+      </article>
+
+      <article class="qcard" id="q8">
+        <div class="qhead">
+          <span class="qnum">08</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 8</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">Which stain color should be used?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>Natural Oak</td><td class="price zero">+0</td></tr>
+          <tr><td>Walnut Tone</td><td class="price pos">+$75</td></tr>
+          <tr><td>Espresso</td><td class="price pos">+$75</td></tr>
+          <tr><td>Weathered Gray</td><td class="price pos">+$75</td></tr>
+        </table>
+
+        <div class="callout">
+          <p class="callabel">Conditional Logic</p>
+          <p>Ask for a stain color whenever the customer chooses a finish other than the basic clear coat.</p>
+          <ol class="steps">
+            <li>Tick <span class="field">"Only if certain earlier answers match"</span></li>
+            <li><span class="field">Question:</span> Finish</li>
+            <li><span class="field">Comparison:</span> is not</li>
+            <li><span class="field">Answer:</span> Clear Coat</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="qcard" id="q9">
+        <div class="qhead">
+          <span class="qnum">09</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 9</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">What lighting and power package is required?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>None</td><td class="price zero">+0</td></tr>
+          <tr><td>LED Strip Lighting</td><td class="price pos">+$180</td></tr>
+          <tr><td>LED + Outlets</td><td class="price pos">+$325</td></tr>
+          <tr><td>LED + Outlets + Charging Station</td><td class="price pos">+$450</td></tr>
+        </table>
+      </article>
+
+      <article class="qcard" id="q10">
+        <div class="qhead">
+          <span class="qnum">10</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 10</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">How should the cabinet system be delivered and installed?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>Customer Pickup</td><td class="price zero">+0</td></tr>
+          <tr><td>Delivery Only</td><td class="price pos">+$175</td></tr>
+          <tr><td>Full Installation</td><td class="price pos">+$650</td></tr>
+        </table>
+      </article>
+
+      <article class="qcard" id="q11">
+        <div class="qhead">
+          <span class="qnum">11</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 11</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">What is the site access condition?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>Ground-Level Garage</td><td class="price zero">+0</td></tr>
+          <tr><td>One-Step Entry</td><td class="price pos">+$50</td></tr>
+          <tr><td>Stairs / Long Carry</td><td class="price pos">+$150</td></tr>
+        </table>
+
+        <div class="callout">
+          <p class="callabel">Conditional Logic</p>
+          <p>Site access matters when the shop is responsible for delivery or installation rather than customer pickup.</p>
+          <ol class="steps">
+            <li>Tick <span class="field">"Only if certain earlier answers match"</span></li>
+            <li><span class="field">Question:</span> How should the cabinet system be delivered and installed?</li>
+            <li><span class="field">Comparison:</span> is not</li>
+            <li><span class="field">Answer:</span> Customer Pickup</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="qcard" id="q12">
+        <div class="qhead">
+          <span class="qnum">12</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 12</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">Which countertop should be used on the base cabinets?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>Laminate</td><td class="price zero">+0</td></tr>
+          <tr><td>Butcher Block</td><td class="price pos">+$250</td></tr>
+          <tr><td>Quartz</td><td class="price pos">+$650</td></tr>
+          <tr><td>Solid Hardwood</td><td class="price pos">+$500</td></tr>
+        </table>
+      </article>
+
+      <article class="qcard" id="q13">
+        <div class="qhead">
+          <span class="qnum">13</span>
+          <span class="qmeta"><span class="pill type-single">Single Choice</span><span class="pill">Sort 13</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">Which edge and trim profile should be used?</div>
+        <table class="opts">
+          <tr><th>Option</th><th>Price</th></tr>
+          <tr><td>Square Edge</td><td class="price zero">+0</td></tr>
+          <tr><td>Small Roundover</td><td class="price pos">+$60</td></tr>
+          <tr><td>Decorative Bevel</td><td class="price pos">+$120</td></tr>
+          <tr><td>Furniture-Style Ogee</td><td class="price pos">+$220</td></tr>
+        </table>
+      </article>
+
+      <article class="qcard" id="q14">
+        <div class="qhead">
+          <span class="qnum">14</span>
+          <span class="qmeta"><span class="pill type-text">Text</span><span class="pill">Sort 14</span></span>
+        </div>
+        <p class="field-label">Question Text</p>
+        <div class="typebox type">Describe any special measurements, storage requirements, or customer notes.</div>
+        <p class="note">Free-text field. No price is attached.</p>
+      </article>
+
+      <p class="group-title">Rules</p>
+      <p style="color:var(--ink-soft); font-size:0.92rem; margin-top:-6px; max-width:66ch;">Add these after all questions exist — a rule can only reference a question and option that are already saved.</p>
+
+      <article class="rcard" id="r1">
+        <div class="rhead"><span class="rnum">01</span><span class="rname">White Oak Surcharge</span></div>
+        <div class="rgrid">
+          <span class="rlabel">When</span>
+          <span class="rval"><span class="field">Wood Species</span> is <span class="field">White Oak</span></span>
+          <span class="rlabel">Then</span>
+          <span class="rval">Add a fixed dollar amount → <strong>$450</strong></span>
+        </div>
+      </article>
+
+      <article class="rcard" id="r2">
+        <div class="rhead"><span class="rnum">02</span><span class="rname">Extra Drawer Count</span></div>
+        <div class="rgrid">
+          <span class="rlabel">When</span>
+          <span class="rval"><span class="field">How many drawers should the cabinet system include?</span> greater than <span class="field">6</span></span>
+          <span class="rlabel">Then</span>
+          <span class="rval">Add a fixed dollar amount → <strong>$300</strong></span>
+        </div>
+      </article>
+
+      <article class="rcard" id="r3">
+        <div class="rhead"><span class="rnum">03</span><span class="rname">Custom Stain Surcharge</span></div>
+        <div class="rgrid">
+          <span class="rlabel">When</span>
+          <span class="rval"><span class="field">Finish</span> is <span class="field">Custom Stain</span></span>
+          <span class="rlabel">Then</span>
+          <span class="rval">Add a percentage → <strong>12%</strong></span>
+        </div>
+      </article>
+
+      <article class="rcard" id="r4">
+        <div class="rhead"><span class="rnum">04</span><span class="rname">Full Wall Installation</span></div>
+        <div class="rgrid">
+          <span class="rlabel">When</span>
+          <span class="rval"><span class="field">Cabinet Layout</span> is <span class="field">Full Wall System</span></span>
+          <span class="rlabel">Then</span>
+          <span class="rval">Set a specific option's price → option <span class="field">Full Installation</span> → new price <strong>$850</strong></span>
+        </div>
+      </article>
+
+      <article class="rcard" id="r5">
+        <div class="rhead"><span class="rnum">05</span><span class="rname">Butcher Block Handling</span></div>
+        <div class="rgrid">
+          <span class="rlabel">When</span>
+          <span class="rval"><span class="field">Which countertop should be used on the base cabinets?</span> is <span class="field">Butcher Block</span></span>
+          <span class="rlabel">Then</span>
+          <span class="rval">Add a fixed dollar amount → <strong>$175</strong></span>
+        </div>
+      </article>
+
+      <p class="closing">Hand-check path: choose <strong>Full Wall System</strong>, <strong>12 ft</strong>, <strong>White Oak</strong>, <strong>Shaker</strong>, <strong>Custom Stain</strong>, <strong>Soft-close</strong>, enter <strong>8 drawers</strong>, choose <strong>Walnut Tone</strong>, choose <strong>LED + Outlets</strong>, choose <strong>Full Installation</strong>, choose <strong>Stairs / Long Carry</strong>, choose <strong>Butcher Block</strong>, choose <strong>Decorative Bevel</strong>, and enter any customer notes. The three conditional questions all display: Drawer Count because Cabinet Layout is <strong>Full Wall System</strong>; Stain Color because Finish is <strong>not Clear Coat</strong>; and Site Access because Installation is <strong>not Customer Pickup</strong>. Starting from the <strong>$1,800</strong> base, selected option prices total <strong>$5,580</strong>. Rule 1 adds <strong>$450</strong>, Rule 2 adds <strong>$300</strong>, Rule 4 changes Full Installation from <strong>$650</strong> to <strong>$850</strong>, and Rule 5 adds <strong>$175</strong>, producing a pre-percentage total of <strong>$6,705</strong>. Rule 3 then adds <strong>12%</strong> ($804.60), giving a final hand-checked price of <strong>$7,509.60</strong>.</p>
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

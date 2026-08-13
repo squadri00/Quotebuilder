@@ -1,0 +1,289 @@
+<?php 
+session_cache_limiter('none');
+session_start();
+ob_start();
+//include "vsadmin/db_conn_open.php";
+//include "vsadmin/inc/languagefile.php";
+//include "vsadmin/includes.php";
+//include "vsadmin/inc/incfunctions.php";
+//include "vsadmin/inc/metainfo.php";
+include "config.php";
+$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+//$url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; do not uncomment this line
+$url = $_SERVER['HTTP_HOST'].'/';
+//echo $url; do not uncomment this line
+?><!DOCTYPE html>
+<html  >
+<head>
+  
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <link rel="shortcut icon" href="assets/images/runwrk20logo201-413x100.png" type="image/x-icon">
+  <meta name="description" content="Understanding your privacy is crucial. Explore our privacy policy to know how we safeguard your information.">
+  
+  
+  <title>Terms and Conditions</title>
+  <link rel="stylesheet" href="assets/web/assets/mobirise-icons2/mobirise2.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/animatecss/animate.css">
+  <link rel="stylesheet" href="assets/dropdown/css/style.css">
+  <link rel="stylesheet" href="assets/socicon/css/styles.css">
+  <link rel="preload" href="https://fonts.googleapis.com/css?family=Inter+Tight:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter+Tight:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap"></noscript>
+  <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css?v=i6HrsH"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css?v=i6HrsH" type="text/css">
+
+  
+  
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TCBDSF5B"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<meta name="theme-color" content="#393193">
+<link rel="manifest" href="manifest.json">
+<script src="sw-connect.js"></script>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-640x1136.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-750x1334.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="assets/images/apple-launch-1242x2208.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="assets/images/apple-launch-1125x2436.png">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="assets/images/apple-launch-1170x2532.png">
+<link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="assets/images/apple-launch-1179x2556.png">
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="assets/images/apple-launch-1290x2796.png">
+<link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-1536x2048.png">
+<link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-1668x2224.png">
+<link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-1668x2388.png">
+<link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="assets/images/apple-launch-2048x2732.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="">
+<link rel="apple-touch-icon" href="apple-touch-icon.png"></head>
+<body>
+
+<!-- Analytics -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GMYW11JP0V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-GMYW11JP0V');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TCBDSF5B');</script>
+<!-- End Google Tag Manager -->
+<!-- /Analytics -->
+
+
+  
+  <section data-bs-version="5.1" class="menu menu2 cid-voPArs17fZ" once="menu" id="menu2-me">
+    
+    <nav class="navbar navbar-dropdown navbar-fixed-top navbar-expand-lg">
+        <div class="container">
+            <div class="navbar-brand">
+                <span class="navbar-logo">
+                    <a href="index.html">
+                        <img src="assets/images/runwrk20logo201-413x100.webp" alt="" style="height: 3rem;">
+                    </a>
+                </span>
+                
+            </div>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbarSupportedContent" data-bs-target="#navbarSupportedContent" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item"><a class="nav-link link text-info text-primary display-4" href="features.html"><span class="mobi-mbri mobi-mbri-smile-face mbr-iconfont mbr-iconfont-btn"></span>Features</a>
+                    </li><li class="nav-item"><a class="nav-link link text-info text-primary display-4" href="pricing.php"><span class="mobi-mbri mobi-mbri-idea mbr-iconfont mbr-iconfont-btn"></span>Pricing</a></li><li class="nav-item"><a class="nav-link link text-info text-primary display-4" href="page8.html"><span class="mobi-mbri mobi-mbri-globe-2 mbr-iconfont mbr-iconfont-btn"></span>Contact</a></li><li class="nav-item"><a class="nav-link link text-info text-primary display-4" href="https://app.meccora.com"><span class="mobi-mbri mobi-mbri-user-2 mbr-iconfont mbr-iconfont-btn"></span>Login</a></li></ul>
+                
+                <div class="navbar-buttons mbr-section-btn"><a class="btn btn-primary display-4" href="#">+1 (866) 798-7860</a></div>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<section data-bs-version="5.1" class="article12 cid-voPArsh3J8" id="article12-mf">    
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-10">
+
+<div class="container py-5">
+<div class="row justify-content-center">
+<div class="col-lg-10">
+<div class="card shadow">
+<div class="card-body p-5">
+<h1>Terms and Conditions</h1>
+<p><strong>Effective Date:</strong> July 8, 2026</p>
+
+<p>These Terms and Conditions govern the use of Workshop Manager CRM, a multi-tenant software platform designed for independent automotive repair shops. By creating an account, accessing, or using the Platform, you acknowledge that you have read, understood and agree to these Terms.</p>
+
+<h2>1. Acceptance of Terms</h2>
+<p>By accessing or using Workshop Manager CRM, you agree to be bound by these Terms and Conditions. If you do not agree, do not use the Platform.</p>
+
+<h2>2. Description of Service</h2>
+<p>Workshop Manager CRM is a multi-tenant SaaS platform for independent automotive repair shops. It provides customer management, appointments, repair tracking, service history, invoicing support, and transactional SMS notifications. The Platform is not intended for mass marketing or bulk advertising.</p>
+
+<h2>3. Business Accounts</h2>
+<p>Each subscribing repair shop is responsible for maintaining accurate account information, protecting login credentials, and ensuring only authorized employees access the Platform.</p>
+
+<h2>4. Customer Data Ownership</h2>
+<p>Each repair shop owns and controls the customer information it enters into the Platform. Workshop Manager CRM processes that information solely to provide the subscribed services.</p>
+
+<h2>5. SMS Messaging Responsibilities</h2>
+<p>Subscribers must obtain valid customer consent before sending SMS messages. Only transactional messages such as appointment reminders, maintenance reminders, repair status updates and vehicle pickup notifications may be sent through the messaging program. Marketing, political, affiliate, lead-generation, or unrelated promotional messages are prohibited.</p>
+
+<h2>6. A2P Compliance</h2>
+<p>Subscribers agree to comply with applicable messaging laws, carrier rules and Twilio A2P requirements. Consent records, including the consent method, timestamp and employee identifier, must be maintained accurately within the Platform.</p>
+
+<h2>7. Prohibited Uses</h2>
+<p>Users may not send spam, phishing messages, fraudulent communications, malware, unlawful content, or messages that violate applicable law. The Platform may suspend accounts engaged in prohibited activity without prior notice.</p>
+
+<h2>8. Availability</h2>
+<p>Reasonable efforts are made to maintain reliable service; however, uninterrupted availability is not guaranteed. Maintenance, software updates, third-party outages or force majeure events may temporarily affect availability.</p>
+
+<h2>9. Third-Party Services</h2>
+<p>The Platform integrates with third-party providers including SMS delivery services, cloud hosting and payment processors. Their services are governed by their own terms and policies.</p>
+
+<h2>10. Fees and Subscription</h2>
+<p>Subscription fees are payable according to the selected plan. Failure to pay may result in suspension or termination of service. Unless otherwise agreed, fees are non-refundable after services have been provided.</p>
+
+<h2>11. Intellectual Property</h2>
+<p>Workshop Manager CRM, including its software, design, documentation, trademarks and source code, remains the property of its owners except where third-party components are used under their respective licenses.</p>
+
+<h2>12. Privacy</h2>
+<p>Use of the Platform is also governed by the Privacy Policy. Subscribers are responsible for collecting customer information lawfully and providing any notices required under applicable privacy legislation.</p>
+
+<h2>13. Security</h2>
+<p>Subscribers must maintain secure passwords, restrict employee access appropriately and promptly report suspected unauthorized access.</p>
+
+<h2>14. Suspension and Termination</h2>
+<p>Accounts may be suspended or terminated for non-payment, illegal activity, repeated messaging violations, security threats, or breaches of these Terms.</p>
+
+<h2>15. Limitation of Liability</h2>
+<p>To the maximum extent permitted by law, Workshop Manager CRM shall not be liable for indirect, incidental, consequential, special or punitive damages, including lost profits, business interruption or loss of data.</p>
+
+<h2>16. Indemnification</h2>
+<p>Subscribers agree to indemnify and hold harmless Workshop Manager CRM from claims arising from their misuse of the Platform, their customer communications, or their failure to obtain required consent.</p>
+
+<h2>17. Changes to the Service</h2>
+<p>Features may be modified, improved or discontinued as the Platform evolves. Reasonable notice will be provided where practical for material changes affecting subscribers.</p>
+
+<h2>18. Governing Law</h2>
+<p>These Terms shall be governed by the laws applicable in the jurisdiction where Workshop Manager CRM operates unless another written agreement specifies otherwise.</p>
+
+<h2>19. Contact</h2>
+<p>Questions regarding these Terms may be directed to the contact information listed below.</p>
+
+<hr>
+<h2>Contact Information</h2>
+<p>
+<strong>Workshop Manager CRM</strong><br>
+Email: hello@eformics.com<br>
+Website: https://eformics.com
+</p>
+<hr>
+        <a href="https://eformics.com/sms-policy.html">SMS Policy</a><br>
+    <a href="https://eformics.com/sms-consent-process.html">SMS Consent Process</a>
+</div>
+</div>
+</div>
+</div>
+</div>        
+
+					<hr>
+					<!-- End  -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<section data-bs-version="5.1" class="footer02 politicsm4_footer02 cid-voPArsu0Gv" once="footers" id="footer02-mg">
+
+	
+
+	
+
+	<div class="container">
+		<div class="row justify-content-center content text-white">
+			<div class="col-9 col-md-12 col-lg-5">
+				<h4 class="align-left mbr-fonts-style display-4">© Meccora.com by Eformics Systems - 2009 - 2026 All
+					Rights Reserved</h4>
+			</div>
+
+			<div class="col-12 col-md-12 col-lg-7 mbr-flex">
+				<div class="item">
+					<div class="card-img"><span class="mbr-iconfont img1 mobi-mbri-pin mobi-mbri"></span>
+					</div>
+					<div class="card-box">
+						<h4 class="item-title align-left mbr-fonts-style display-4"><a href="privacy-policy.html" class="text-white text-primary">Privacy Policy</a>
+						</h4>
+					</div>
+				</div>
+
+				<div class="item">
+					<div class="card-img"><span class="mbr-iconfont img1 mobi-mbri-pin mobi-mbri"></span></div>
+					<div class="card-box">
+						<h4 class="item-title align-left mbr-fonts-style display-4"><a href="terms-and-conditions.html" class="text-white text-primary">Terms of Use</a>
+						</h4>
+					</div>
+				</div>
+
+
+
+
+			</div>
+		</div>
+	</div>
+</section>
+
+
+<script src="assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/smoothscroll/smooth-scroll.js"></script>
+  <script src="assets/ytplayer/index.js"></script>
+  <script src="assets/dropdown/js/navbar-dropdown.js"></script>
+  <script src="assets/theme/js/script.js"></script>
+  
+                              <script>
+                            // Check if the browser supports the beforeinstallprompt event
+                            window.addEventListener('beforeinstallprompt', (event) => {
+                                // Prevent the browser's default install prompt
+                                event.preventDefault();
+
+                                // Show your custom install button
+                                document.getElementById('installButton').style.display = 'block';
+
+                                // Handle the install button click
+                                document.getElementById('installButton').addEventListener('click', () => {
+                                // Trigger the install prompt
+                                event.prompt();
+                                // Wait for the user to respond to the prompt
+                                event.userChoice.then((choiceResult) => {
+                                    if (choiceResult.outcome === 'accepted') {
+                                    console.log('User accepted the install prompt');
+                                    } else {
+                                    console.log('User dismissed the install prompt');
+                                    }
+                                });
+                                });
+                            });
+                            </script>
+
+<script type="text/javascript" src="https://chatterpal.me/build/js/chatpal.js?8.3" integrity="sha384-+YIWcPZjPZYuhrEm13vJJg76TIO/g7y5B14VE35zhQdrojfD9dPemo7q6vnH44FR" crossorigin="anonymous" data-cfasync="false"></script>
+
+  
+ <div id="scrollToTop" class="scrollToTop mbr-arrow-up"><a style="text-align: center;"><i class="mbr-arrow-up-icon mbr-arrow-up-icon-cm cm-icon cm-icon-smallarrow-up"></i></a></div>
+    <input name="animation" type="hidden">
+  </body>
+</html>
