@@ -1,7 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between w-full">
-            <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">Tax Rates</h2>
+            <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                    <a href="{{ route('profile.edit') }}" class="hover:text-gray-700">Business Settings</a> / Tax Rates
+                </p>
+                <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">Tax Rates</h2>
+            </div>
             <x-primary-button onclick="window.location='{{ route('tax-rates.create') }}'">New Tax Line</x-primary-button>
         </div>
     </x-slot>

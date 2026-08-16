@@ -65,7 +65,7 @@
 
         <footer class="mt-24 bg-indigo-950 text-white">
             <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-                <p class="text-sm text-indigo-200">© {{ config('app.name', 'Runwrk') }}.com by Eformics Systems - 2009 - {{ date('Y') }} All Rights Reserved</p>
+                <p class="text-sm text-indigo-200">© {{ config('app.name', 'Runwrk') }}.com by {{ optional($platformSettings ?? null)->legal_business_name ?: 'Eformics Systems' }} - 2009 - {{ date('Y') }} All Rights Reserved</p>
                 <div class="flex items-center gap-6 text-sm text-indigo-200">
                     <a href="#" class="hover:text-white transition">Privacy Policy</a>
                     <a href="#" class="hover:text-white transition">Terms of Use</a>

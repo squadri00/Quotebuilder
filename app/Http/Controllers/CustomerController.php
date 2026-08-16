@@ -80,6 +80,26 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')->with('status', 'Customer deleted.');
     }
 
+    /**
+     * Blocks this customer's most-recently-seen IP from submitting any
+     * more public quotes for this business — see PublicQuoteController::
+     * store(). Scoped to this business only; has no effect on any other
+     * business's own quote forms, even if the same IP shows up there too.
+     */
+    public function block(Customer $customer): RedirectResponse
+    {
+        $customer->update(['is_blocked' => true]);
+
+        return redirect()->back()->with('status', "\"{$customer->name}\" is now blocked from submitting quotes.");
+    }
+
+    public function unblock(Customer $customer): RedirectResponse
+    {
+        $customer->update(['is_blocked' => false]);
+
+        return redirect()->back()->with('status', "\"{$customer->name}\" can submit quotes again.");
+    }
+
     private function validateCustomer(Request $request, ?Customer $customer = null): array
     {
         return $request->validate([

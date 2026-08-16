@@ -6,13 +6,8 @@
     @php $logoFull = ($platformSettings ?? null)?->logo_path && $platformSettings->logo_display_style === 'full'; @endphp
     <div class="flex h-16 shrink-0 items-center {{ $logoFull ? 'justify-center' : '' }} border-b border-gray-200 px-3 dark:border-gray-700">
         <a href="{{ route('dashboard') }}" class="flex items-center overflow-hidden {{ $logoFull ? 'w-full justify-center' : '' }}">
-            @if ($logoFull)
-                <img src="{{ Storage::url($platformSettings->logo_path) }}" alt="{{ config('app.name') }}" class="max-h-14 w-full object-contain">
-            @elseif (($platformSettings ?? null)?->logo_path)
-                <img src="{{ Storage::url($platformSettings->logo_path) }}" alt="{{ config('app.name') }}" class="h-10 w-10 shrink-0 rounded-lg object-contain">
-            @else
-                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-base font-bold text-white">{{ Str::upper(Str::substr(config('app.name'), 0, 1)) }}</span>
-            @endif
+            <x-platform-logo :settings="$platformSettings ?? null"
+                :img-class="$logoFull ? 'max-h-14 w-full object-contain' : 'h-10 w-10 shrink-0 rounded-lg object-contain'" />
             @unless ($logoFull)
                 <span x-show="sidebarOpen" x-cloak class="ml-2 font-bold text-gray-900 whitespace-nowrap dark:text-gray-100">{{ config('app.name') }}</span>
             @endunless
@@ -28,6 +23,15 @@
                 </svg>
             </x-slot>
             {{ __('Dashboard') }}
+        </x-sidebar-link>
+
+        <x-sidebar-link :href="route('templates.index')" :active="request()->routeIs('templates.*')">
+            <x-slot name="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h17.25m-17.25 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h17.25" />
+                </svg>
+            </x-slot>
+            {{ __('Templates') }}
         </x-sidebar-link>
 
         <x-sidebar-link :href="route('products.index')" :active="request()->routeIs('products.*', 'questions.*', 'options.*')">
@@ -49,26 +53,6 @@
             {{ __('Rules') }}
         </x-sidebar-link>
 
-        @if (Auth::user()->canManageBusinessSettings())
-            <x-sidebar-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
-                <x-slot name="icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                    </svg>
-                </x-slot>
-                {{ __('Business Settings') }}
-            </x-sidebar-link>
-
-            <x-sidebar-link :href="route('tax-rates.index')" :active="request()->routeIs('tax-rates.*')">
-                <x-slot name="icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 14.25l6-6m-5.25-.75h.008v.008H9.75V7.5zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM14.25 13.5h.008v.008h-.008V13.5zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </x-slot>
-                {{ __('Tax Rates') }}
-            </x-sidebar-link>
-        @endif
-
         @if (Auth::user()->business?->hasFeature('quote_inbox'))
             <x-sidebar-link :href="route('quotes.index')" :active="request()->routeIs('quotes.*')">
                 <x-slot name="icon">
@@ -88,6 +72,15 @@
                 {{ __('Customers') }}
             </x-sidebar-link>
         @endif
+
+        <x-sidebar-link :href="route('training.index')" :active="request()->routeIs('training.*')">
+            <x-slot name="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                </svg>
+            </x-slot>
+            {{ __('Training') }}
+        </x-sidebar-link>
 
         @if (Auth::user()->hasPermission(\App\Support\TeamPermissions::ANNOUNCEMENTS))
             <x-sidebar-link :href="route('announcements.index')" :active="request()->routeIs('announcements.*')">
@@ -130,6 +123,17 @@
                     </svg>
                 </x-slot>
                 {{ __('Billing') }}
+            </x-sidebar-link>
+        @endif
+
+        @if (Auth::user()->canManageBusinessSettings())
+            <x-sidebar-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
+                <x-slot name="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                    </svg>
+                </x-slot>
+                {{ __('Business Settings') }}
             </x-sidebar-link>
         @endif
     </nav>

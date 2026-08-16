@@ -60,7 +60,11 @@ class InternalQuoteController extends Controller
     {
         $templates = Business::where('is_template', true)
             ->withCount(['products' => function ($query) {
-                $query->where('is_active', true)->whereNotNull('published_snapshot');
+                // withoutGlobalScopes() here for the same reason as
+                // SuperAdmin\TemplateController::index() — otherwise this
+                // count silently filters to whichever business the 'web'
+                // guard happens to be logged into in this browser session.
+                $query->withoutGlobalScopes()->where('is_active', true)->whereNotNull('published_snapshot');
             }])
             ->with('industry')
             ->orderBy('name')

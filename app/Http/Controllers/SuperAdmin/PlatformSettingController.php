@@ -23,8 +23,12 @@ class PlatformSettingController extends Controller
     {
         $validated = $request->validate([
             'platform_name' => ['nullable', 'string', 'max:255'],
+            'legal_business_name' => ['nullable', 'string', 'max:255'],
             'logo' => ['nullable', 'image', 'max:2048'],
+            'dark_logo' => ['nullable', 'image', 'max:2048'],
             'logo_display_style' => ['nullable', 'string', Rule::in(['icon', 'full'])],
+            'turnstile_site_key' => ['nullable', 'string', 'max:255'],
+            'turnstile_secret_key' => ['nullable', 'string', 'max:255'],
             'version' => ['nullable', 'string', 'max:50'],
             'address_line1' => ['nullable', 'string', 'max:255'],
             'address_line2' => ['nullable', 'string', 'max:255'],
@@ -56,7 +60,7 @@ class PlatformSettingController extends Controller
         // submission means "leave it as it is" rather than "clear it" —
         // otherwise saving the form after just changing, say, the SMTP
         // host would silently wipe out an already-saved Stripe secret.
-        foreach (['stripe_secret', 'stripe_webhook_secret', 'mail_password'] as $secretField) {
+        foreach (['stripe_secret', 'stripe_webhook_secret', 'mail_password', 'turnstile_secret_key'] as $secretField) {
             if (empty($validated[$secretField])) {
                 unset($validated[$secretField]);
             }
@@ -70,7 +74,15 @@ class PlatformSettingController extends Controller
             $validated['logo_path'] = $request->file('logo')->store('platform', 'public');
         }
 
-        unset($validated['logo']);
+        if ($request->hasFile('dark_logo')) {
+            if ($settings->dark_logo_path) {
+                Storage::disk('public')->delete($settings->dark_logo_path);
+            }
+
+            $validated['dark_logo_path'] = $request->file('dark_logo')->store('platform', 'public');
+        }
+
+        unset($validated['logo'], $validated['dark_logo']);
 
         $settings->update($validated);
 

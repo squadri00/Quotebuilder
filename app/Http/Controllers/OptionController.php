@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Option;
 use App\Models\Question;
+use App\Support\DeletionGuard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -77,6 +78,13 @@ class OptionController extends Controller
     public function destroy(Option $option): RedirectResponse
     {
         abort_unless(Auth::user()->canAccessProduct($option->question->product), 404);
+
+        $blockers = DeletionGuard::blockersForOption($option);
+
+        if (! empty($blockers)) {
+            return redirect()->route('questions.options.index', $option->question_id)
+                ->with('error', "Can't delete \"{$option->label}\" — it's used by ".DeletionGuard::joinList($blockers).'. Edit or remove that first, then try again.');
+        }
 
         $questionId = $option->question_id;
 

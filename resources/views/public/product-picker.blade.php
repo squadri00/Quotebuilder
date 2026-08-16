@@ -51,5 +51,6 @@
         </div>
 
         @include('public._powered-by')
+        @include('public._embed-resize')
     </body>
 </html>

@@ -28,7 +28,9 @@ class PlatformSetting extends Model
 
     protected $fillable = [
         'platform_name',
+        'legal_business_name',
         'logo_path',
+        'dark_logo_path',
         'logo_display_style',
         'version',
         'address_line1',
@@ -53,6 +55,8 @@ class PlatformSetting extends Model
         'mail_scheme',
         'mail_from_address',
         'mail_from_name',
+        'turnstile_site_key',
+        'turnstile_secret_key',
     ];
 
     protected function casts(): array
@@ -62,6 +66,7 @@ class PlatformSetting extends Model
             'stripe_webhook_secret' => 'encrypted',
             'mail_password' => 'encrypted',
             'mail_port' => 'integer',
+            'turnstile_secret_key' => 'encrypted',
         ];
     }
 

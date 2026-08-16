@@ -92,6 +92,13 @@
         @endif
     </x-card>
 
+    {{--
+        Priority Support doesn't make sense to upsell on the free plan, so
+        it's hidden there — but if a Free business somehow already has
+        active/granted access (e.g. a Super Admin grant), it stays visible
+        so they can still see and manage it.
+    --}}
+    @if ($business->plan?->stripe_price_id || $business->support_access_granted || $supportSubscription)
     <x-card class="mt-6">
         <div class="flex items-start justify-between gap-4">
             <div>
@@ -144,6 +151,7 @@
             </div>
         </div>
     </x-card>
+    @endif
 
     @if (request('implementation_checkout') === 'success')
         <x-card class="mt-6 border-green-200 bg-green-50">
@@ -155,6 +163,12 @@
         </x-card>
     @endif
 
+    {{--
+        Same reasoning as the Priority Support card above: not offered to
+        the free plan, but still shown if a Free business already has past
+        orders on record so their order history stays visible.
+    --}}
+    @if ($business->plan?->stripe_price_id || $implementationOrders->isNotEmpty())
     <x-card class="mt-6">
         <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Add-on</p>
         <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">Quote Builder Implementation Service</p>
@@ -214,6 +228,7 @@
             </div>
         @endif
     </x-card>
+    @endif
 
     <div class="mt-6" x-data="{
             interval: 'monthly',

@@ -24,24 +24,36 @@
                 <x-input-error :messages="$errors->get('platform_name')" class="mt-2" />
             </div>
 
-            <div class="mt-4">
-                <x-input-label value="Current Logo" />
-                <div class="mt-2 flex items-center gap-4">
-                    @if ($settings->logo_path)
-                        <img src="{{ Storage::url($settings->logo_path) }}" alt="{{ $settings->platform_name ?? config('app.name') }}" class="h-10 max-w-[160px] object-contain rounded-lg border border-gray-200 dark:border-gray-700 bg-white p-1">
-                    @else
-                        <p class="text-sm text-gray-500 dark:text-gray-400">No logo uploaded yet — the sidebar shows a plain letter mark until one is set.</p>
-                    @endif
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+                    <x-input-label value="Light Mode Logo" />
+                    <div class="mt-2 flex items-center gap-3">
+                        @if ($settings->logo_path)
+                            <img src="{{ Storage::url($settings->logo_path) }}" alt="{{ $settings->platform_name ?? config('app.name') }}" class="h-10 max-w-[140px] object-contain rounded-lg border border-gray-200 bg-white p-1">
+                        @else
+                            <p class="text-xs text-gray-500 dark:text-gray-400">No logo uploaded yet — a plain letter mark is shown until one is set.</p>
+                        @endif
+                    </div>
+                    <input id="logo" name="logo" type="file" accept="image/*"
+                        class="mt-3 block w-full text-xs text-gray-700 dark:text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-gray-700 dark:file:text-gray-200">
+                    <x-input-error :messages="$errors->get('logo')" class="mt-2" />
+                </div>
+
+                <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+                    <x-input-label value="Dark Mode Logo" />
+                    <div class="mt-2 flex items-center gap-3">
+                        @if ($settings->dark_logo_path)
+                            <img src="{{ Storage::url($settings->dark_logo_path) }}" alt="{{ $settings->platform_name ?? config('app.name') }}" class="h-10 max-w-[140px] object-contain rounded-lg border border-gray-700 bg-gray-900 p-1">
+                        @else
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Not set — the light mode logo is used in dark mode too until one is uploaded here.</p>
+                        @endif
+                    </div>
+                    <input id="dark_logo" name="dark_logo" type="file" accept="image/*"
+                        class="mt-3 block w-full text-xs text-gray-700 dark:text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-gray-700 dark:file:text-gray-200">
+                    <x-input-error :messages="$errors->get('dark_logo')" class="mt-2" />
                 </div>
             </div>
-
-            <div class="mt-4">
-                <x-input-label for="logo" value="Upload New Logo" />
-                <input id="logo" name="logo" type="file" accept="image/*"
-                    class="mt-1 block w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-gray-700 dark:file:text-gray-200">
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">JPG, PNG, or SVG — max 2MB. Shown top-left in both the Super Admin sidebar and the customer portal sidebar, sized to fit.</p>
-                <x-input-error :messages="$errors->get('logo')" class="mt-2" />
-            </div>
+            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">JPG, PNG, or SVG — max 2MB each. Shown top-left in both the Super Admin sidebar and the customer portal sidebar, sized to fit — pick whichever version reads best against a light or dark background.</p>
 
             <div class="mt-4">
                 <x-input-label for="logo_display_style" value="Logo Display Style" />
@@ -64,12 +76,42 @@
         </x-card>
 
         <x-card>
+            <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Spam Protection</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Cloudflare Turnstile — a free, usually-invisible "prove you're not a robot" check shown on public quote forms, on top of the honeypot field that's always on. Get a site key and secret key at <span class="font-mono">dash.cloudflare.com</span> → Turnstile (free, no card required). Leave both blank to leave it off — every submission passes straight through, same as today.
+            </p>
+
+            <div>
+                <x-input-label for="turnstile_site_key" value="Site Key" />
+                <x-text-input id="turnstile_site_key" name="turnstile_site_key" type="text" class="block mt-1 w-full"
+                    placeholder="0x4AAAAAAA..." :value="old('turnstile_site_key', $settings->turnstile_site_key)" />
+                <x-input-error :messages="$errors->get('turnstile_site_key')" class="mt-2" />
+            </div>
+
+            <div class="mt-4">
+                <x-input-label for="turnstile_secret_key" value="Secret Key" />
+                <x-text-input id="turnstile_secret_key" name="turnstile_secret_key" type="password" class="block mt-1 w-full"
+                    placeholder="{{ $settings->turnstile_secret_key ? '••••••••' : '' }}" />
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Never shown again once saved — leave blank to keep the current one.</p>
+                <x-input-error :messages="$errors->get('turnstile_secret_key')" class="mt-2" />
+            </div>
+        </x-card>
+
+        <x-card>
             <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Business Profile</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Your own company's identity — not any business using the platform. Nothing prints this automatically today (Stripe hosts and brands subscription invoices from your own Stripe Dashboard settings, outside this app), but it's here ready for anything platform-generated that needs it later.
             </p>
 
             <div>
+                <x-input-label for="legal_business_name" value="Legal Business Name" />
+                <x-text-input id="legal_business_name" name="legal_business_name" type="text" class="block mt-1 w-full"
+                    placeholder="e.g. Eformics Systems" :value="old('legal_business_name', $settings->legal_business_name)" />
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Your full legal entity name — used in the site footer's copyright line and anywhere else the legal entity (not the "{{ $settings->platform_name ?: config('app.name') }}" brand name) needs to appear.</p>
+                <x-input-error :messages="$errors->get('legal_business_name')" class="mt-2" />
+            </div>
+
+            <div class="mt-4">
                 <x-input-label for="address_line1" value="Address Line 1" />
                 <x-text-input id="address_line1" name="address_line1" type="text" class="block mt-1 w-full" :value="old('address_line1', $settings->address_line1)" />
                 <x-input-error :messages="$errors->get('address_line1')" class="mt-2" />

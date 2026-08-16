@@ -16,12 +16,15 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicQuoteController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QrCodeController;
+use App\Http\Controllers\QuoteHubController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RuleController;
 use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\TaxRateController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\ThemeController;
+use App\Http\Controllers\TrainingArtifactController;
 use App\Http\Controllers\Stripe\WebhookController as StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Cashier\Http\Controllers\PaymentController as CashierPaymentController;
@@ -73,6 +76,11 @@ Route::middleware(['auth', 'business.active'])->group(function () {
 
     Route::resource('tax-rates', TaxRateController::class)->except('show')->middleware('permission:tax_rates');
 
+    // Registered before the products resource route below — otherwise
+    // PATCH /products/{product} (from the resource route) matches first
+    // and tries to bind "quote-hub" as a product ID, 404ing before this
+    // route is ever reached.
+    Route::patch('/products/quote-hub', [QuoteHubController::class, 'update'])->name('quote-hub.update');
     Route::resource('products', ProductController::class)->except('show');
     Route::post('/products/{product}/publish', [ProductController::class, 'publish'])->name('products.publish');
     Route::get('/products/{product}/qrcode', [QrCodeController::class, 'show'])->name('products.qrcode');
@@ -81,6 +89,20 @@ Route::middleware(['auth', 'business.active'])->group(function () {
     Route::resource('products.questions', QuestionController::class)->shallow()->except('show');
     Route::resource('questions.options', OptionController::class)->shallow()->except('show');
     Route::resource('rules', RuleController::class)->except('show');
+
+    // Self-service "add a template product to my account" — available any
+    // time, on every plan, unlike the one-time onboarding flow above.
+    // Businesses can't change their own Industry here; only Super Admin
+    // can (see SuperAdmin\BusinessController) — this only ever shows
+    // templates matching whatever Industry is already assigned.
+    Route::get('/templates', [TemplateController::class, 'index'])->name('templates.index');
+    Route::post('/templates/{product}', [TemplateController::class, 'store'])->name('templates.store');
+
+    // Read-only library of the build sheets installed alongside this
+    // business's own products — see BusinessTrainingArtifact's docblock.
+    Route::get('/training', [TrainingArtifactController::class, 'index'])->name('training.index');
+    Route::get('/training/{artifact}', [TrainingArtifactController::class, 'show'])->name('training.show');
+    Route::get('/training/{artifact}/raw', [TrainingArtifactController::class, 'raw'])->name('training.raw');
 
     Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
     Route::patch('/quotes/{quote}/status', [QuoteController::class, 'updateStatus'])->name('quotes.update-status');
@@ -106,6 +128,8 @@ Route::middleware(['auth', 'business.active'])->group(function () {
     Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
 
     Route::resource('customers', CustomerController::class);
+    Route::post('/customers/{customer}/block', [CustomerController::class, 'block'])->name('customers.block');
+    Route::post('/customers/{customer}/unblock', [CustomerController::class, 'unblock'])->name('customers.unblock');
 
     Route::middleware('permission:announcements')->group(function () {
         Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');

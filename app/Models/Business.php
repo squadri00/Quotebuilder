@@ -89,6 +89,11 @@ class Business extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function trainingArtifacts(): HasMany
+    {
+        return $this->hasMany(BusinessTrainingArtifact::class);
+    }
+
     /**
      * The subset of this business's products the given user may see/work
      * in — every product for the Owner, only explicitly granted ones for

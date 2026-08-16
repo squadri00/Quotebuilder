@@ -7,6 +7,7 @@ use App\Models\Concerns\HasSlug;
 use App\Models\Concerns\TracksPublishState;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -17,11 +18,14 @@ class Product extends Model
 
     protected $fillable = [
         'business_id',
+        'source_template_product_id',
         'name',
         'slug',
         'description',
         'base_price',
         'is_active',
+        'show_in_quote_hub',
+        'quote_hub_sort_order',
         'is_published',
         'published_snapshot',
         'published_at',
@@ -39,6 +43,7 @@ class Product extends Model
         return [
             'base_price' => 'decimal:2',
             'is_active' => 'boolean',
+            'show_in_quote_hub' => 'boolean',
             'is_published' => 'boolean',
             'published_snapshot' => 'array',
             'published_at' => 'datetime',
@@ -47,6 +52,11 @@ class Product extends Model
             'num3' => 'decimal:2',
             'meta' => 'array',
         ];
+    }
+
+    public function sourceTemplateProduct(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'source_template_product_id');
     }
 
     public function questions(): HasMany

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Question;
+use App\Support\DeletionGuard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -91,6 +92,13 @@ class QuestionController extends Controller
     public function destroy(Question $question): RedirectResponse
     {
         abort_unless(Auth::user()->canAccessProduct($question->product), 404);
+
+        $blockers = DeletionGuard::blockersForQuestion($question);
+
+        if (! empty($blockers)) {
+            return redirect()->route('products.questions.index', $question->product_id)
+                ->with('error', "Can't delete \"{$question->question_text}\" — it's used by ".DeletionGuard::joinList($blockers).'. Edit or remove that first, then try again.');
+        }
 
         $productId = $question->product_id;
 

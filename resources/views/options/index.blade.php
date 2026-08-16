@@ -15,6 +15,12 @@
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    @if (session('error'))
+        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+        </div>
+    @endif
+
     @if ($options->isEmpty())
         <x-card class="text-center text-gray-500 dark:text-gray-400">
             No options yet for this question. Create the first one.

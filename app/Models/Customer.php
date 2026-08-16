@@ -27,6 +27,8 @@ class Customer extends Model
         'business_id',
         'name',
         'email',
+        'ip_address',
+        'is_blocked',
         'phone',
         'address_line1',
         'address_line2',
@@ -36,6 +38,13 @@ class Customer extends Model
         'country',
         'notes',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_blocked' => 'boolean',
+        ];
+    }
 
     public function quotes(): HasMany
     {

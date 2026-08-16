@@ -10,6 +10,7 @@ use App\Models\Quote;
 use App\Services\CustomerResolver;
 use App\Services\QuoteAnswerProcessor;
 use App\Services\TaxCalculator;
+use App\Support\TurnstileVerifier;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,12 +44,15 @@ use Illuminate\View\View;
 class PublicQuoteController extends Controller
 {
     /**
-     * A business-wide landing page for businesses with more than one
-     * product — lets the customer pick which one they want a quote for,
-     * then continues into that product's normal quote wizard. This is
-     * what a general-purpose QR code (a storefront sticker, a business
-     * card) should link to; a product-specific QR code can skip this and
-     * link straight to show() for that one product instead.
+     * The "Quote Hub" — a business-wide landing page listing whichever
+     * products the business has chosen to feature here (see
+     * QuoteHubController), in the order they picked. Lets the customer
+     * pick which one they want a quote for, then continues into that
+     * product's normal quote wizard. This is what a general-purpose QR
+     * code (a storefront sticker, a business card) should link to, and
+     * what the no-data-product variant of embed.js embeds; a
+     * product-specific QR code or embed can skip this and link straight
+     * to show() for that one product instead.
      */
     public function picker(Business $business): View
     {
@@ -56,7 +60,9 @@ class PublicQuoteController extends Controller
 
         $products = $business->products()
             ->where('is_active', true)
+            ->where('show_in_quote_hub', true)
             ->whereNotNull('published_snapshot')
+            ->orderBy('quote_hub_sort_order')
             ->orderBy('name')
             ->get();
 
@@ -80,6 +86,31 @@ class PublicQuoteController extends Controller
     public function store(Request $request, Business $business, Product $product): View|RedirectResponse
     {
         $this->assertProductBelongsToBusiness($business, $product);
+
+        // Blocked IPs never even reach the honeypot/Turnstile checks — a
+        // business owner who's already identified and blocked a specific
+        // nuisance IP (Customers page) shouldn't need it to keep passing
+        // those checks every time first. Scoped to this business only,
+        // same as the Customer record itself.
+        if ($business->customers()->where('ip_address', $request->ip())->where('is_blocked', true)->exists()) {
+            return view('public.quote-unavailable', [
+                'business' => $business,
+                'product' => $product,
+            ]);
+        }
+
+        // Honeypot: a field real customers never see or fill in (hidden
+        // off-screen in quote-builder.blade.php), but a bot filling the
+        // form out blindly usually does. Bail out quietly — no error, no
+        // hint anything was detected — rather than creating a Quote and
+        // Customer row from it.
+        if ($request->filled('website')) {
+            return redirect()->route('quote.show', [$business, $product]);
+        }
+
+        if (! app(TurnstileVerifier::class)->passes($request->input('cf-turnstile-response'), $request->ip())) {
+            return back()->withErrors(['turnstile' => "We couldn't verify you're not a robot — please try again."]);
+        }
 
         if (! $business->is_template && $business->hasReachedMonthlyQuoteLimit()) {
             return view('public.quote-unavailable', [
@@ -110,6 +141,7 @@ class PublicQuoteController extends Controller
         $customer = (new CustomerResolver)->findOrCreate($business, [
             'name' => $validated['customer_name'],
             'email' => $validated['customer_email'],
+            'ip_address' => $request->ip(),
         ]);
 
         $quote = Quote::create([

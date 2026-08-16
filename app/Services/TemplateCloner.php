@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Models\Business;
+use App\Models\BusinessTrainingArtifact;
 use App\Models\Option;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Question;
 use App\Models\Rule;
+use App\Models\TrainingArtifact;
 use Illuminate\Support\Collection;
 
 /**
@@ -44,15 +46,31 @@ class TemplateCloner
      */
     public function clone(Business $template, Business $target, ?array $onlyProductIds = null): void
     {
+        // Every nested relation below needs withoutGlobalScopes() of its
+        // own — Product::withoutGlobalScopes() only lifts the tenant scope
+        // on Product itself, not on eager-loaded Question/Option/Rule/
+        // ProductImage rows, which still filter to whichever business is
+        // currently logged in (see BelongsToBusiness). Skipping this
+        // silently clones an empty shell (no questions/options/rules)
+        // whenever this runs under a real logged-in business session —
+        // it only ever looked fine before because every prior caller ran
+        // outside that session (an unauthenticated webhook, or Super
+        // Admin's separate guard, where the scope never activates).
         $products = Product::withoutGlobalScopes()
             ->where('business_id', $template->id)
             ->when($onlyProductIds !== null, fn ($query) => $query->whereIn('id', $onlyProductIds))
-            ->with(['questions' => fn ($query) => $query->orderBy('sort_order'), 'questions.options', 'rules', 'images'])
+            ->with([
+                'questions' => fn ($query) => $query->withoutGlobalScopes()->orderBy('sort_order'),
+                'questions.options' => fn ($query) => $query->withoutGlobalScopes(),
+                'rules' => fn ($query) => $query->withoutGlobalScopes(),
+                'images' => fn ($query) => $query->withoutGlobalScopes(),
+            ])
             ->get();
 
         foreach ($products as $sourceProduct) {
             $newProduct = Product::create([
                 'business_id' => $target->id,
+                'source_template_product_id' => $sourceProduct->id,
                 'name' => $sourceProduct->name,
                 'description' => $sourceProduct->description,
                 'base_price' => $sourceProduct->base_price,
@@ -115,6 +133,22 @@ class TemplateCloner
                     'product_id' => $newProduct->id,
                     'path' => $sourceImage->path,
                     'sort_order' => $sourceImage->sort_order,
+                ]);
+            }
+
+            // If Super Admin has authored a build sheet for this template
+            // product, install the business's own private copy alongside
+            // it — see BusinessTrainingArtifact's docblock for why it's a
+            // copy, not a live link.
+            $artifact = TrainingArtifact::where('product_id', $sourceProduct->id)->first();
+
+            if ($artifact) {
+                BusinessTrainingArtifact::create([
+                    'business_id' => $target->id,
+                    'product_id' => $newProduct->id,
+                    'source_artifact_id' => $artifact->id,
+                    'title' => $artifact->title,
+                    'html' => $artifact->html,
                 ]);
             }
         }

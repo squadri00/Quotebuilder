@@ -1,17 +1,25 @@
 /**
  * QuoteBuilder embeddable widget loader.
  *
- * Usage (paste this where the quote builder should appear on your site):
+ * Usage — a single product's quote builder (paste where it should appear):
  *   <script src="https://YOUR-QUOTEBUILDER-DOMAIN/embed.js"
  *           data-business="your-business-slug"
  *           data-product="your-product-slug"></script>
  *
- * This script finds itself in the page, reads the business/product slugs
- * off its own <script> tag, and inserts an <iframe> pointing at the
- * public quote builder right where the tag is. It then listens for the
- * iframe telling it (via postMessage) how tall its content currently is,
- * and resizes the iframe to match — so there's never an inner scrollbar
- * and never awkward empty space, even as the wizard moves between steps.
+ * Usage — the "Quote Hub" picker for several products at once (omit
+ * data-product entirely; which products appear and in what order is
+ * managed from the Quote Hub card on the Products page):
+ *   <script src="https://YOUR-QUOTEBUILDER-DOMAIN/embed.js"
+ *           data-business="your-business-slug"></script>
+ *
+ * This script finds itself in the page, reads the business (and
+ * optionally product) slug off its own <script> tag, and inserts an
+ * <iframe> pointing at the right public page right where the tag is. It
+ * then listens for the iframe telling it (via postMessage) how tall its
+ * content currently is, and resizes the iframe to match — so there's
+ * never an inner scrollbar and never awkward empty space, even as the
+ * wizard moves between steps or the hub swaps between its picker and a
+ * chosen product.
  */
 (function () {
     var thisScript = document.currentScript;
@@ -23,8 +31,8 @@
     var business = thisScript.getAttribute('data-business');
     var product = thisScript.getAttribute('data-product');
 
-    if (! business || ! product) {
-        console.error('QuoteBuilder embed: the <script> tag needs data-business and data-product attributes.');
+    if (! business) {
+        console.error('QuoteBuilder embed: the <script> tag needs a data-business attribute.');
         return;
     }
 
@@ -34,12 +42,12 @@
     var scriptUrl = new URL(thisScript.src, window.location.href);
     var quoteBuilderOrigin = scriptUrl.origin;
     var basePath = scriptUrl.pathname.replace(/\/embed\.js$/, '');
-    var quoteUrl = quoteBuilderOrigin + basePath + '/quote/'
-        + encodeURIComponent(business) + '/' + encodeURIComponent(product);
+    var quoteUrl = quoteBuilderOrigin + basePath + '/quote/' + encodeURIComponent(business)
+        + (product ? '/' + encodeURIComponent(product) : '');
 
     var iframe = document.createElement('iframe');
     iframe.src = quoteUrl;
-    iframe.title = 'Get a quote';
+    iframe.title = product ? 'Get a quote' : 'Get a quote — choose a product';
     iframe.style.width = '100%';
     iframe.style.maxWidth = '100%';
     iframe.style.border = 'none';

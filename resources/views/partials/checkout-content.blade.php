@@ -57,8 +57,8 @@
 
 <div class="mt-4 space-y-2 text-xs leading-relaxed text-gray-500">
     <p class="font-semibold text-gray-600">Secure Payment Processing</p>
-    <p>Runwrk is a product of Eformics Systems.</p>
+    <p>{{ config('app.name') }} is a product of {{ optional($platformSettings ?? null)->legal_business_name ?: 'Eformics Systems' }}.</p>
     <p>You are now being redirected to Stripe, our trusted payment processing partner, to securely complete your purchase. Your payment information will be processed directly by Stripe using industry-standard security measures.</p>
-    <p>By continuing, you acknowledge that you are leaving the Runwrk checkout environment and proceeding to Stripe to complete your payment.</p>
+    <p>By continuing, you acknowledge that you are leaving the {{ config('app.name') }} checkout environment and proceeding to Stripe to complete your payment.</p>
     <p>Continue to Stripe to complete your purchase.</p>
 </div>

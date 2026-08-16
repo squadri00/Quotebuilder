@@ -33,6 +33,10 @@
                 <x-card>
                     @include('profile.partials.update-public-quote-settings-form', ['business' => Auth::user()->business])
                 </x-card>
+
+                <x-card>
+                    @include('profile.partials.tax-rates-summary', ['taxRateCount' => Auth::user()->business->shopTaxRates()->count()])
+                </x-card>
             @endif
 
             <x-card>

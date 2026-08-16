@@ -30,7 +30,22 @@ class ProductController extends Controller
 {
     public function index(Business $business): View
     {
-        $products = $business->products()->with(['questions.options', 'rules'])->orderBy('name')->get();
+        // Every nested relation needs its own withoutGlobalScopes() — see
+        // TemplateCloner::clone()'s docblock for why. Without this, the
+        // product list (and each product's questions/options/rules)
+        // silently filters to whatever business a 'web' guard session
+        // happens to be logged into elsewhere in this same browser
+        // session, which reads as "the template lost its products" when
+        // nothing was actually lost.
+        $products = Product::withoutGlobalScopes()
+            ->where('business_id', $business->id)
+            ->with([
+                'questions' => fn ($query) => $query->withoutGlobalScopes(),
+                'questions.options' => fn ($query) => $query->withoutGlobalScopes(),
+                'rules' => fn ($query) => $query->withoutGlobalScopes(),
+            ])
+            ->orderBy('name')
+            ->get();
 
         return view('superadmin.products.index', compact('business', 'products'));
     }

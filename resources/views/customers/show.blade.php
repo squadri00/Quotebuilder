@@ -1,9 +1,26 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">{{ $customer->name }}</h2>
+            <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">
+                {{ $customer->name }}
+                @if ($customer->is_blocked)
+                    <span class="ml-1 inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/40 dark:text-red-300 align-middle">Blocked</span>
+                @endif
+            </h2>
             <div class="flex items-center gap-3">
                 <a href="{{ route('customers.edit', $customer) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">Edit</a>
+                @if ($customer->is_blocked)
+                    <form method="POST" action="{{ route('customers.unblock', $customer) }}">
+                        @csrf
+                        <button type="submit" class="text-sm font-medium text-green-600 hover:text-green-800 dark:text-green-400">Unblock</button>
+                    </form>
+                @else
+                    <form method="POST" action="{{ route('customers.block', $customer) }}"
+                        onsubmit="return confirm('Block \'{{ $customer->name }}\'? Their IP ({{ $customer->ip_address ?? 'none on file yet' }}) won\'t be able to submit quotes on your public forms anymore.');">
+                        @csrf
+                        <button type="submit" @disabled(! $customer->ip_address) class="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 disabled:opacity-40 disabled:cursor-not-allowed">Block</button>
+                    </form>
+                @endif
             </div>
         </div>
     </x-slot>
@@ -17,6 +34,10 @@
                 <div>
                     <dt class="text-gray-500 dark:text-gray-400">Email</dt>
                     <dd class="text-gray-900 dark:text-gray-100">{{ $customer->email }}</dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500 dark:text-gray-400">IP Address</dt>
+                    <dd class="text-gray-900 dark:text-gray-100 font-mono text-xs">{{ $customer->ip_address ?? 'None on file yet' }}</dd>
                 </div>
                 @if ($customer->phone)
                     <div>

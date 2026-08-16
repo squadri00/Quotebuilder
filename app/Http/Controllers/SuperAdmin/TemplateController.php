@@ -24,8 +24,19 @@ class TemplateController extends Controller
 {
     public function index(): View
     {
+        // Every withCount()'d relation needs its own withoutGlobalScopes()
+        // — the outer Business::withoutGlobalScopes() only lifts scoping
+        // on Business itself. Without this, product/rule counts silently
+        // filter to whatever business the 'web' guard happens to be
+        // logged into in this same browser session (a different session
+        // than the admin guard driving this page) — usually showing 0 for
+        // every template that isn't that one business, which reads as
+        // "the templates lost their data" when nothing was actually lost.
         $templates = Business::withoutGlobalScopes()
-            ->withCount(['products', 'rules'])
+            ->withCount([
+                'products' => fn ($query) => $query->withoutGlobalScopes(),
+                'rules' => fn ($query) => $query->withoutGlobalScopes(),
+            ])
             ->with('industry')
             ->where('is_template', true)
             ->latest()

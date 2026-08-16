@@ -17,6 +17,10 @@
              just supplies the value. Falls back to QuoteBuilder's own
              indigo when a business hasn't set a brand_color. --}}
         <style>:root { --brand-color: {{ $business->brand_color ?? '#4f46e5' }}; }</style>
+
+        @if (($platformSettings ?? null)?->turnstile_site_key)
+            <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+        @endif
     </head>
     <body class="font-sans antialiased bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
         <div
@@ -162,6 +166,10 @@
                                 <form method="POST" action="{{ route('quote.store', [$business, $product]) }}{{ request('theme') === 'dark' ? '?theme=dark' : '' }}" class="mt-6 space-y-4" @submit="submitForm()">
                                     @csrf
 
+                                    @if ($errors->has('turnstile'))
+                                        <p class="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{{ $errors->first('turnstile') }}</p>
+                                    @endif
+
                                     <div>
                                         <label for="customer_name" class="block font-medium text-sm text-gray-700 dark:text-gray-300 mb-1.5">Your Name</label>
                                         <input id="customer_name" name="customer_name" type="text" required
@@ -173,6 +181,17 @@
                                         <input id="customer_email" name="customer_email" type="email" required
                                             class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                     </div>
+
+                                    {{-- Honeypot — invisible to a real visitor (off-screen, no label,
+                                         never tab-reachable), but a bot filling every field blindly
+                                         usually fills this too. See PublicQuoteController::store(). --}}
+                                    <div style="position:absolute; left:-9999px;" aria-hidden="true">
+                                        <input type="text" name="website" tabindex="-1" autocomplete="off">
+                                    </div>
+
+                                    @if (($platformSettings ?? null)?->turnstile_site_key)
+                                        <div class="cf-turnstile" data-sitekey="{{ $platformSettings->turnstile_site_key }}"></div>
+                                    @endif
 
                                     <input type="hidden" name="answers" x-ref="answersInput">
 

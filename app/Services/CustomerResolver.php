@@ -32,6 +32,11 @@ class CustomerResolver
             'state_province' => $data['state_province'] ?? null,
             'postal_code' => $data['postal_code'] ?? null,
             'country' => $data['country'] ?? null,
+            // Always the IP of the MOST RECENT submission, overwriting
+            // whatever was there before — that's the one worth blocking
+            // if this customer turns out to be a nuisance, not wherever
+            // they happened to submit from the first time.
+            'ip_address' => $data['ip_address'] ?? null,
         ], fn ($value) => $value !== null && $value !== '');
 
         if ($customer) {

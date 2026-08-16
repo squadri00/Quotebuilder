@@ -23,13 +23,8 @@
                 @php $logoFull = ($platformSettings ?? null)?->logo_path && $platformSettings->logo_display_style === 'full'; @endphp
                 <div class="flex h-16 shrink-0 items-center {{ $logoFull ? 'justify-center' : '' }} border-b border-gray-800 px-3">
                     <a href="{{ route('superadmin.dashboard') }}" class="flex items-center overflow-hidden {{ $logoFull ? 'w-full justify-center' : '' }}">
-                        @if ($logoFull)
-                            <img src="{{ Storage::url($platformSettings->logo_path) }}" alt="{{ config('app.name') }}" class="max-h-14 w-full object-contain">
-                        @elseif (($platformSettings ?? null)?->logo_path)
-                            <img src="{{ Storage::url($platformSettings->logo_path) }}" alt="{{ config('app.name') }}" class="h-10 w-10 shrink-0 rounded-lg object-contain">
-                        @else
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-base font-bold text-white">{{ Str::upper(Str::substr(config('app.name'), 0, 1)) }}</span>
-                        @endif
+                        <x-platform-logo :settings="$platformSettings ?? null"
+                            :img-class="$logoFull ? 'max-h-14 w-full object-contain' : 'h-10 w-10 shrink-0 rounded-lg object-contain'" />
                         @unless ($logoFull)
                             <span x-show="sidebarOpen" x-cloak class="ml-2 whitespace-nowrap font-bold text-white">{{ config('app.name') }}</span>
                         @endunless
