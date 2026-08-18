@@ -30,6 +30,8 @@ class Quote extends Model
 
     protected $fillable = [
         'business_id',
+        'reference_number',
+        'revises_quote_id',
         'product_id',
         'customer_name',
         'customer_email',
@@ -100,6 +102,38 @@ class Quote extends Model
     public function quoteAnswers(): HasMany
     {
         return $this->hasMany(QuoteAnswer::class);
+    }
+
+    /**
+     * The quote this one revises, if any — see InternalQuoteController::
+     * persist()'s docblock for when a revision gets created instead of
+     * updating a quote in place.
+     */
+    public function revisesQuote(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'revises_quote_id');
+    }
+
+    /**
+     * Any quotes that revise THIS one — usually zero or one, but nothing
+     * stops a revision from itself being revised again later, so this
+     * stays a HasMany rather than a single nullable relation.
+     */
+    public function revisions(): HasMany
+    {
+        return $this->hasMany(self::class, 'revises_quote_id');
+    }
+
+    /**
+     * The number shown to staff and printed on the PDF — the business's
+     * own configured reference_number when this quote has one, or a
+     * plain #id for a quote that predates that feature. Every view should
+     * go through this rather than reading reference_number/id directly,
+     * so "how do we show a quote's number" only has to be decided once.
+     */
+    public function displayReference(): string
+    {
+        return $this->reference_number ?? (string) $this->id;
     }
 
     /**

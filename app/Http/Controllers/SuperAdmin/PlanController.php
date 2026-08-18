@@ -34,6 +34,7 @@ class PlanController extends Controller
             ...collect($validated)->except('features')->all(),
             'is_active' => $request->boolean('is_active'),
             'is_highlighted' => $request->boolean('is_highlighted'),
+            'show_discount' => $request->boolean('show_discount'),
         ]);
         $plan->features()->sync($validated['features'] ?? []);
 
@@ -56,6 +57,7 @@ class PlanController extends Controller
             ...collect($validated)->except('features')->all(),
             'is_active' => $request->boolean('is_active'),
             'is_highlighted' => $request->boolean('is_highlighted'),
+            'show_discount' => $request->boolean('show_discount'),
         ]);
         $plan->features()->sync($validated['features'] ?? []);
 
@@ -82,6 +84,8 @@ class PlanController extends Controller
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
+            'compare_at_price' => ['nullable', 'numeric', 'min:0', 'gt:price'],
+            'discount_display' => ['required', Rule::in(Plan::DISCOUNT_DISPLAYS)],
             'billing_interval' => ['required', Rule::in(['monthly', 'yearly'])],
             'stripe_price_id' => ['nullable', 'string', 'max:255'],
             'max_products' => ['nullable', 'integer', 'min:0'],

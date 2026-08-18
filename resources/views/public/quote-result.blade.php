@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Your Quote — {{ $product->name }} — {{ $quote->demoBusinessOverride()['name'] ?? $business->name }}</title>
+        <title>Your Quote — {{ $product?->name ?? 'Quote' }} — {{ $quote->demoBusinessOverride()['name'] ?? $business->name }}</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +41,7 @@
                         {{ implode(' · ', array_filter([$businessPhone, $businessEmail])) }}
                     </p>
                 @endif
-                <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">{{ $product->name }}</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">{{ $product?->name ?? 'Product no longer available' }} &middot; Quote #{{ $quote->displayReference() }}</p>
 
                 <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">Your estimated price</p>
                 <p class="text-4xl font-bold text-gray-900 dark:text-gray-100 mt-1">${{ number_format($quote->final_price, 2) }}</p>
@@ -115,6 +115,8 @@
                         <p>Thanks, {{ $quote->customer_name }} — we've saved this quote for {{ $quote->customer_email }}.</p>
                     @endif
 
+                    <p class="mt-1 text-xs">Quoted on {{ $quote->created_at->format('M j, Y \a\t g:i A') }}</p>
+
                     @if ($quote->prepared_by_name)
                         <p class="mt-1 text-xs">Prepared by {{ $quote->prepared_by_name }} ({{ $quote->prepared_by_email }})</p>
                     @endif
@@ -142,7 +144,7 @@
                     </p>
                 @endif
 
-                <a href="{{ route('quote.show', [$business, $product]) }}{{ request('theme') === 'dark' ? '?theme=dark' : '' }}" class="mt-6 inline-block text-sm font-medium brand-text">
+                <a href="{{ $startOverUrl }}{{ request('theme') === 'dark' ? '?theme=dark' : '' }}" class="mt-6 inline-block text-sm font-medium brand-text">
                     Start a new quote
                 </a>
 
@@ -153,6 +155,19 @@
                 @endif
             </div>
         </div>
+
+        @if ($product)
+            <script>
+                // The quote was actually submitted, so any in-progress draft
+                // the wizard was autosaving for this product is done with —
+                // see quote-wizard.js's draftKey. Reaching this page (whether
+                // just now or via the bookmarked "view again" link) is the
+                // one unambiguous signal that it's safe to clear.
+                try {
+                    localStorage.removeItem({{ Js::from('quotebuilder:draft:'.$business->id.':'.$product->id) }});
+                } catch (e) {}
+            </script>
+        @endif
 
         @include('public._powered-by')
         @include('public._embed-resize')

@@ -86,7 +86,7 @@
                             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                                 @foreach ($quotes as $quote)
                                     <tr @if ($quote->isInternal()) class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/40" onclick="window.location='{{ route('quotes.create.result', $quote) }}'" @endif>
-                                        <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $quote->created_at->format('M j, Y') }}</td>
+                                        <td class="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $quote->created_at->format('M j, Y g:i A') }}</td>
                                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $quote->product?->name ?? '—' }}</td>
                                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${{ number_format($quote->final_price, 2) }}</td>
                                         <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $quote->isInternal() ? 'Internal' : 'Public' }}</td>

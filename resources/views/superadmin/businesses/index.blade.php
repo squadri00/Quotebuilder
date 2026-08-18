@@ -32,6 +32,8 @@
                     <thead class="bg-gray-50 dark:bg-gray-700/50">
                         <tr>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Name</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Email</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Plan</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Industry</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Template used</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Signed up</th>
@@ -47,6 +49,14 @@
                                         {{ $business->name }}
                                     </a>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ $business->users_count }} user(s) &middot; {{ $business->products_count }} product(s) &middot; {{ $business->quotes_count }} quote(s)</p>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $business->owner?->email ?? '—' }}</td>
+                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                    @if ($business->plan)
+                                        {{ $business->plan->name }}
+                                    @else
+                                        <span class="text-gray-400 dark:text-gray-500">No plan</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $business->industry?->name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $business->createdFromTemplate?->name ?? '—' }}</td>

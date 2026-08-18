@@ -132,11 +132,11 @@ class ProductController extends Controller
 
         $snapshot = $product->buildPublishableSnapshot();
 
-        $product->update([
+        Product::withoutPublishTracking(fn () => $product->update([
             'is_published' => true,
             'published_snapshot' => $snapshot,
             'published_at' => now(),
-        ]);
+        ]));
 
         $questionIds = $product->questions->pluck('id');
 

@@ -57,6 +57,8 @@ class PlatformSetting extends Model
         'mail_from_name',
         'turnstile_site_key',
         'turnstile_secret_key',
+        'maintenance_mode',
+        'maintenance_message',
     ];
 
     protected function casts(): array
@@ -67,7 +69,19 @@ class PlatformSetting extends Model
             'mail_password' => 'encrypted',
             'mail_port' => 'integer',
             'turnstile_secret_key' => 'encrypted',
+            'maintenance_mode' => 'boolean',
         ];
+    }
+
+    /**
+     * Falls back to a sensible generic message when the field is left
+     * blank, so turning maintenance mode on is never one save away from
+     * showing visitors an empty page.
+     */
+    public function maintenanceMessageOrDefault(): string
+    {
+        return $this->maintenance_message
+            ?: "We're currently performing scheduled maintenance. Please check back soon.";
     }
 
     public static function get(): self

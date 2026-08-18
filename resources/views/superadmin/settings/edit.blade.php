@@ -75,6 +75,31 @@
             </div>
         </x-card>
 
+        <x-card class="{{ $settings->maintenance_mode ? 'border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30' : '' }}">
+            <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Maintenance Mode</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                When on, nobody can log in, sign up, or purchase/change anything — everywhere that touches Login, Register, Checkout, or Billing shows a "temporarily unavailable" page with the message below instead. <strong>Everything else keeps working as normal</strong>: the marketing site, every public quote page and embedded widget, and anyone already logged into a business dashboard. <strong>Super Admin is never affected</strong> — you can still log in and turn this back off at any time.
+            </p>
+
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="maintenance_mode" value="1" class="rounded border-gray-300 brand-checkbox shadow-sm focus:ring-indigo-500"
+                    @checked(old('maintenance_mode', $settings->maintenance_mode))>
+                <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Turn on maintenance mode now</span>
+            </label>
+            @if ($settings->maintenance_mode)
+                <p class="mt-1 text-xs font-medium text-amber-700 dark:text-amber-400">Currently ON — the site is showing the maintenance page to everyone except Super Admin.</p>
+            @endif
+
+            <div class="mt-4">
+                <x-input-label for="maintenance_message" value="Message shown to visitors" />
+                <textarea id="maintenance_message" name="maintenance_message" rows="3"
+                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                    placeholder="We're currently performing scheduled maintenance. Please check back soon.">{{ old('maintenance_message', $settings->maintenance_message) }}</textarea>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank to use the default message shown above as a placeholder.</p>
+                <x-input-error :messages="$errors->get('maintenance_message')" class="mt-2" />
+            </div>
+        </x-card>
+
         <x-card>
             <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Spam Protection</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">

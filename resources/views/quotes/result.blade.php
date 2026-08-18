@@ -9,10 +9,17 @@
         <x-card>
             <div class="text-center">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
-                    Internal Quote
+                    Internal Quote #{{ $quote->displayReference() }}
                 </span>
 
-                <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ $product->name }} — {{ $quote->customer_name }} ({{ $quote->customer_email }})</p>
+                @if ($quote->revisesQuote)
+                    <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                        Revision of <a href="{{ route('quotes.show', $quote->revisesQuote) }}" class="font-medium brand-text hover:underline">Quote #{{ $quote->revisesQuote->displayReference() }}</a>
+                    </p>
+                @endif
+
+                <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ $product?->name ?? 'Product no longer available' }} — {{ $quote->customer_name }} ({{ $quote->customer_email }})</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $quote->created_at->format('M j, Y \a\t g:i A') }}</p>
 
                 <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">Quoted Price</p>
                 <p class="text-4xl font-bold text-gray-900 dark:text-gray-100 mt-1">${{ number_format($quote->final_price, 2) }}</p>
@@ -116,8 +123,12 @@
                     </a>
                 </div>
 
-                <div class="mt-4 flex items-center justify-center gap-4 text-sm">
-                    <a href="{{ route('quotes.create.show', $product) }}" class="font-medium brand-text">Create another quote</a>
+                <div class="mt-4 flex items-center justify-center gap-4 text-sm flex-wrap">
+                    <a href="{{ $product ? route('quotes.create.show', $product) : route('quotes.create') }}" class="font-medium brand-text">Create another quote</a>
+                    @if ($product)
+                        <span class="text-gray-300 dark:text-gray-600">&middot;</span>
+                        <a href="{{ route('quotes.edit', $quote) }}" class="font-medium brand-text">Edit / Re-quote</a>
+                    @endif
                     <span class="text-gray-300 dark:text-gray-600">&middot;</span>
                     <a href="{{ route('quotes.index') }}" class="font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">Back to Quotes</a>
                 </div>

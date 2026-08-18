@@ -19,7 +19,7 @@ class BusinessController extends Controller
     {
         $query = Business::withCount(['users', 'products', 'quotes'])
             ->where('is_template', false)
-            ->with(['createdFromTemplate', 'industry']);
+            ->with(['createdFromTemplate', 'industry', 'plan', 'owner']);
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%'.$request->string('search').'%');
@@ -44,6 +44,18 @@ class BusinessController extends Controller
     }
 
     /**
+     * Temporarily off (2026-08-16) — every business is locked to a single
+     * industry and running this a second time re-clones the WHOLE
+     * template with no duplicate check, so a business that already has
+     * products from that template ends up with two of everything. Left
+     * in place, not deleted, so it's a one-line flip to bring back once
+     * that's fixed (or removed for good, if it turns out nobody needs it
+     * once the per-product self-service Templates page covers the same
+     * job safely — see TemplateController::store()'s duplicate check).
+     */
+    private const COPY_TEMPLATE_ENABLED = false;
+
+    /**
      * Pushes a template's entire catalog (products, questions, options,
      * rules, images) into an existing business — purely additive,
      * alongside whatever that business already has. Unlike the
@@ -56,6 +68,8 @@ class BusinessController extends Controller
      */
     public function copyTemplate(Request $request, Business $business): RedirectResponse
     {
+        abort_unless(self::COPY_TEMPLATE_ENABLED, 423, 'Copy Template Data is temporarily disabled.');
+
         $validated = $request->validate([
             'template_id' => ['required', Rule::exists('businesses', 'id')->where('is_template', true)],
         ]);
@@ -130,16 +144,42 @@ class BusinessController extends Controller
         return back()->with('status', "Priority Support for \"{$business->name}\" is now ".($business->support_access_granted ? 'granted.' : 'revoked.'));
     }
 
+    /**
+     * Deleting a business only ever wipes local rows — the `subscriptions`
+     * table Cashier ships has no foreign key to businesses at all, and
+     * even if it did, a cascade delete only removes our own database
+     * record of a subscription, never tells Stripe to actually stop
+     * billing it. Without this, deleting a business with an active paid
+     * plan left Stripe still charging their card every month with no
+     * account left in the app to even show it was happening. Cancelled
+     * immediately (cancelNow(), not the grace-period cancel() the
+     * business's own Billing page uses) since there's no account left
+     * for a grace period to apply to.
+     */
     public function destroy(Request $request, Business $business): RedirectResponse
     {
         $name = $business->name;
         $id = $business->id;
 
+        $activeSubscriptions = $business->subscriptions->filter->active();
+
+        if ($activeSubscriptions->isNotEmpty()) {
+            try {
+                $activeSubscriptions->each->cancelNow();
+            } catch (\Throwable $e) {
+                report($e);
+
+                return back()->with('status', "Couldn't delete \"{$name}\" — cancelling its Stripe subscription failed, so nothing was deleted. Check Stripe and try again.");
+            }
+        }
+
         AuditLog::record(
             $request->user('admin'),
             'business.deleted',
             null,
-            "Deleted business \"{$name}\" (#{$id}) and all its data."
+            $activeSubscriptions->isNotEmpty()
+                ? "Deleted business \"{$name}\" (#{$id}) and all its data — also cancelled {$activeSubscriptions->count()} active Stripe subscription(s)."
+                : "Deleted business \"{$name}\" (#{$id}) and all its data."
         );
 
         $business->delete();

@@ -88,6 +88,35 @@ class InternalQuoteController extends Controller
     }
 
     /**
+     * Re-opens an existing quote in the same wizard used to create one,
+     * pre-filled with its previously-recorded answers — see quoteWizard()'s
+     * initialAnswers param. What happens next depends on whether this
+     * quote has already been emailed (see save()'s docblock): editing one
+     * that hasn't updates it in place; editing one that has creates a
+     * linked revision instead, leaving the original untouched.
+     */
+    public function edit(Quote $quote): View
+    {
+        $business = Auth::user()->business;
+
+        abort_unless($business->hasFeature('quote_inbox'), 404);
+        abort_unless($quote->product && Auth::user()->canAccessProduct($quote->product), 404);
+        $this->assertProductQuotable($quote->product);
+
+        $initialAnswers = $quote->quoteAnswers->mapWithKeys(
+            fn ($answer) => [(string) $answer->question_id => $answer->option_id ?? $answer->answer_value]
+        )->all();
+
+        return view('quotes.builder', [
+            'business' => $business,
+            'product' => $quote->product,
+            'snapshot' => $quote->product->published_snapshot,
+            'initialAnswers' => $initialAnswers,
+            'editingQuoteId' => $quote->id,
+        ]);
+    }
+
+    /**
      * The end of the wizard — the *only* thing needed to get here is the
      * product's questions answered. Shows the price immediately, with
      * nothing written to the database yet; customer name/email, notes,
@@ -103,6 +132,13 @@ class InternalQuoteController extends Controller
         abort_unless($business->hasFeature('quote_inbox'), 404);
         $this->assertProductQuotable($product);
 
+        // Tenant-scoped via Quote's own BelongsToBusiness — a tampered
+        // editing_quote_id for another business's quote just resolves to
+        // null here, same as any other cross-tenant route-model lookup.
+        $editingQuote = $request->filled('editing_quote_id')
+            ? Quote::find($request->integer('editing_quote_id'))
+            : null;
+
         $priced = $this->calculatePrice($request, $business, $product);
 
         return view('quotes.review', [
@@ -114,8 +150,9 @@ class InternalQuoteController extends Controller
             'calculatedPrice' => $priced['calculatedPrice'],
             'selections' => (new QuoteAnswerProcessor)->buildSelections($product->published_snapshot, $priced['answers']),
             'existingCustomers' => $this->recentCustomers($business),
-            'preparedByName' => Auth::user()->name,
-            'preparedByEmail' => Auth::user()->email,
+            'preparedByName' => $editingQuote->prepared_by_name ?? Auth::user()->name,
+            'preparedByEmail' => $editingQuote->prepared_by_email ?? Auth::user()->email,
+            'editingQuote' => $editingQuote,
         ]);
     }
 
@@ -144,6 +181,10 @@ class InternalQuoteController extends Controller
         abort_unless($business->hasFeature('quote_inbox'), 404);
         $this->assertProductQuotable($product);
 
+        if ($limitResponse = $this->blockIfOverQuoteLimit($request, $business, $product)) {
+            return $limitResponse;
+        }
+
         $quote = $this->persist($business, $product, $this->calculate($request, $business, $product));
 
         return redirect()->route('quotes.create.result', $quote)->with('status', 'Quote saved.');
@@ -156,11 +197,17 @@ class InternalQuoteController extends Controller
         abort_unless($business->hasFeature('quote_inbox'), 404);
         $this->assertProductQuotable($product);
 
+        if ($limitResponse = $this->blockIfOverQuoteLimit($request, $business, $product)) {
+            return $limitResponse;
+        }
+
         $quote = $this->persist($business, $product, $this->calculate($request, $business, $product));
 
-        $this->sendCustomerEmail($quote);
+        $status = $this->trySendCustomerEmail($quote)
+            ? 'Quote saved and emailed to the customer.'
+            : 'Quote saved, but the email failed to send — check your mail settings and try again from the quote.';
 
-        return redirect()->route('quotes.create.result', $quote)->with('status', 'Quote saved and emailed to the customer.');
+        return redirect()->route('quotes.create.result', $quote)->with('status', $status);
     }
 
     public function pdf(Request $request, Product $product): RedirectResponse
@@ -169,6 +216,10 @@ class InternalQuoteController extends Controller
 
         abort_unless($business->hasFeature('quote_inbox'), 404);
         $this->assertProductQuotable($product);
+
+        if ($limitResponse = $this->blockIfOverQuoteLimit($request, $business, $product)) {
+            return $limitResponse;
+        }
 
         $quote = $this->persist($business, $product, $this->calculate($request, $business, $product));
 
@@ -186,7 +237,7 @@ class InternalQuoteController extends Controller
     public function result(Quote $quote): View
     {
         abort_unless($quote->isInternal(), 404);
-        abort_unless(Auth::user()->canAccessProduct($quote->product), 404);
+        abort_unless($this->canAccessQuote($quote), 404);
 
         return view('quotes.result', [
             'quote' => $quote,
@@ -205,14 +256,16 @@ class InternalQuoteController extends Controller
      */
     public function emailExisting(Quote $quote): RedirectResponse
     {
-        abort_unless(Auth::user()->canAccessProduct($quote->product), 404);
+        abort_unless($this->canAccessQuote($quote), 404);
         abort_unless($quote->isInternal() || $quote->business->hasFeature('email_notifications'), 404);
 
-        $this->sendCustomerEmail($quote);
+        $sent = $this->trySendCustomerEmail($quote);
 
         $route = $quote->isInternal() ? 'quotes.create.result' : 'quotes.show';
 
-        return redirect()->route($route, $quote)->with('status', 'Emailed to the customer.');
+        return redirect()->route($route, $quote)->with('status', $sent
+            ? 'Emailed to the customer.'
+            : 'The email failed to send — check your mail settings and try again.');
     }
 
     /**
@@ -267,6 +320,7 @@ class InternalQuoteController extends Controller
             'expires_in_days' => ['nullable', Rule::in(Quote::EXPIRATION_DAY_OPTIONS)],
             'prepared_by_name' => ['required', 'string', 'max:255'],
             'prepared_by_email' => ['required', 'email', 'max:255'],
+            'editing_quote_id' => ['nullable', 'integer'],
         ]);
 
         $snapshot = $product->published_snapshot;
@@ -303,6 +357,19 @@ class InternalQuoteController extends Controller
      * Business::hasFeature() plan gates, same "staff always can" rule
      * covering PDF download for internal quotes (see downloadPdf()'s
      * comment in PublicQuoteController).
+     *
+     * Three outcomes, depending on $bundle['validated']['editing_quote_id']
+     * (see edit()'s docblock):
+     *   - not editing anything: an ordinary brand-new quote, new reference
+     *     number.
+     *   - editing a quote that was never emailed: updated in place — same
+     *     id, same reference number, its old answers replaced with the
+     *     new ones. Nothing was sent yet, so there's nothing to preserve.
+     *   - editing a quote that WAS already emailed: a new quote is created
+     *     instead, with its own new reference number and
+     *     revises_quote_id pointing at the original. The original is
+     *     never touched — whoever already has a copy of it keeps seeing
+     *     exactly what they were sent.
      */
     private function persist(Business $business, Product $product, array $bundle): Quote
     {
@@ -314,7 +381,11 @@ class InternalQuoteController extends Controller
             'phone' => $validated['customer_phone'] ?? null,
         ]);
 
-        $quote = Quote::create([
+        $editingQuote = ! empty($validated['editing_quote_id'])
+            ? Quote::find($validated['editing_quote_id'])
+            : null;
+
+        $attributes = [
             'business_id' => $business->id,
             'product_id' => $product->id,
             'customer_name' => $validated['customer_name'],
@@ -338,7 +409,23 @@ class InternalQuoteController extends Controller
                 'selections' => (new QuoteAnswerProcessor)->buildSelections($product->published_snapshot, $bundle['answers']),
                 'customer_contact' => (new CustomerResolver)->snapshotContact($customer),
             ],
-        ]);
+        ];
+
+        if ($editingQuote && ! $editingQuote->emailed_at) {
+            $editingQuote->update($attributes);
+            $editingQuote->quoteAnswers()->delete();
+            (new QuoteAnswerProcessor)->recordAnswers($product, $editingQuote, $product->published_snapshot, $bundle['answers']);
+
+            return $editingQuote;
+        }
+
+        $attributes['reference_number'] = $business->nextQuoteReferenceNumber();
+
+        if ($editingQuote) {
+            $attributes['revises_quote_id'] = $editingQuote->id;
+        }
+
+        $quote = Quote::create($attributes);
 
         (new QuoteAnswerProcessor)->recordAnswers($product, $quote, $product->published_snapshot, $bundle['answers']);
 
@@ -352,8 +439,16 @@ class InternalQuoteController extends Controller
      * hasFeature('email_notifications'): internal quotes bypass plan
      * gates everywhere else, and this is the one place staff explicitly
      * asked for the email to go out, so there's nothing to gate.
+     *
+     * Unlike the public wizard's own notification emails (which are a
+     * background side-effect of saving a quote), staff explicitly clicked
+     * "Email" here — so a mail failure is worth telling them about
+     * (returns false) rather than hiding it, but it must still never
+     * crash the request: the quote itself is already safely saved by the
+     * time this runs, and a mail server problem must not take that
+     * successful save down with it.
      */
-    private function sendCustomerEmail(Quote $quote): void
+    private function trySendCustomerEmail(Quote $quote): bool
     {
         $result = ['applied_rules' => $quote->meta['applied_rules'] ?? []];
 
@@ -365,9 +460,17 @@ class InternalQuoteController extends Controller
             ? route('quote.view', $quote->uuid)
             : null;
 
-        Mail::to($quote->customer_email)->send(new QuoteSubmittedToCustomer($quote, $result, $viewUrl));
+        try {
+            Mail::to($quote->customer_email)->send(new QuoteSubmittedToCustomer($quote, $result, $viewUrl));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return false;
+        }
 
         $quote->update(['emailed_at' => now()]);
+
+        return true;
     }
 
     /**
@@ -391,5 +494,40 @@ class InternalQuoteController extends Controller
         abort_unless(Auth::user()->canAccessProduct($product), 404);
         abort_unless($product->is_active, 404);
         abort_unless($product->published_snapshot, 404);
+    }
+
+    /**
+     * canAccessProduct() needs a real Product — can't be called at all
+     * once a quote's product has been deleted (product_id is null). No
+     * per-product grant is left to check at that point (a Member's
+     * access was always scoped to specific products, and that product is
+     * gone), so only the Owner — who already sees everything regardless
+     * — can still open it.
+     */
+    private function canAccessQuote(Quote $quote): bool
+    {
+        return $quote->product
+            ? Auth::user()->canAccessProduct($quote->product)
+            : Auth::user()->isOwner();
+    }
+
+    /**
+     * The same monthly cap PublicQuoteController::store() already enforces
+     * for customer-submitted quotes — reused here so staff-created quotes
+     * count against (and are stopped by) the exact same shared total,
+     * rather than only customers ever being the ones who hit a wall.
+     * Never blocks editing an already-saved quote (editing_quote_id
+     * present) — that isn't a new quote, so it shouldn't cost against the
+     * limit or be refused because of it. Templates are exempt, same as
+     * the public side, so Super Admin's own testing is never affected.
+     */
+    private function blockIfOverQuoteLimit(Request $request, Business $business, Product $product): ?RedirectResponse
+    {
+        if ($request->filled('editing_quote_id') || $business->is_template || ! $business->hasReachedMonthlyQuoteLimit()) {
+            return null;
+        }
+
+        return redirect()->route('quotes.create.show', $product)
+            ->with('error', "You've reached this month's quote limit — upgrade your plan to create more.");
     }
 }

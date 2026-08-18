@@ -80,9 +80,11 @@ class TeamController extends Controller
             'invited_by' => Auth::id(),
         ]);
 
-        Mail::to($invitation->email)->send(new TeamInvitationMail($invitation));
+        $status = $this->trySendInvitationEmail($invitation)
+            ? "Invitation sent to {$invitation->email}."
+            : "The invitation was created, but the email to {$invitation->email} failed to send — check your mail settings and use Resend from the Team page.";
 
-        return redirect()->route('team.index')->with('status', "Invitation sent to {$invitation->email}.");
+        return redirect()->route('team.index')->with('status', $status);
     }
 
     public function resend(TeamInvitation $invitation): RedirectResponse
@@ -91,9 +93,24 @@ class TeamController extends Controller
 
         $invitation->update(['expires_at' => now()->addDays(7)]);
 
-        Mail::to($invitation->email)->send(new TeamInvitationMail($invitation));
+        $status = $this->trySendInvitationEmail($invitation)
+            ? "Invitation resent to {$invitation->email}."
+            : "The email to {$invitation->email} failed to send — check your mail settings and try again.";
 
-        return back()->with('status', "Invitation resent to {$invitation->email}.");
+        return back()->with('status', $status);
+    }
+
+    private function trySendInvitationEmail(TeamInvitation $invitation): bool
+    {
+        try {
+            Mail::to($invitation->email)->send(new TeamInvitationMail($invitation));
+
+            return true;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return false;
+        }
     }
 
     public function revoke(TeamInvitation $invitation): RedirectResponse

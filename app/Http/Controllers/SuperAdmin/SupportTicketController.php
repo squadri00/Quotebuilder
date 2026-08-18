@@ -53,7 +53,11 @@ class SupportTicketController extends Controller
         $recipients = $ticket->business->users()->where('is_active', true)->pluck('email');
 
         foreach ($recipients as $email) {
-            Mail::to($email)->send(new SupportTicketReplied($reply));
+            try {
+                Mail::to($email)->send(new SupportTicketReplied($reply));
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         return redirect()->route('superadmin.support.show', $ticket)->with('status', 'Reply sent.');

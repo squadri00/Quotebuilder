@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use App\Models\Industry;
+use App\Services\SetupGuideService;
 use App\Services\TemplateCloner;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,15 +12,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 /**
- * The post-login "pick your industry and starting products" flow that
- * used to live on the registration form itself — moved here because it
- * was confusing customers before they'd even paid. Reached via the
- * dismissible "Get Started" prompt on the Dashboard (see
- * DashboardController) or directly at /get-started any time after that.
+ * The full post-signup "Setup Guide" — starts with the original "pick your
+ * industry and starting products" step (which used to live on the
+ * registration form itself, moved here because it was confusing customers
+ * before they'd even paid) and now walks through everything a business
+ * needs before its first real quote works correctly: profile/branding, tax
+ * rates, a published product, and team invites. Reached via the Dashboard
+ * banner or the permanent "Setup Guide" link in the sidebar, any time.
  */
 class OnboardingController extends Controller
 {
-    public function create(): View
+    public function create(SetupGuideService $setupGuide): View
     {
         $business = Auth::user()->business;
 
@@ -31,7 +34,13 @@ class OnboardingController extends Controller
             ->get();
         $industries = Industry::orderBy('name')->get();
 
-        return view('onboarding.create', compact('business', 'templates', 'industries'));
+        return view('onboarding.create', [
+            'business' => $business,
+            'templates' => $templates,
+            'industries' => $industries,
+            'steps' => $setupGuide->steps($business),
+            'progress' => $setupGuide->progress($business),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -49,15 +58,14 @@ class OnboardingController extends Controller
 
         $business->update([
             'industry_id' => $request->industry_id,
-            'onboarding_dismissed_at' => now(),
         ]);
 
         $templateIds = $cloner->cloneProductsInto($business, $products);
         $business->templatesUsed()->attach($templateIds);
 
-        return redirect()->route('dashboard')->with('status', $products->isEmpty()
-            ? "You're all set — build your first product whenever you're ready."
-            : "You're all set — {$products->count()} starting product(s) were added to your account.");
+        return redirect()->route('onboarding.create')->with('status', $products->isEmpty()
+            ? "Nice — now let's finish setting up your account below."
+            : "{$products->count()} starting product(s) were added. Now let's finish setting up your account below.");
     }
 
     public function dismiss(): RedirectResponse

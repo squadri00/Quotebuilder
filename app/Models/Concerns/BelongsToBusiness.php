@@ -35,17 +35,21 @@ trait BelongsToBusiness
      * Laravel allows more than one guard to be authenticated in the same
      * session at once — e.g. a business account logged into one browser
      * tab and Super Admin logged into another tab of the SAME browser,
-     * sharing one session cookie. Without this check, that combination
-     * silently scopes every Super Admin query down to whichever business
-     * the 'web' guard happens to be logged into elsewhere in that same
-     * session — it looks exactly like missing data (0 products, 0
-     * questions) when nothing is actually missing. The 'web' guard is
-     * only trusted for tenant scoping when this request isn't ALSO
-     * authenticated as 'admin'.
+     * sharing one session cookie. Checking Auth::guard('admin')->check()
+     * alone doesn't tell you which guard THIS request is actually using —
+     * it's true any time an admin session cookie exists anywhere, even on
+     * a plain business-side request — which used to null out business_id
+     * (and crash inserts like TaxRate::create()) the moment a Super Admin
+     * tab was open in the same browser as a business tab. Checking the
+     * current route's name instead of raw guard state tells us which side
+     * this specific request belongs to: every Super Admin route is named
+     * "superadmin.*" (see routes/superadmin.php), and Super Admin's own
+     * controllers already set business_id explicitly wherever it's
+     * needed, so scoping is safe to skip only there.
      */
     protected static function currentTenantBusinessId(): ?int
     {
-        if (Auth::guard('admin')->check()) {
+        if (request()?->routeIs('superadmin.*')) {
             return null;
         }
 

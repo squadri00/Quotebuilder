@@ -1,0 +1,82 @@
+Here are both prompts updated — each now ends with generating the ready-to-upload SQL file automatically.
+
+Prompt 1 — you describe the product:
+
+Build a new product for the [TEMPLATE NAME, e.g. Printing Shop] template, called
+"[PRODUCT NAME]", matching the same style as the existing products in that
+template (e.g. how Banners is built).
+
+1. Product — a short, realistic name, a one-sentence plain-English description,
+   and a sensible starting Base Price.
+
+2. Questions — mostly Single Choice, one per real decision a customer makes
+   when ordering this (material, size, finish, quantity, add-ons, etc.).
+   Every option gets a price adjustment: $0 for the standard choice, positive
+   for upgrades, negative for bulk-quantity discounts — same pattern as the
+   existing products use.
+
+3. At least one conditional question — something that only appears depending
+   on an earlier answer (e.g. an "enter custom size" text box that only shows
+   up if Size = Custom).
+
+4. Rules for anything that isn't a simple per-option price bump — a volume
+   discount percentage, a flat add-on fee, that kind of thing.
+
+5. Publish it once it's built, and confirm the pricing actually calculates
+   correctly by running a sample quote through it.
+
+6. Build a Training Artifact (build sheet) for it, in the same styled,
+   theme-aware format the existing ones use — overview panel, every
+   question/option/rule listed in order, and step-by-step "where to click"
+   instructions so a staff member could manually rebuild it by hand.
+
+7. Export it as a ready-to-upload SQL file using the product:export-sql
+   command, and send me the file — I'll paste it into phpMyAdmin on the
+   live server myself.
+
+Here's what I want the product to actually offer:
+[Describe it in your own words — what it is, what choices a customer picks
+from, roughly what should cost more or less, and any discounts/fees that
+should apply. No need to know question types or pricing formats — just
+describe it like you're explaining it to a new employee.]
+
+Prompt 2 — you just name the industry, AI picks the product:
+
+For the [TEMPLATE NAME, e.g. HVAC Contractor] template, create one brand-new
+product that doesn't already exist there.
+
+1. First list that template's current products, so you know what's already
+   covered — don't build something that duplicates or overlaps an existing
+   one.
+
+2. Pick one realistic, genuinely useful product or service that businesses
+   in this industry commonly quote, that this template is missing. Use your
+   own judgment on what's a sensible gap to fill.
+
+3. Build it fully, matching the same style as the template's existing
+   products (e.g. how Banners is built in Printing Shop):
+   - Product: realistic name, one-sentence description, sensible base price
+   - Questions: mostly Single Choice, one per real decision a customer makes
+     (material, size, finish, quantity, timeline, add-ons, etc.) — enough to
+     be genuinely usable, not a bare-bones stub
+   - Every option priced: $0 for standard, positive for upgrades, negative
+     for bulk/volume discounts
+   - At least one conditional question (only appears based on an earlier
+     answer)
+   - At least one Rule for something a flat option price can't do — a volume
+     discount, a rush fee, a travel/delivery charge, etc.
+   - Publish it when done, and confirm the pricing actually calculates
+     correctly by running a sample quote through it.
+
+4. Build a Training Artifact (build sheet) for it, same styled format as the
+   existing ones — overview panel, every question/option/rule listed in
+   order, step-by-step "where to click" instructions.
+
+5. Export it as a ready-to-upload SQL file using the product:export-sql
+   command, and send me the file — I'll paste it into phpMyAdmin on the
+   live server myself.
+
+6. Tell me what product you picked and why, and give me a short summary of
+   what you built (questions, pricing, rules) before I go check it myself.
+
+What changed in both: one new final step that runs php artisan product:export-sql {product-id} and sends you the resulting .sql file — the same reusable tool I just built and tested. Nothing else about how you use these changed.

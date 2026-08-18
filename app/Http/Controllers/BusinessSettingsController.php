@@ -76,4 +76,26 @@ class BusinessSettingsController extends Controller
 
         return back()->with('status', 'business-public-quote-settings-updated');
     }
+
+    /**
+     * The reference number shown to customers/staff on quotes — see
+     * Business::nextQuoteReferenceNumber() and Quote::displayReference().
+     * quote_number_next is deliberately editable at any time (not just once
+     * at setup): a business might want to jump the sequence, e.g. to match
+     * an existing paper invoice book. It only ever affects quotes created
+     * from this point forward — already-issued reference numbers are
+     * frozen on their Quote row and never renumbered.
+     */
+    public function updateQuoteNumbering(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'quote_number_format' => ['required', Rule::in(['numeric', 'alphanumeric'])],
+            'quote_number_prefix' => ['nullable', 'string', 'max:20'],
+            'quote_number_next' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $request->user()->business->update($validated);
+
+        return back()->with('status', 'business-quote-numbering-updated');
+    }
 }

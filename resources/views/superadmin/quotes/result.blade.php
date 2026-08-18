@@ -15,7 +15,7 @@
                     Demo Quote
                 </span>
 
-                <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ $product->name }} — {{ $quote->customer_name }} ({{ $quote->customer_email }})</p>
+                <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ $product?->name ?? 'Product no longer available' }} — {{ $quote->customer_name }} ({{ $quote->customer_email }})</p>
                 <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
                     Quoted as: {{ $quote->demoBusinessOverride()['name'] ?? $business->name }}
                     @if ($quote->demoBusinessOverride()['address'] ?? null)
@@ -28,6 +28,7 @@
                         — {{ $quote->demoBusinessOverride()['email'] }}
                     @endif
                 </p>
+                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $quote->created_at->format('M j, Y \a\t g:i A') }}</p>
 
                 <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">Quoted Price</p>
                 <p class="text-4xl font-bold text-gray-900 dark:text-gray-100 mt-1">${{ number_format($quote->final_price, 2) }}</p>
@@ -132,8 +133,10 @@
                 </div>
 
                 <div class="mt-4 flex items-center justify-center gap-4 text-sm">
-                    <a href="{{ route('superadmin.quotes.create.show', $product) }}" class="font-medium text-indigo-600 dark:text-indigo-400">Create another quote</a>
-                    <span class="text-gray-300 dark:text-gray-600">&middot;</span>
+                    @if ($product)
+                        <a href="{{ route('superadmin.quotes.create.show', $product) }}" class="font-medium text-indigo-600 dark:text-indigo-400">Create another quote</a>
+                        <span class="text-gray-300 dark:text-gray-600">&middot;</span>
+                    @endif
                     <a href="{{ route('superadmin.quotes.create') }}" class="font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">Back to Demo Quotes</a>
                 </div>
             </div>

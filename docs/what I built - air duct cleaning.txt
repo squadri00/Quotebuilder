@@ -1,0 +1,19 @@
+What I picked and why
+
+HVAC Contractor's template had exactly one product — HVAC Service — and it's a thorough one, already covering install/replace/repair for AC, furnaces, heat pumps, mini-splits, and combo systems. So I looked for something genuinely separate rather than overlapping it, and picked Air Duct Cleaning — a standard, commonly-quoted HVAC service that has nothing to do with equipment installation or repair, so there's zero overlap with what's already there.
+
+What I built
+
+Product: Air Duct Cleaning — base price $199
+
+9 questions: home size/vent count, number of HVAC systems, last cleaning date, dryer vent add-on, sanitizing treatment, UV air purifier add-on, a mold/pest contamination check, a conditional follow-up description field (only appears if contamination = Yes), and preferred timing — each option priced realistically ($0 for the standard choice, upgrades and add-ons priced up).
+
+3 rules: a -10% bundle discount for 3+ systems, a $50 flat assessment fee if contamination is reported, and a +15% rush fee for same-day service.
+
+Published it using the same publish process the real button uses — verified the snapshot saved correctly.
+
+Verified the math for real, not just that it saves: ran an actual quote through the pricing engine (large home, 3+ systems, overdue cleaning, dryer vent + sanitizing + UV add-ons, no contamination, rush timing) and hand-checked every step — it came out to $1,458.32, with both percentage rules applying correctly in sequence.
+
+Built the training build-sheet, matching the Banners one's exact styled format — sent it to you above so you can look it over.
+
+Go check it in Super Admin: /superad

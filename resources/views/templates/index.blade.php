@@ -13,7 +13,12 @@
 
     @php
         $limit = $business->productLimit();
-        $atLimit = $limit !== null && $myProducts->count() >= $limit;
+        // Only active products count against the limit — see
+        // Business::hasReachedProductLimit()'s docblock — so this has to
+        // match that same counting rule, or this page would show "at your
+        // limit" while the actual check underneath disagrees.
+        $activeProductCount = $myProducts->where('is_active', true)->count();
+        $atLimit = $limit !== null && $activeProductCount >= $limit;
     @endphp
 
     <x-card class="mb-6">
@@ -30,10 +35,13 @@
         @endif
 
         <p class="text-xs text-gray-400 dark:text-gray-500 mt-3">
-            {{ $myProducts->count() }} of {{ $limit === null ? 'unlimited' : $limit }} product(s) used.
+            {{ $activeProductCount }} of {{ $limit === null ? 'unlimited' : $limit }} active product(s) used.
             @if ($atLimit)
-                You're at your plan's limit — pick a product to replace below when adding a new one, or upgrade your plan for more room.
+                You're at your plan's limit — deactivate one to make room without losing it, replace one below, or upgrade your plan for more room.
             @endif
+        </p>
+        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            Adding a product below copies it into your own account, once — it's yours to edit from there. If we improve the original template later, it won't change what you've already added.
         </p>
     </x-card>
 

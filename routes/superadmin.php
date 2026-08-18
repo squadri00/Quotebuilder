@@ -11,6 +11,7 @@ use App\Http\Controllers\SuperAdmin\ImplementationOrderController;
 use App\Http\Controllers\SuperAdmin\ImplementationTierController;
 use App\Http\Controllers\SuperAdmin\IndustryController;
 use App\Http\Controllers\SuperAdmin\InternalQuoteController;
+use App\Http\Controllers\SuperAdmin\PasswordController;
 use App\Http\Controllers\SuperAdmin\PlanController;
 use App\Http\Controllers\SuperAdmin\OptionController;
 use App\Http\Controllers\SuperAdmin\PlatformSettingController;
@@ -42,6 +43,9 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
     Route::middleware('auth:admin')->group(function () {
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
         Route::post('/theme', [ThemeController::class, 'update'])->name('theme.update');
+
+        Route::get('/password', [PasswordController::class, 'edit'])->name('password.edit');
+        Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

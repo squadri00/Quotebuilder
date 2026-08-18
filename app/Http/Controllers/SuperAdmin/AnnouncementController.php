@@ -162,7 +162,11 @@ class AnnouncementController extends Controller
         $recipients = User::whereIn('business_id', $businesses)->where('is_active', true)->get(['id', 'name', 'email']);
 
         foreach ($recipients as $recipient) {
-            Mail::to($recipient->email)->send(new AnnouncementNotice($announcement, $recipient->name));
+            try {
+                Mail::to($recipient->email)->send(new AnnouncementNotice($announcement, $recipient->name));
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         $announcement->update(['email_sent_at' => now()]);

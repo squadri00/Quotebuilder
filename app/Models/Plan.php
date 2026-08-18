@@ -9,9 +9,14 @@ use Illuminate\Support\Collection;
 
 class Plan extends Model
 {
+    public const DISCOUNT_DISPLAYS = ['fixed', 'percentage'];
+
     protected $fillable = [
         'name',
         'price',
+        'compare_at_price',
+        'show_discount',
+        'discount_display',
         'billing_interval',
         'stripe_price_id',
         'max_products',
@@ -36,12 +41,43 @@ class Plan extends Model
     {
         return [
             'price' => 'decimal:2',
+            'compare_at_price' => 'decimal:2',
+            'show_discount' => 'boolean',
             'max_products' => 'integer',
             'max_quotes_per_month' => 'integer',
             'max_users' => 'integer',
             'is_highlighted' => 'boolean',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * True only when there's an actual discount to show — the toggle is
+     * on, a "was" price is set, and it's genuinely higher than the real
+     * price. Never trusts show_discount alone, since a stale compare_at_price
+     * left over from an old promotion (e.g. equal to or below the current
+     * price) shouldn't render a nonsensical "$0 off" badge.
+     */
+    public function hasDiscount(): bool
+    {
+        return $this->show_discount
+            && $this->compare_at_price !== null
+            && (float) $this->compare_at_price > (float) $this->price;
+    }
+
+    /**
+     * The dollar amount to show as "you save" — always derived live from
+     * compare_at_price minus price, never stored separately, so it can
+     * never drift out of sync with the two real numbers driving it.
+     */
+    public function discountAmount(): float
+    {
+        return $this->hasDiscount() ? round((float) $this->compare_at_price - (float) $this->price, 2) : 0.0;
+    }
+
+    public function discountPercent(): int
+    {
+        return $this->hasDiscount() ? (int) round($this->discountAmount() / (float) $this->compare_at_price * 100) : 0;
     }
 
     public function features(): BelongsToMany

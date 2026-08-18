@@ -3,9 +3,15 @@
     $displayName = $demoBusiness['name'] ?? $business->name;
 @endphp
 <x-mail::message>
+@if ($quote->revises_quote_id)
+# Revised quote from {{ $displayName }}
+
+Hi {{ $quote->customer_name }}, here's a revised quote for **{{ $product?->name ?? 'the product you requested' }}** — quote #{{ $quote->displayReference() }}, replacing the one we sent before.
+@else
 # Your quote from {{ $displayName }}
 
-Hi {{ $quote->customer_name }}, thanks for requesting a quote for **{{ $product->name }}**.
+Hi {{ $quote->customer_name }}, thanks for requesting a quote for **{{ $product?->name ?? 'the product you requested' }}**.
+@endif
 
 ## ${{ number_format($quote->final_price, 2) }}
 

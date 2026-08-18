@@ -101,7 +101,20 @@ class RegisteredUserController extends Controller
             'plan_id' => $plan->id,
         ]);
 
-        Mail::to($pending->email)->send(new RegistrationOtpMail($pending, $pending->issueOtp()));
+        // A mail server problem here must not strand someone on a signup
+        // form that appears to have silently failed — the pending
+        // registration already exists either way, so send them on to the
+        // same verify screen regardless, just honest about whether a code
+        // actually went out. "Resend" on that screen goes through this
+        // same try/catch too, so they have a real way to retry.
+        try {
+            Mail::to($pending->email)->send(new RegistrationOtpMail($pending, $pending->issueOtp()));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()->route('register.verify', $pending->token)
+                ->with('status', "We couldn't send your verification code just now — click \"Resend\" below to try again.");
+        }
 
         return redirect()->route('register.verify', $pending->token);
     }

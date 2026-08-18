@@ -75,6 +75,7 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
                     <thead class="bg-gray-50 dark:bg-gray-700/50">
                         <tr>
+                            <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Quote #</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Source</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Customer</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Email</th>
@@ -84,11 +85,18 @@
                             @if ($statusTrackingEnabled)
                                 <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Status</th>
                             @endif
+                            <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach ($quotes as $quote)
                             <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/40" onclick="window.location='{{ route('quotes.show', $quote) }}'">
+                                <td class="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">
+                                    #{{ $quote->displayReference() }}
+                                    @if ($quote->revises_quote_id)
+                                        <span class="block text-xs font-normal text-gray-400 dark:text-gray-500">revision of #{{ $quote->revisesQuote?->displayReference() }}</span>
+                                    @endif
+                                </td>
                                 <td class="px-4 py-3">
                                     @if ($quote->isInternal())
                                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300"
@@ -115,7 +123,7 @@
                                         <span class="block text-xs text-amber-600 dark:text-amber-400">was ${{ number_format($quote->calculated_price, 2) }}</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $quote->created_at->format('M j, Y') }}</td>
+                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $quote->created_at->format('M j, Y g:i A') }}</td>
                                 @if ($statusTrackingEnabled)
                                     <td class="px-4 py-3" onclick="event.stopPropagation()">
                                         <form method="POST" action="{{ route('quotes.update-status', $quote) }}">
@@ -130,6 +138,15 @@
                                         </form>
                                     </td>
                                 @endif
+                                <td class="px-4 py-3" onclick="event.stopPropagation()">
+                                    @if ($quote->product)
+                                        <a href="{{ route('quotes.edit', $quote) }}" class="text-sm font-medium brand-text hover:underline">
+                                            Edit / Re-quote
+                                        </a>
+                                    @else
+                                        <span class="text-xs text-gray-400 dark:text-gray-500" title="The product this quote was built from no longer exists">—</span>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

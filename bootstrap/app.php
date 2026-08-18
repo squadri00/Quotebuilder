@@ -48,6 +48,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'stripe/webhook',
         ]);
+
+        // See App\Http\Middleware\CheckMaintenanceMode's own docblock for
+        // why this is a DB-backed Super-Admin toggle rather than
+        // `artisan down` — appended (not prepended) so it always runs
+        // after session/auth are available, since it needs the current
+        // request's path to already be resolvable.
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckMaintenanceMode::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

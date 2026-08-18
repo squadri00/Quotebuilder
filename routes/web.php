@@ -68,6 +68,7 @@ Route::middleware(['auth', 'business.active'])->group(function () {
         Route::patch('/business', [BusinessSettingsController::class, 'updateDetails'])->name('business.update');
         Route::post('/business/branding', [BusinessSettingsController::class, 'updateBranding'])->name('business.branding.update');
         Route::post('/business/public-quote-settings', [BusinessSettingsController::class, 'updatePublicQuoteSettings'])->name('business.public-quote-settings.update');
+        Route::post('/business/quote-numbering', [BusinessSettingsController::class, 'updateQuoteNumbering'])->name('business.quote-numbering.update');
 
         Route::get('/get-started', [OnboardingController::class, 'create'])->name('onboarding.create');
         Route::post('/get-started', [OnboardingController::class, 'store'])->name('onboarding.store');
@@ -107,6 +108,7 @@ Route::middleware(['auth', 'business.active'])->group(function () {
     Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
     Route::patch('/quotes/{quote}/status', [QuoteController::class, 'updateStatus'])->name('quotes.update-status');
     Route::post('/quotes/{quote}/email', [InternalQuoteController::class, 'emailExisting'])->name('quotes.email');
+    Route::get('/quotes/{quote}/edit', [InternalQuoteController::class, 'edit'])->name('quotes.edit');
 
     // The internal, staff-facing quote builder — see InternalQuoteController's
     // docblock. Named quotes.create.* to sit next to quotes.index rather than

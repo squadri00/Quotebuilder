@@ -41,7 +41,12 @@ class QuoteController extends Controller
         $sort = $request->query('sort', 'newest');
 
         $quotes = Quote::with(['product', 'createdBy'])
-            ->whereIn('product_id', $accessibleProductIds)
+            // A quote whose product was since deleted has product_id = null
+            // — that never matches whereIn() on its own (NULL isn't "in"
+            // any list in SQL), which would silently drop it from this
+            // list entirely even though the quote itself still exists.
+            // Explicitly including "no product at all" keeps it visible.
+            ->where(fn ($query) => $query->whereIn('product_id', $accessibleProductIds)->orWhereNull('product_id'))
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('customer_name', 'like', "%{$search}%")
@@ -79,7 +84,7 @@ class QuoteController extends Controller
         $business = Auth::user()->business;
 
         abort_unless($business->hasFeature('quote_inbox'), 404);
-        abort_unless(Auth::user()->canAccessProduct($quote->product), 404);
+        abort_unless($this->canAccessQuote($quote), 404);
 
         return view('quotes.show', [
             'quote' => $quote,
@@ -95,7 +100,7 @@ class QuoteController extends Controller
 
         abort_unless($business->hasFeature('quote_inbox'), 404);
         abort_unless($business->hasFeature('quote_status_tracking'), 404);
-        abort_unless(Auth::user()->canAccessProduct($quote->product), 404);
+        abort_unless($this->canAccessQuote($quote), 404);
 
         $validated = $request->validate([
             'status' => ['required', Rule::in(Quote::STATUSES)],
@@ -104,5 +109,20 @@ class QuoteController extends Controller
         $quote->update(['status' => $validated['status']]);
 
         return back()->with('status', 'Quote status updated.');
+    }
+
+    /**
+     * canAccessProduct() requires a real Product — can't be called at all
+     * once a quote's product has been deleted (product_id is null). At
+     * that point there's no per-product grant left to check against (a
+     * Member's access was always scoped to specific products, and that
+     * product is gone), so only the Owner — who already sees everything
+     * regardless — can still open it.
+     */
+    private function canAccessQuote(Quote $quote): bool
+    {
+        return $quote->product
+            ? Auth::user()->canAccessProduct($quote->product)
+            : Auth::user()->isOwner();
     }
 }

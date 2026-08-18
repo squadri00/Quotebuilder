@@ -75,8 +75,11 @@
                 <td style="width: 45%;">
                     <div class="doc-title">QUOTATION</div>
                     <div class="doc-meta">
-                        <div>Quote #<strong>{{ $quote->id }}</strong></div>
-                        <div>Date: <strong>{{ $quote->created_at->format('M j, Y') }}</strong></div>
+                        <div>Quote #<strong>{{ $quote->displayReference() }}</strong></div>
+                        @if ($quote->revisesQuote)
+                            <div>Revised Quote (was #{{ $quote->revisesQuote->displayReference() }})</div>
+                        @endif
+                        <div>Date: <strong>{{ $quote->created_at->format('M j, Y g:i A') }}</strong></div>
                         @if ($quote->expires_at)
                             <div>{{ $quote->isExpired() ? 'Expired:' : 'Valid until:' }} <strong>{{ $quote->expires_at->format('M j, Y') }}</strong></div>
                         @endif
@@ -102,8 +105,8 @@
                 </td>
                 <td>
                     <div class="label">Quote For</div>
-                    <div class="party-name">{{ $product->name }}</div>
-                    @if ($product->description)
+                    <div class="party-name">{{ $product?->name ?? 'Product no longer available' }}</div>
+                    @if ($product?->description)
                         <div class="party-line">{{ $product->description }}</div>
                     @endif
                 </td>
@@ -166,7 +169,7 @@
         @endif
 
         <div class="footer">
-            This quotation was prepared for {{ $quote->customer_name }} on {{ $quote->created_at->format('M j, Y') }} &middot; Quote #{{ $quote->id }}
+            This quotation was prepared for {{ $quote->customer_name }} on {{ $quote->created_at->format('M j, Y g:i A') }} &middot; Quote #{{ $quote->displayReference() }}
             @if ($quote->prepared_by_name)
                 <br>Prepared by {{ $quote->prepared_by_name }} ({{ $quote->prepared_by_email }})
             @endif

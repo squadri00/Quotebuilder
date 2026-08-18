@@ -80,7 +80,14 @@ class RegistrationOtpController extends Controller
             return redirect()->route('register')->with('status', 'That signup link is no longer valid — please sign up again.');
         }
 
-        Mail::to($pending->email)->send(new RegistrationOtpMail($pending, $pending->issueOtp()));
+        try {
+            Mail::to($pending->email)->send(new RegistrationOtpMail($pending, $pending->issueOtp()));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()->route('register.verify', $pending->token)
+                ->with('status', "We couldn't send a new code just now — please wait a moment and try Resend again.");
+        }
 
         return redirect()->route('register.verify', $pending->token)
             ->with('status', 'We sent you a new code.');

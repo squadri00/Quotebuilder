@@ -5,12 +5,20 @@
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    @php
+        $editingQuote = $editingQuote ?? null;
+        $initialOverride = $editingQuote && $editingQuote->hasPriceOverride() ? (string) $editingQuote->final_price : '';
+        $initialDiscountType = $editingQuote->meta['discount']['type'] ?? '';
+        $initialDiscountValue = $editingQuote->meta['discount']['value'] ?? '';
+        $initialCustomerPhone = $editingQuote ? ($editingQuote->customerContact()['phone'] ?? '') : '';
+    @endphp
+
     <div
         class="max-w-3xl mx-auto"
         x-data="{
-            override: '',
-            discountType: '',
-            discountValue: '',
+            override: {{ Js::from($initialOverride) }},
+            discountType: {{ Js::from($initialDiscountType) }},
+            discountValue: {{ Js::from($initialDiscountValue) }},
             existingCustomers: {{ Js::from($existingCustomers) }},
             customerMode: 'new',
             customerSearch: '',
@@ -69,6 +77,17 @@
                     Not saved yet
                 </span>
 
+                @if ($editingQuote)
+                    <p class="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-left">
+                        Editing Quote #{{ $editingQuote->reference_number ?? $editingQuote->id }}.
+                        @if ($editingQuote->emailed_at)
+                            This quote was already sent to the customer, so saving creates a new, revised quote with its own number — the original stays exactly as it was, untouched.
+                        @else
+                            It hasn't been sent yet, so saving just updates this same quote — nothing to revise.
+                        @endif
+                    </p>
+                @endif
+
                 <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ $product->name }}</p>
 
                 <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">Price</p>
@@ -122,6 +141,9 @@
                 <form method="POST" id="quote-review-form" class="mt-6 text-left space-y-4">
                     @csrf
                     <input type="hidden" name="answers" value="{{ $answersJson }}">
+                    @if ($editingQuote)
+                        <input type="hidden" name="editing_quote_id" value="{{ $editingQuote->id }}">
+                    @endif
 
                     <div>
                         <x-input-label value="Customer" />
@@ -143,17 +165,17 @@
                         <div class="space-y-4">
                             <div>
                                 <x-input-label for="customer_name" value="Customer Name" />
-                                <x-text-input id="customer_name" name="customer_name" type="text" class="block mt-1 w-full" required />
+                                <x-text-input id="customer_name" name="customer_name" type="text" class="block mt-1 w-full" value="{{ old('customer_name', $editingQuote->customer_name ?? '') }}" required />
                                 <x-input-error :messages="$errors->get('customer_name')" class="mt-2" />
                             </div>
                             <div>
                                 <x-input-label for="customer_email" value="Customer Email" />
-                                <x-text-input id="customer_email" name="customer_email" type="email" class="block mt-1 w-full" required />
+                                <x-text-input id="customer_email" name="customer_email" type="email" class="block mt-1 w-full" value="{{ old('customer_email', $editingQuote->customer_email ?? '') }}" required />
                                 <x-input-error :messages="$errors->get('customer_email')" class="mt-2" />
                             </div>
                             <div>
                                 <x-input-label for="customer_phone" value="Customer Phone (optional)" />
-                                <x-text-input id="customer_phone" name="customer_phone" type="text" class="block mt-1 w-full" />
+                                <x-text-input id="customer_phone" name="customer_phone" type="text" class="block mt-1 w-full" value="{{ old('customer_phone', $initialCustomerPhone) }}" />
                                 <x-input-error :messages="$errors->get('customer_phone')" class="mt-2" />
                             </div>
                         </div>
@@ -192,7 +214,7 @@
                         <x-input-label for="internal_notes" value="Internal Notes" />
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1.5">Staff-only — never shown to the customer.</p>
                         <textarea id="internal_notes" name="internal_notes" rows="3"
-                            class="block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm"></textarea>
+                            class="block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm">{{ old('internal_notes', $editingQuote->internal_notes ?? '') }}</textarea>
                         <x-input-error :messages="$errors->get('internal_notes')" class="mt-2" />
                     </div>
 
@@ -272,7 +294,7 @@
                 </form>
 
                 <div class="mt-4 flex items-center justify-center gap-4 text-sm">
-                    <a href="{{ route('quotes.create.show', $product) }}" class="font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">&larr; Back to edit</a>
+                    <a href="{{ $editingQuote ? route('quotes.edit', $editingQuote) : route('quotes.create.show', $product) }}" class="font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">&larr; Back to edit</a>
                 </div>
             </div>
         </x-card>

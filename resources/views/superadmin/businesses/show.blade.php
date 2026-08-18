@@ -20,8 +20,11 @@
                     </x-secondary-button>
                 </form>
 
+                @php
+                    $hasActiveSubscription = ($subscription && $subscription->active()) || ($supportSubscription && $supportSubscription->active());
+                @endphp
                 <form method="POST" action="{{ route('superadmin.businesses.destroy', $business) }}"
-                    onsubmit="return confirm('Permanently delete &quot;{{ $business->name }}&quot;? This deletes all of its products, questions, rules, quotes, and users. This cannot be undone.');">
+                    onsubmit="return confirm('Permanently delete &quot;{{ $business->name }}&quot;? This deletes all of its products, questions, rules, quotes, and users. This cannot be undone.{{ $hasActiveSubscription ? ' It also has an active Stripe subscription — that will be cancelled immediately as part of this.' : '' }}');">
                     @csrf
                     @method('DELETE')
                     <x-danger-button type="submit">Delete</x-danger-button>
@@ -70,6 +73,7 @@
         <x-card>
             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Products / Rules</p>
             <p class="mt-1 text-gray-900 dark:text-gray-100">{{ $business->products_count }} product(s) &middot; {{ $business->rules_count }} rule(s)</p>
+            <a href="{{ route('superadmin.products.index', $business) }}" class="mt-2 inline-block text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300">Quote Builder &rarr;</a>
         </x-card>
 
         <x-card>
@@ -80,33 +84,13 @@
 
     <div class="mt-6">
         <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">Copy Template Data</h3>
-        <x-card>
+        <x-card class="opacity-60">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-300">Temporarily disabled</span>
+            </div>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-                Adds a template's products, questions, options, and rules to this business — as new copies, alongside anything it already has. Nothing existing is removed or changed, and the template itself is never modified.
+                Disabled for now — running this a second time re-adds a template's entire product list with no duplicate check, so a business that already has products from that template would end up with two of everything. It'll come back once that's fixed, or be removed for good if the business's own Templates page (which checks for duplicates, one product at a time) turns out to cover the same need safely.
             </p>
-
-            @if ($templates->isEmpty())
-                <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">No templates exist yet.</p>
-            @else
-                <form method="POST" action="{{ route('superadmin.businesses.copy-template', $business) }}" class="mt-4 flex items-end gap-3"
-                    onsubmit="return confirm('Copy this template\'s products into &quot;{{ $business->name }}&quot;? This is additive and won\'t remove anything the business already has.');">
-                    @csrf
-
-                    <div class="flex-1 max-w-xs">
-                        <x-input-label for="template_id" value="Template" />
-                        <select id="template_id" name="template_id" required
-                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm">
-                            <option value="" disabled selected>Choose a template&hellip;</option>
-                            @foreach ($templates as $template)
-                                <option value="{{ $template->id }}">{{ $template->name }}</option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('template_id')" class="mt-2" />
-                    </div>
-
-                    <x-secondary-button type="submit">Copy Into This Business</x-secondary-button>
-                </form>
-            @endif
         </x-card>
     </div>
 

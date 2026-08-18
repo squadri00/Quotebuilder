@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">Quote #{{ $quote->id }}</h2>
+        <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">Quote #{{ $quote->displayReference() }}</h2>
     </x-slot>
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -8,6 +8,20 @@
     <div class="max-w-lg">
         <x-card>
             <div class="text-center">
+                @if ($quote->revisesQuote)
+                    <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
+                        Revision of <a href="{{ route('quotes.show', $quote->revisesQuote) }}" class="font-medium brand-text hover:underline">Quote #{{ $quote->revisesQuote->displayReference() }}</a>
+                    </p>
+                @endif
+                @if ($quote->revisions->isNotEmpty())
+                    <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
+                        Revised as
+                        @foreach ($quote->revisions as $revision)
+                            <a href="{{ route('quotes.show', $revision) }}" class="font-medium brand-text hover:underline">Quote #{{ $revision->displayReference() }}</a>@if (! $loop->last), @endif
+                        @endforeach
+                    </p>
+                @endif
+
                 @if ($quote->isInternal())
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
                         Internal Quote
@@ -18,7 +32,7 @@
                     </span>
                 @endif
 
-                <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ $product->name }}</p>
+                <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ $product?->name ?? 'Product no longer available' }}</p>
 
                 <div class="mt-2 text-sm text-gray-700 dark:text-gray-300">
                     <p class="font-medium text-gray-900 dark:text-gray-100">{{ $quote->customer_name }}</p>
@@ -127,6 +141,15 @@
                 </p>
 
                 <div class="mt-4 grid grid-cols-2 gap-2">
+                    @if ($product)
+                        <a href="{{ route('quotes.edit', $quote) }}" class="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg font-semibold text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 col-span-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                            Edit / Re-quote
+                        </a>
+                    @endif
+
                     @if ($emailEnabled)
                         <form method="POST" action="{{ route('quotes.email', $quote) }}">
                             @csrf

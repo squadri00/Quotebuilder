@@ -52,7 +52,10 @@ class PlatformSettingController extends Controller
             'mail_scheme' => ['nullable', 'string', 'max:255'],
             'mail_from_address' => ['nullable', 'email', 'max:255'],
             'mail_from_name' => ['nullable', 'string', 'max:255'],
+            'maintenance_message' => ['nullable', 'string', 'max:2000'],
         ]);
+
+        $validated['maintenance_mode'] = $request->boolean('maintenance_mode');
 
         $settings = PlatformSetting::get();
 

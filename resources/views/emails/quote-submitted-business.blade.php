@@ -1,7 +1,7 @@
 <x-mail::message>
 # New quote submitted
 
-**{{ $quote->customer_name }}** ({{ $quote->customer_email }}) just requested a quote for **{{ $product->name }}**.
+**{{ $quote->customer_name }}** ({{ $quote->customer_email }}) just requested a quote for **{{ $product?->name ?? 'a product that has since been removed' }}**.
 
 **Price:** ${{ number_format($quote->final_price, 2) }}
 **Submitted:** {{ $quote->created_at->format('M j, Y g:ia') }}

@@ -29,9 +29,17 @@
                             @else
                                 <span class="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-900/30 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">No Stripe price</span>
                             @endif
+                            @if ($plan->hasDiscount())
+                                <span class="inline-flex items-center rounded-full bg-green-50 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:text-green-300">
+                                    On sale — {{ $plan->discount_display === 'fixed' ? '$'.number_format($plan->discountAmount(), 0).' off' : $plan->discountPercent().'% off' }}
+                                </span>
+                            @endif
                         </div>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             ${{ number_format($plan->price, 2) }} / {{ $plan->billing_interval }}
+                            @if ($plan->hasDiscount())
+                                <span class="line-through text-gray-400 dark:text-gray-500">${{ number_format($plan->compare_at_price, 2) }}</span>
+                            @endif
                             &middot; {{ $plan->features_count }} feature(s)
                             &middot; {{ $plan->businesses_count }} business(es) on this plan
                             &middot; {{ $plan->max_products === null ? 'unlimited' : $plan->max_products }} products

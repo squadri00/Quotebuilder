@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Billable;
 
 class Business extends Model
@@ -40,6 +43,9 @@ class Business extends Model
         'public_email_enabled',
         'logo_path',
         'brand_color',
+        'quote_number_format',
+        'quote_number_prefix',
+        'quote_number_next',
     ];
 
     /**
@@ -65,6 +71,18 @@ class Business extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    /**
+     * The one account this business was signed up under — every business
+     * has exactly one (see User::ROLE_OWNER), regardless of how many
+     * team members get invited afterward. Handy anywhere a single
+     * "the business's email" is needed, e.g. the Super Admin businesses
+     * list, since a business itself has no login/email of its own.
+     */
+    public function owner(): HasOne
+    {
+        return $this->hasOne(User::class)->where('role', User::ROLE_OWNER);
     }
 
     public function industry(): BelongsTo
@@ -187,11 +205,20 @@ class Business extends Model
         return $this->plan ? $this->plan->max_products : 0;
     }
 
+    /**
+     * Only ACTIVE products count against the plan limit — deliberately,
+     * so a business at their cap can make room for something new by
+     * deactivating an old product instead of having to delete it. An
+     * inactive product is already fully hidden from customers (same as
+     * deleted, as far as anyone outside the business can tell), so it
+     * costs nothing to leave it sitting there switched off — all its
+     * data, and any quote history tied to it, just stays intact.
+     */
     public function hasReachedProductLimit(): bool
     {
         $limit = $this->productLimit();
 
-        return $limit !== null && $this->products()->count() >= $limit;
+        return $limit !== null && $this->products()->where('is_active', true)->count() >= $limit;
     }
 
     /**
@@ -203,11 +230,59 @@ class Business extends Model
         return $this->plan ? $this->plan->max_quotes_per_month : 0;
     }
 
+    /**
+     * The start of this business's CURRENT billing cycle — anchored to
+     * the day-of-month their subscription actually renews on (or, for a
+     * business with no real Stripe subscription — free plan, or a plan
+     * Super Admin assigned by hand, see BusinessController::assignPlan()
+     * — the day-of-month they originally signed up on), not the 1st of
+     * the calendar month. A business that signed up on the 15th should
+     * see their quote count reset on the 15th, same as their real
+     * invoice date, not get a free reset on the 1st and another one
+     * mid-cycle. Never calls Stripe for this — the anchor day-of-month is
+     * stable and known locally, so there's nothing to look up.
+     *
+     * Clamped to whichever month's actual last day, for an anchor like
+     * the 31st in a shorter month (Carbon's day() would otherwise roll
+     * over into the next month entirely, e.g. "Feb 31st" becoming March
+     * 3rd). Re-clamped separately against the PREVIOUS month too when
+     * rolling back to it, rather than reusing the current month's clamp
+     * — a 31st-anchor business checked in February clamps to the 28th
+     * for February itself, but rolling back from there must land on
+     * January's real 31st, not carry February's 28 backwards into a
+     * month that actually had 31 days of its own.
+     */
+    public function currentBillingPeriodStart(): Carbon
+    {
+        $anchorDay = ($this->subscription('default')?->created_at ?? $this->created_at)->day;
+
+        $periodStart = $this->clampedAnchorDate(now(), $anchorDay);
+
+        if ($periodStart->greaterThan(now())) {
+            $periodStart = $this->clampedAnchorDate(now()->copy()->subMonthNoOverflow(), $anchorDay);
+        }
+
+        return $periodStart;
+    }
+
+    private function clampedAnchorDate(Carbon $referenceMonth, int $anchorDay): Carbon
+    {
+        return $referenceMonth->copy()->startOfDay()->day(min($anchorDay, $referenceMonth->daysInMonth));
+    }
+
+    /**
+     * When the count below next resets — purely for showing the business
+     * when their usage clears, not used in the limit check itself.
+     */
+    public function nextQuoteResetDate(): Carbon
+    {
+        return $this->currentBillingPeriodStart()->addMonthNoOverflow();
+    }
+
     public function quotesThisMonthCount(): int
     {
         return $this->quotes()
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
+            ->where('created_at', '>=', $this->currentBillingPeriodStart())
             ->count();
     }
 
@@ -216,6 +291,29 @@ class Business extends Model
         $limit = $this->monthlyQuoteLimit();
 
         return $limit !== null && $this->quotesThisMonthCount() >= $limit;
+    }
+
+    /**
+     * Claims and formats this business's next quote reference number
+     * (e.g. "42" or "INV-0042", per quote_number_format/quote_number_prefix
+     * — see Business Settings), atomically so two quotes created at the
+     * same moment can never collide. Every quote gets exactly one of
+     * these, assigned once at creation and never reassigned — see
+     * Quote::reference_number's docblock in the migration for why a quote
+     * predating this feature just falls back to showing its plain #id.
+     */
+    public function nextQuoteReferenceNumber(): string
+    {
+        return DB::transaction(function () {
+            $business = self::withoutGlobalScopes()->whereKey($this->id)->lockForUpdate()->first();
+
+            $number = $business->quote_number_next;
+            $business->increment('quote_number_next');
+
+            return $business->quote_number_format === 'alphanumeric'
+                ? trim((string) $business->quote_number_prefix).str_pad((string) $number, 4, '0', STR_PAD_LEFT)
+                : (string) $number;
+        });
     }
 
     /**

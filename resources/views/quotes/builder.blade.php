@@ -1,7 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">New Quote — {{ $product->name }}</h2>
+        <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">
+            {{ ($editingQuoteId ?? null) ? 'Edit Quote — '.$product->name : 'New Quote — '.$product->name }}
+        </h2>
     </x-slot>
+
+    @if (session('error'))
+        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+        </div>
+    @endif
 
     <div
         x-data="{
@@ -14,7 +22,8 @@
                     'options' => collect($q['options'])->map(fn ($o) => ['id' => $o['id'], 'label' => $o['label']])->values(),
                 ])) }},
                 {{ Js::from(route('quotes.create.price', $product)) }},
-                true
+                true,
+                {{ Js::from($initialAnswers ?? []) }}
             ),
         }"
         class="max-w-3xl"
@@ -157,6 +166,9 @@
                         <form method="POST" action="{{ route('quotes.create.review', $product) }}" class="mt-4" x-ref="doneForm">
                             @csrf
                             <input type="hidden" name="answers" x-ref="answersInput">
+                            @if ($editingQuoteId ?? null)
+                                <input type="hidden" name="editing_quote_id" value="{{ $editingQuoteId }}">
+                            @endif
                             <button type="button" @click="back()" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
                                 &larr; Back
                             </button>

@@ -28,3 +28,11 @@
     color: var(--brand-color, #4f46e5);
 }
 .brand-border { border-color: var(--brand-color, #4f46e5); }
+
+/* Keyboard-focus ring in the business's own brand color — used on the
+   public wizard's option/next/back buttons, which otherwise have no
+   visible focus indicator for keyboard users. */
+.brand-focus-ring:focus-visible {
+    outline: 2px solid var(--brand-color, #4f46e5);
+    outline-offset: 2px;
+}

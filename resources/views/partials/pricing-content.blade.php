@@ -47,8 +47,26 @@
                 @endphp
                 <div
                     x-data="{
-                        monthly: @js($monthly ? ['id' => $monthly->id, 'price' => (float) $monthly->price, 'bullets' => $monthly->marketingBulletsList()] : null),
-                        yearly: @js($yearly ? ['id' => $yearly->id, 'price' => (float) $yearly->price, 'bullets' => $yearly->marketingBulletsList()] : null),
+                        monthly: @js($monthly ? [
+                            'id' => $monthly->id,
+                            'price' => (float) $monthly->price,
+                            'bullets' => $monthly->marketingBulletsList(),
+                            'hasDiscount' => $monthly->hasDiscount(),
+                            'comparePrice' => (float) $monthly->compare_at_price,
+                            'discountAmount' => $monthly->discountAmount(),
+                            'discountPercent' => $monthly->discountPercent(),
+                            'discountDisplay' => $monthly->discount_display,
+                        ] : null),
+                        yearly: @js($yearly ? [
+                            'id' => $yearly->id,
+                            'price' => (float) $yearly->price,
+                            'bullets' => $yearly->marketingBulletsList(),
+                            'hasDiscount' => $yearly->hasDiscount(),
+                            'comparePrice' => (float) $yearly->compare_at_price,
+                            'discountAmount' => $yearly->discountAmount(),
+                            'discountPercent' => $yearly->discountPercent(),
+                            'discountDisplay' => $yearly->discount_display,
+                        ] : null),
                         get plan() { return interval === 'yearly' && this.yearly ? this.yearly : this.monthly; },
                     }"
                     class="relative rounded-2xl border bg-white p-8 flex flex-col h-full {{ $anyVariant->is_highlighted ? 'border-indigo-600 shadow-lg ring-1 ring-indigo-600' : 'border-gray-200 shadow-sm' }}"
@@ -61,10 +79,19 @@
 
                     <h2 class="text-lg font-semibold text-gray-900">{{ $anyVariant->name }}</h2>
 
-                    <p class="mt-2 flex items-baseline gap-1">
-                        <span class="text-4xl font-bold text-gray-900" x-text="'$' + Math.round(plan.price)"></span>
-                        <span class="text-sm font-medium text-gray-500" x-text="interval === 'yearly' ? '/yr' : '/mo'"></span>
-                    </p>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-400 line-through" x-show="plan.hasDiscount" x-cloak x-text="'$' + Math.round(plan.comparePrice)"></p>
+                        <p class="flex items-baseline gap-1">
+                            <span class="text-4xl font-bold text-gray-900" x-text="'$' + Math.round(plan.price)"></span>
+                            <span class="text-sm font-medium text-gray-500" x-text="interval === 'yearly' ? '/yr' : '/mo'"></span>
+                        </p>
+                        <span
+                            class="inline-flex items-center mt-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-bold text-green-700"
+                            x-show="plan.hasDiscount"
+                            x-cloak
+                            x-text="plan.discountDisplay === 'fixed' ? 'Save $' + Math.round(plan.discountAmount) : 'Save ' + plan.discountPercent + '%'"
+                        ></span>
+                    </div>
 
                     <ul class="mt-6 space-y-3 text-sm text-gray-700 flex-1">
                         <template x-for="bullet in plan.bullets" :key="bullet">

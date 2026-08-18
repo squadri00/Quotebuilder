@@ -27,6 +27,35 @@
     </div>
 </div>
 
+<div class="mt-6 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+    <label class="flex items-center gap-2">
+        <input type="checkbox" name="show_discount" value="1" class="rounded border-gray-300 text-indigo-600 dark:text-indigo-400 shadow-sm focus:ring-indigo-500"
+            @checked(old('show_discount', $plan?->show_discount ?? false))>
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Show a sale price on the public pricing page</span>
+    </label>
+    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">When on, the pricing page shows the price below struck through, then the actual price below as the sale price — the savings shown are always calculated live from the two, so they can never end up out of sync. Doesn't affect what's actually charged.</p>
+
+    <div class="grid grid-cols-2 gap-4 mt-3">
+        <div>
+            <x-input-label for="compare_at_price" value="Was Price ($)" />
+            <x-text-input id="compare_at_price" name="compare_at_price" type="number" step="0.01" min="0" class="block mt-1 w-full"
+                placeholder="e.g. 99.00" :value="old('compare_at_price', $plan?->compare_at_price)" />
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Must be higher than the real Price above.</p>
+            <x-input-error :messages="$errors->get('compare_at_price')" class="mt-2" />
+        </div>
+
+        <div>
+            <x-input-label for="discount_display" value="Show Savings As" />
+            <select id="discount_display" name="discount_display"
+                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm">
+                <option value="fixed" @selected(old('discount_display', $plan?->discount_display ?? 'percentage') === 'fixed')>Dollar amount — e.g. "Save $20"</option>
+                <option value="percentage" @selected(old('discount_display', $plan?->discount_display ?? 'percentage') === 'percentage')>Percentage — e.g. "20% off"</option>
+            </select>
+            <x-input-error :messages="$errors->get('discount_display')" class="mt-2" />
+        </div>
+    </div>
+</div>
+
 <div class="mt-4">
     <x-input-label for="stripe_price_id" value="Stripe Price ID" />
     <x-text-input id="stripe_price_id" name="stripe_price_id" type="text" class="block mt-1 w-full font-mono text-sm"

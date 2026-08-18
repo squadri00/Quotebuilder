@@ -31,7 +31,9 @@ class QuoteSubmittedToCustomer extends Mailable
         $business = $this->quote->business;
 
         return new Envelope(
-            subject: "Your quote from {$business->name}",
+            subject: $this->quote->revises_quote_id
+                ? "Your revised quote from {$business->name}"
+                : "Your quote from {$business->name}",
             // Sent From the platform's own verified address (keeps
             // SPF/DKIM intact — see PublicQuoteController's docblock),
             // but a customer who hits Reply lands in the business's own

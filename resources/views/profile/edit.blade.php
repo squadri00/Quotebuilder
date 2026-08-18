@@ -15,12 +15,6 @@
                 @include('profile.partials.update-password-form')
             </x-card>
 
-            <x-card>
-                @include('profile.partials.delete-user-form')
-            </x-card>
-        </div>
-
-        <div class="space-y-6">
             @if (Auth::user()->canManageBusinessSettings())
                 <x-card>
                     @include('profile.partials.update-business-address-form', ['business' => Auth::user()->business])
@@ -29,9 +23,17 @@
                 <x-card>
                     @include('profile.partials.update-business-branding-form', ['business' => Auth::user()->business])
                 </x-card>
+            @endif
+        </div>
 
+        <div class="space-y-6">
+            @if (Auth::user()->canManageBusinessSettings())
                 <x-card>
                     @include('profile.partials.update-public-quote-settings-form', ['business' => Auth::user()->business])
+                </x-card>
+
+                <x-card>
+                    @include('profile.partials.update-quote-numbering-form', ['business' => Auth::user()->business])
                 </x-card>
 
                 <x-card>
@@ -43,5 +45,11 @@
                 @include('profile.partials.business-qr-code', ['business' => Auth::user()->business])
             </x-card>
         </div>
+    </div>
+
+    <div class="mt-6">
+        <x-card>
+            @include('profile.partials.delete-user-form')
+        </x-card>
     </div>
 </x-app-layout>

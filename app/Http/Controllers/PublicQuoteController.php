@@ -146,6 +146,7 @@ class PublicQuoteController extends Controller
 
         $quote = Quote::create([
             'business_id' => $business->id,
+            'reference_number' => $business->nextQuoteReferenceNumber(),
             'product_id' => $product->id,
             'customer_name' => $validated['customer_name'],
             'customer_email' => $validated['customer_email'],
@@ -192,6 +193,7 @@ class PublicQuoteController extends Controller
             'selections' => $quote->meta['selections'] ?? [],
             'pdfEnabled' => $this->pdfEnabledForQuoting($business),
             'viewUrl' => $viewUrl,
+            'startOverUrl' => $this->startOverUrl($business, $product),
         ]);
     }
 
@@ -219,7 +221,29 @@ class PublicQuoteController extends Controller
             'pdfEnabled' => $this->pdfEnabledForQuoting($business),
             'viewUrl' => route('quote.view', $quote->uuid),
             'revisiting' => true,
+            'startOverUrl' => $product ? $this->startOverUrl($business, $product) : route('quote.picker', $business),
         ]);
+    }
+
+    /**
+     * Where "Start a new quote" on the result page should go — the
+     * product picker (so the customer can also pick a different product)
+     * when this business actually has one to show, otherwise back into
+     * this same product's wizard. Quote Hub visibility defaults off (see
+     * the products migration), so a business that's never turned it on
+     * would otherwise send every customer to an empty picker page.
+     */
+    private function startOverUrl(Business $business, Product $product): string
+    {
+        $hasHubProducts = $business->products()
+            ->where('is_active', true)
+            ->where('show_in_quote_hub', true)
+            ->whereNotNull('published_snapshot')
+            ->exists();
+
+        return $hasHubProducts
+            ? route('quote.picker', $business)
+            : route('quote.show', [$business, $product]);
     }
 
     public function downloadPdf(Quote $quote): Response
@@ -243,7 +267,9 @@ class PublicQuoteController extends Controller
             'tax' => $this->taxFromMeta($quote),
         ]);
 
-        return $pdf->download("quote-{$quote->id}.pdf");
+        $filename = 'quote-'.preg_replace('/[^A-Za-z0-9_-]+/', '-', $quote->displayReference()).'.pdf';
+
+        return $pdf->download($filename);
     }
 
     /**
@@ -264,18 +290,37 @@ class PublicQuoteController extends Controller
         ];
     }
 
+    /**
+     * The quote itself is already saved by the time this runs (see
+     * store() — Quote::create() happens well before this is called), so
+     * a mail server problem here (bad SMTP credentials, the provider
+     * rejecting this server's IP, a timeout, ...) must never take the
+     * customer's already-successful submission down with it. Each send
+     * is caught independently and logged rather than thrown, so one
+     * failing recipient (or a total outage) still lets every other send
+     * attempt run and always leaves the customer looking at their result
+     * page instead of a 500 error.
+     */
     private function sendNotificationEmails(Business $business, Quote $quote, array $result, ?string $viewUrl): void
     {
-        Mail::to($quote->customer_email)->send(
-            new QuoteSubmittedToCustomer($quote, $result, $viewUrl)
-        );
+        try {
+            Mail::to($quote->customer_email)->send(
+                new QuoteSubmittedToCustomer($quote, $result, $viewUrl)
+            );
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         $inboxUrl = $business->hasFeature('quote_inbox') ? route('quotes.index') : null;
 
         $recipients = $business->users()->where('is_active', true)->pluck('email');
 
         foreach ($recipients as $email) {
-            Mail::to($email)->send(new QuoteSubmittedToBusiness($quote, $inboxUrl));
+            try {
+                Mail::to($email)->send(new QuoteSubmittedToBusiness($quote, $inboxUrl));
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
     }
 

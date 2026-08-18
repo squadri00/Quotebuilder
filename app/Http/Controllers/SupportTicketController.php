@@ -57,7 +57,12 @@ class SupportTicketController extends Controller
         ])->fresh();
 
         $this->notifyAdmins(new SupportTicketCreated($ticket));
-        Mail::to(Auth::user()->email)->send(new SupportTicketReceived($ticket));
+
+        try {
+            Mail::to(Auth::user()->email)->send(new SupportTicketReceived($ticket));
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return redirect()->route('support.show', $ticket)
             ->with('status', "Ticket {$ticket->tracking_number} submitted.");
@@ -94,8 +99,12 @@ class SupportTicketController extends Controller
 
     private function notifyAdmins($mailable): void
     {
-        Admin::pluck('email')->each(
-            fn (string $email) => Mail::to($email)->send($mailable)
-        );
+        Admin::pluck('email')->each(function (string $email) use ($mailable) {
+            try {
+                Mail::to($email)->send($mailable);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        });
     }
 }

@@ -159,9 +159,11 @@ class InternalQuoteController extends Controller
         $business = $product->business;
         $quote = $this->persist($business, $product, $this->calculate($request, $business, $product));
 
-        $this->sendCustomerEmail($quote);
+        $status = $this->trySendCustomerEmail($quote)
+            ? 'Demo quote saved and emailed.'
+            : 'Demo quote saved, but the email failed to send — check your mail settings.';
 
-        return redirect()->route('superadmin.quotes.result', $quote)->with('status', 'Demo quote saved and emailed.');
+        return redirect()->route('superadmin.quotes.result', $quote)->with('status', $status);
     }
 
     public function pdf(Request $request, Product $product): RedirectResponse
@@ -191,9 +193,11 @@ class InternalQuoteController extends Controller
         abort_unless($quote->isInternal(), 404);
         abort_unless($quote->business->is_template, 404);
 
-        $this->sendCustomerEmail($quote);
+        $status = $this->trySendCustomerEmail($quote)
+            ? 'Emailed to the customer.'
+            : 'The email failed to send — check your mail settings and try again.';
 
-        return redirect()->route('superadmin.quotes.result', $quote)->with('status', 'Emailed to the customer.');
+        return redirect()->route('superadmin.quotes.result', $quote)->with('status', $status);
     }
 
     /**
@@ -322,7 +326,7 @@ class InternalQuoteController extends Controller
         return $quote;
     }
 
-    private function sendCustomerEmail(Quote $quote): void
+    private function trySendCustomerEmail(Quote $quote): bool
     {
         $result = ['applied_rules' => $quote->meta['applied_rules'] ?? []];
 
@@ -330,9 +334,17 @@ class InternalQuoteController extends Controller
             ? route('quote.view', $quote->uuid)
             : null;
 
-        Mail::to($quote->customer_email)->send(new QuoteSubmittedToCustomer($quote, $result, $viewUrl));
+        try {
+            Mail::to($quote->customer_email)->send(new QuoteSubmittedToCustomer($quote, $result, $viewUrl));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return false;
+        }
 
         $quote->update(['emailed_at' => now()]);
+
+        return true;
     }
 
     private function recentCustomers(Business $business): array

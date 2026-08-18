@@ -3,7 +3,12 @@
         <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">Dashboard</h2>
     </x-slot>
 
-    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Welcome back, {{ $business->name }}.</p>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        Welcome back, {{ $business->name }}.
+        @if ($business->industry)
+            <span class="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-300 ml-1">{{ $business->industry->name }}</span>
+        @endif
+    </p>
 
     @if ($headerAnnouncements->isNotEmpty())
         @php
@@ -36,10 +41,13 @@
     @if ($showOnboarding)
         <x-card class="mb-6 border-indigo-200 bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950">
             <div class="flex items-start justify-between gap-4">
-                <div>
-                    <p class="font-semibold text-gray-900 dark:text-gray-100">Get started</p>
-                    <p class="mt-1 text-sm text-gray-700 dark:text-gray-300">Pick your industry and add some ready-made starting products to your account — or skip this and build everything from scratch.</p>
-                    <a href="{{ route('onboarding.create') }}" class="mt-2 inline-block text-sm font-medium brand-text">Get Started →</a>
+                <div class="flex-1">
+                    <p class="font-semibold text-gray-900 dark:text-gray-100">Finish setting up your account</p>
+                    <p class="mt-1 text-sm text-gray-700 dark:text-gray-300">{{ $progress['completed'] }} of {{ $progress['total'] }} steps done — a few things are worth finishing before you send your first real quote.</p>
+                    <div class="w-full max-w-xs bg-indigo-100 rounded-full h-1.5 mt-2 dark:bg-indigo-900">
+                        <div class="h-1.5 rounded-full brand-bg" style="width: {{ $progress['percent'] }}%"></div>
+                    </div>
+                    <a href="{{ route('onboarding.create') }}" class="mt-2 inline-block text-sm font-medium brand-text">Continue Setup Guide →</a>
                 </div>
                 <form method="POST" action="{{ route('onboarding.dismiss') }}">
                     @csrf
@@ -70,15 +78,61 @@
             <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $quoteCount }}</p>
         </x-card>
 
-        <x-card>
+        @php
+            $quoteUsagePercent = $quoteLimit ? min(100, (int) round($quotesThisMonth / max($quoteLimit, 1) * 100)) : null;
+            $quoteUsageIsHigh = $quoteUsagePercent !== null && $quoteUsagePercent >= 80;
+        @endphp
+        <x-card class="{{ $quoteUsageIsHigh ? 'border-amber-300 dark:border-amber-800' : '' }}">
             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Quotes this month</p>
-            <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $quotesThisMonth }}</p>
+            <p class="mt-1 text-2xl font-bold {{ $quoteUsageIsHigh ? 'text-amber-700 dark:text-amber-400' : 'text-gray-900 dark:text-gray-100' }}">
+                {{ $quotesThisMonth }}{{ $quoteLimit !== null ? ' of '.$quoteLimit : '' }}
+            </p>
+            @if ($quoteLimit === null)
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Unlimited on your plan</p>
+            @else
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-2">
+                    <div class="h-1.5 rounded-full {{ $quoteUsageIsHigh ? 'bg-amber-500' : 'brand-bg' }}" style="width: {{ $quoteUsagePercent }}%"></div>
+                </div>
+                <p class="mt-1 text-xs {{ $quoteUsageIsHigh ? 'text-amber-700 dark:text-amber-400 font-medium' : 'text-gray-500 dark:text-gray-400' }}">
+                    @if ($quotesThisMonth >= $quoteLimit)
+                        Limit reached — resets {{ $quoteResetDate->format('M j') }}
+                    @else
+                        Resets {{ $quoteResetDate->format('M j') }}
+                    @endif
+                </p>
+            @endif
         </x-card>
 
         <x-card>
             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Current Plan</p>
             <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $business->plan?->name ?? 'None' }}</p>
             <a href="{{ route('billing.index') }}" class="mt-1 inline-block text-xs font-medium brand-text">Manage billing</a>
+        </x-card>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <x-card>
+            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Public Quotes (this month)</p>
+            <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $publicQuotesThisMonth }}</p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Submitted by customers online</p>
+        </x-card>
+
+        <x-card>
+            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Public Quotes (all time)</p>
+            <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $publicQuotesAllTime }}</p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Submitted by customers online</p>
+        </x-card>
+
+        <x-card>
+            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Internal Quotes (this month)</p>
+            <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $internalQuotesThisMonth }}</p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Created by your team</p>
+        </x-card>
+
+        <x-card>
+            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Internal Quotes (all time)</p>
+            <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $internalQuotesAllTime }}</p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Created by your team</p>
         </x-card>
     </div>
 
@@ -119,7 +173,7 @@
                                         <td class="px-4 py-3 text-gray-900 dark:text-gray-100">{{ $quote->customer_name }}</td>
                                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $quote->product?->name ?? '—' }}</td>
                                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${{ number_format($quote->final_price, 2) }}</td>
-                                        <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $quote->created_at->format('M j, Y') }}</td>
+                                        <td class="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $quote->created_at->format('M j, Y g:i A') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
