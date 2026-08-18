@@ -12,6 +12,7 @@ class PlatformTaxRate extends Model
         'tax_label',
         'rate',
         'is_active',
+        'stripe_tax_rate_id',
     ];
 
     protected $attributes = [

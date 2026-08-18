@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\ImplementationOrder;
 use App\Models\PendingRegistration;
 use App\Models\Plan;
+use App\Models\TaxCollection;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\DB;
@@ -93,6 +94,51 @@ class WebhookController extends CashierWebhookController
         }
 
         return $this->successMethod();
+    }
+
+    /**
+     * The local record-keeping side of Business::taxRates() — every paid
+     * invoice that actually carried tax (Stripe's own total_taxes array,
+     * present whenever a Tax Rate was attached) gets logged here, so the
+     * platform owner has a running total for their own HST/GST remittance
+     * instead of having to reconstruct it from raw Stripe data. Guarded by
+     * stripe_invoice_id's unique constraint against a redelivered webhook
+     * double-recording the same invoice.
+     */
+    protected function handleInvoicePaymentSucceeded(array $payload): Response
+    {
+        $response = parent::handleInvoicePaymentSucceeded($payload);
+
+        $invoice = $payload['data']['object'];
+        $taxTotal = collect($invoice['total_taxes'] ?? [])->sum('amount');
+
+        if ($taxTotal <= 0) {
+            return $response;
+        }
+
+        $business = $this->getUserByStripeId($invoice['customer'] ?? null);
+
+        if (! $business instanceof Business) {
+            return $response;
+        }
+
+        $subscriptionId = $invoice['parent']['subscription_details']['subscription'] ?? null;
+        $subscriptionType = $subscriptionId
+            ? Subscription::where('stripe_id', $subscriptionId)->value('type')
+            : null;
+
+        TaxCollection::firstOrCreate(
+            ['stripe_invoice_id' => $invoice['id']],
+            [
+                'business_id' => $business->id,
+                'subscription_type' => $subscriptionType,
+                'amount' => $taxTotal / 100,
+                'currency' => strtoupper($invoice['currency'] ?? 'cad'),
+                'collected_at' => now(),
+            ]
+        );
+
+        return $response;
     }
 
     /**

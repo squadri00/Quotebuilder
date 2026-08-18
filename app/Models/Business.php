@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasFormattedAddress;
 use App\Models\Concerns\HasSlug;
+use App\Services\PlatformTaxCalculator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -193,6 +194,27 @@ class Business extends Model
     public function hasSupportAccess(): bool
     {
         return $this->support_access_granted || $this->subscribed('support') || $this->hasFeature('priority_support');
+    }
+
+    /**
+     * Cashier's own extension point (see Billable::taxRates(), which
+     * defaults to []) — whatever this returns gets attached as
+     * default_tax_rates on every subscription Cashier creates for this
+     * business (newSubscription()->checkout()/create()), and Stripe then
+     * re-applies it on every future renewal invoice on its own. Unlike the
+     * old approach of merging tax into a one-time price, this survives
+     * plan swaps automatically too, since Subscription::swap() never
+     * touches default_tax_rates.
+     *
+     * Empty for anywhere outside Canada, or if no matching rate has been
+     * set up in Stripe yet (see PlatformTaxRate::stripe_tax_rate_id) —
+     * either way, Stripe simply adds nothing.
+     */
+    public function taxRates(): array
+    {
+        $rate = (new PlatformTaxCalculator)->rateFor($this);
+
+        return $rate?->stripe_tax_rate_id ? [$rate->stripe_tax_rate_id] : [];
     }
 
     /**

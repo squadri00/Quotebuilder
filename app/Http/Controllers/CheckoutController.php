@@ -14,9 +14,10 @@ use Laravel\Cashier\Checkout;
 /**
  * The plan checkout review page shown right after registration: shows a
  * real tax breakdown computed from the address entered on the signup
- * form, and — unlike the informational split shown elsewhere on the
- * Billing page — actually sends that tax-inclusive total to Stripe as
- * the subscription price, built fresh per checkout via price_data.
+ * form, then sends the plan's real fixed Stripe price plus the matching
+ * Stripe Tax Rate (see Business::taxRates()) to build the subscription —
+ * so unlike an earlier version of this flow, tax isn't merged into a
+ * one-off frozen price; Stripe re-applies it fresh on every renewal.
  *
  * No Business/User exists yet at this point — the registration is just a
  * PendingRegistration behind a token, so an abandoned checkout never
@@ -60,9 +61,6 @@ class CheckoutController extends Controller
 
         abort_unless($plan && $plan->is_active && $plan->stripe_price_id, 404, 'This plan is not set up for Stripe billing.');
 
-        $tax = $this->taxForPending($pending, $plan);
-        $interval = $plan->billing_interval === 'yearly' ? 'year' : 'month';
-
         // No Business/Stripe customer exists yet, so this is a guest
         // checkout (Stripe creates the customer itself once payment
         // completes) rather than $business->newSubscription(...). The
@@ -70,24 +68,29 @@ class CheckoutController extends Controller
         // pending registration's token — that's what the webhook reads to
         // create the real account and sync its plan (see
         // Stripe\WebhookController).
+        //
+        // Uses the plan's real, fixed, tax-exclusive stripe_price_id —
+        // NOT a one-off price_data with tax merged into the amount. Tax
+        // is attached separately below as default_tax_rates, which Stripe
+        // then re-applies on every future renewal invoice on its own
+        // (unlike the old merged-price approach, which froze that first
+        // charge's tax amount forever). This is the exact same mechanism
+        // as Business::taxRates() — just computed by hand here since no
+        // real Business exists yet to call that method on.
         return Checkout::guest()->create([[
-            'price_data' => [
-                'currency' => (new Business)->preferredCurrency(),
-                'unit_amount' => (int) round($tax['total'] * 100),
-                'recurring' => ['interval' => $interval],
-                'product_data' => ['name' => $plan->name],
-            ],
+            'price' => $plan->stripe_price_id,
             'quantity' => 1,
         ]], [
             'mode' => 'subscription',
-            'subscription_data' => [
+            'subscription_data' => array_filter([
+                'default_tax_rates' => $this->taxRateIdsForPending($pending) ?: null,
                 'metadata' => [
                     'name' => 'default',
                     'type' => 'default',
                     'plan_id' => (string) $plan->id,
                     'pending_registration_token' => $pending->token,
                 ],
-            ],
+            ]),
             'success_url' => route('checkout.success', $pending->token).'?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('checkout.show', $pending->token).'?checkout=cancelled',
         ]);
@@ -121,5 +124,18 @@ class CheckoutController extends Controller
         ]);
 
         return (new PlatformTaxCalculator)->addToBase($business, (float) $plan->price);
+    }
+
+    /**
+     * @return string[] Stripe Tax Rate IDs to attach — see
+     *   Business::taxRates(), whose exact logic this mirrors for a
+     *   pending registrant that isn't a real Business yet.
+     */
+    private function taxRateIdsForPending(PendingRegistration $pending): array
+    {
+        return (new Business([
+            'country' => $pending->country,
+            'state_province' => $pending->state_province,
+        ]))->taxRates();
     }
 }
