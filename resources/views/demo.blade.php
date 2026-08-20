@@ -19,8 +19,50 @@
             </div>
         </section>
 
-        <section class="py-10 lg:py-16">
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section
+            class="py-10 lg:py-16"
+            x-data="{
+                active: null,
+                activeName: null,
+                open(slug, name) {
+                    this.active = slug;
+                    this.activeName = name;
+                    this.$nextTick(() => {
+                        const container = this.$refs.embedContainer;
+                        container.innerHTML = '';
+                        const script = document.createElement('script');
+                        script.src = '{{ url('/embed.js') }}';
+                        script.setAttribute('data-business', slug);
+                        container.appendChild(script);
+                        this.$refs.embedPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                },
+                close() {
+                    this.active = null;
+                    this.$refs.embedContainer.innerHTML = '';
+                },
+            }"
+        >
+            <!-- Inline embedded calculator — same public/embed.js an industry's -->
+            <!-- own iframe embed on a real website would use, so this is the -->
+            <!-- exact experience a customer gets, right inside the Quotaire layout. -->
+            <div x-show="active" x-cloak x-ref="embedPanel" class="mb-10">
+                <button type="button" @click="close()" class="inline-flex items-center text-sm font-semibold text-gray-600 hover:text-gray-900 mb-4">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    All industries
+                </button>
+                <div class="rounded-2xl border border-gray-200 shadow-lg overflow-hidden bg-white">
+                    <div class="px-5 py-3 bg-gray-900 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-400"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-400"></span>
+                        <span class="ml-3 text-xs text-gray-300" x-text="activeName + ' — live demo'"></span>
+                    </div>
+                    <div x-ref="embedContainer"></div>
+                </div>
+            </div>
+
+            <div x-show="!active" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($industries as $i => $industry)
                     <div data-aos="fade-up" data-aos-once="true" data-aos-delay="{{ ($i % 3) * 100 }}" class="group flex flex-col bg-white rounded-2xl border border-gray-200 p-8 hover:shadow-xl hover:-translate-y-1.5 hover:border-green-200 transition duration-300">
                         <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600 mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -30,12 +72,12 @@
                         </div>
                         <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $industry['name'] }}</h3>
                         <p class="text-gray-600 leading-relaxed flex-1">{{ $industry['description'] }}</p>
-                        <a href="{{ route('quote.picker', ['business' => $industry['business']]) }}" target="_blank" class="inline-flex items-center mt-6 font-semibold text-green-600">
+                        <button type="button" @click="open('{{ $industry['business']->slug }}', '{{ addslashes($industry['name']) }}')" class="inline-flex items-center mt-6 font-semibold text-green-600">
                             Try the demo
                             <svg class="w-4 h-4 ml-1.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
-                        </a>
+                        </button>
                     </div>
                 @endforeach
             </div>

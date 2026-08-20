@@ -20,6 +20,7 @@ use App\Http\Controllers\SuperAdmin\PlatformSettingController;
 use App\Http\Controllers\SuperAdmin\PlatformTaxRateController;
 use App\Http\Controllers\SuperAdmin\ProductController;
 use App\Http\Controllers\SuperAdmin\QuestionController;
+use App\Http\Controllers\SuperAdmin\QuoteHubController;
 use App\Http\Controllers\SuperAdmin\RuleController;
 use App\Http\Controllers\SuperAdmin\SupportAddonController;
 use App\Http\Controllers\SuperAdmin\SupportTicketController;
@@ -84,6 +85,7 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::delete('/businesses/{business}/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
         Route::post('/businesses/{business}/products/{product}/publish', [ProductController::class, 'publish'])->name('products.publish');
         Route::get('/businesses/{business}/products/{product}/preview', [ProductController::class, 'preview'])->name('products.preview');
+        Route::patch('/businesses/{business}/quote-hub', [QuoteHubController::class, 'update'])->name('quote-hub.update');
 
         /*
          * Super Admin's demo-quote tool — every product reachable here

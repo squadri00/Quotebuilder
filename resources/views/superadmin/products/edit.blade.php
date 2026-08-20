@@ -73,4 +73,33 @@
             <x-danger-button>Delete Product</x-danger-button>
         </form>
     </x-card>
+
+    <x-card class="max-w-xl mt-6">
+        <div x-data="{ open: false, copied: false }">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <p class="font-semibold text-gray-900 dark:text-gray-100">Embed on a website</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Paste this on a site to show this quote builder there.</p>
+                </div>
+                <x-secondary-button type="button" @click="open = !open" x-text="open ? 'Hide' : 'Get Embed Code'">Get Embed Code</x-secondary-button>
+            </div>
+
+            <div x-show="open" x-cloak class="mt-4">
+                @unless ($product->published_snapshot)
+                    <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3">
+                        This product hasn't been published yet — publish it first, or the embedded widget won't have anything to show.
+                    </p>
+                @endunless
+
+                <textarea x-ref="snippet" readonly rows="2" @click="$event.target.select()"
+                    class="w-full font-mono text-xs border-gray-300 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-900/50 dark:border-gray-600 dark:text-gray-300 resize-none">{{ '<script src="'.url('/embed.js').'" data-business="'.$business->slug.'" data-product="'.$product->slug.'"></script>' }}</textarea>
+
+                <button type="button"
+                    @click="navigator.clipboard.writeText($refs.snippet.value); copied = true; setTimeout(() => copied = false, 2000)"
+                    class="mt-2 inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <span x-text="copied ? 'Copied!' : 'Copy to Clipboard'">Copy to Clipboard</span>
+                </button>
+            </div>
+        </div>
+    </x-card>
 </x-superadmin-layout>

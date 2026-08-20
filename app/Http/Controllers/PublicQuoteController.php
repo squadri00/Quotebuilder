@@ -62,6 +62,11 @@ class PublicQuoteController extends Controller
             ->where('is_active', true)
             ->where('show_in_quote_hub', true)
             ->whereNotNull('published_snapshot')
+            // A product should always have a slug (HasSlug generates one on
+            // creation), but route('quote.show', ...) throws for the whole
+            // page if any single row here doesn't — excluding a stray one
+            // is safer than a 500 hiding every other product in the hub.
+            ->whereNotNull('slug')
             ->orderBy('quote_hub_sort_order')
             ->orderBy('name')
             ->get();
