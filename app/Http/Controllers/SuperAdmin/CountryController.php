@@ -59,6 +59,21 @@ class CountryController extends Controller
         return back()->with('status', "\"{$country->name}\" is now ".($country->is_active ? 'active' : 'inactive').'.');
     }
 
+    /**
+     * Businesses store their country as a plain name string (see
+     * register-form.blade.php), never a foreign key to this table, so
+     * deleting a country here can't orphan anything — a business already
+     * registered from here keeps its own stored name untouched.
+     */
+    public function destroy(Country $country): RedirectResponse
+    {
+        $name = $country->name;
+
+        $country->delete();
+
+        return redirect()->route('superadmin.countries.index')->with('status', "\"{$name}\" deleted.");
+    }
+
     private function validated(Request $request, ?Country $country = null): array
     {
         $validated = $request->validate([

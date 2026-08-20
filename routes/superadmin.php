@@ -6,6 +6,7 @@ use App\Http\Controllers\SuperAdmin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\SuperAdmin\BusinessController;
 use App\Http\Controllers\SuperAdmin\CountryController;
 use App\Http\Controllers\SuperAdmin\DashboardController;
+use App\Http\Controllers\SuperAdmin\DemoCalculatorController;
 use App\Http\Controllers\SuperAdmin\ExportController;
 use App\Http\Controllers\SuperAdmin\FeatureController;
 use App\Http\Controllers\SuperAdmin\FinancialController;
@@ -141,6 +142,9 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
 
         Route::resource('countries', CountryController::class)->except('show');
         Route::patch('/countries/{country}/toggle-active', [CountryController::class, 'toggleActive'])->name('countries.toggle-active');
+
+        Route::resource('demo-calculators', DemoCalculatorController::class)->except('show');
+        Route::patch('/demo-calculators/{demo_calculator}/toggle-active', [DemoCalculatorController::class, 'toggleActive'])->name('demo-calculators.toggle-active');
 
         Route::resource('announcements', AnnouncementController::class)->except('show');
         Route::patch('/announcements/{announcement}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');
