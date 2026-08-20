@@ -11,6 +11,7 @@ use App\Http\Controllers\SuperAdmin\ExportController;
 use App\Http\Controllers\SuperAdmin\FeatureController;
 use App\Http\Controllers\SuperAdmin\FeaturesPageController;
 use App\Http\Controllers\SuperAdmin\FinancialController;
+use App\Http\Controllers\SuperAdmin\HomePageController;
 use App\Http\Controllers\SuperAdmin\ImplementationOrderController;
 use App\Http\Controllers\SuperAdmin\ImplementationTierController;
 use App\Http\Controllers\SuperAdmin\IndustryController;
@@ -158,6 +159,9 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::put('/features-page/cards/{card}', [FeaturesPageController::class, 'updateCard'])->name('features-page.cards.update');
         Route::delete('/features-page/cards/{card}', [FeaturesPageController::class, 'destroyCard'])->name('features-page.cards.destroy');
         Route::patch('/features-page/cards/{card}/toggle-active', [FeaturesPageController::class, 'toggleCardActive'])->name('features-page.cards.toggle-active');
+
+        Route::get('/home-page', [HomePageController::class, 'index'])->name('home-page.index');
+        Route::put('/home-page/hero', [HomePageController::class, 'updateHero'])->name('home-page.hero.update');
 
         Route::resource('announcements', AnnouncementController::class)->except('show');
         Route::patch('/announcements/{announcement}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');

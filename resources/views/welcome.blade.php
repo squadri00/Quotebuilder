@@ -8,9 +8,9 @@
         <div class="max-w-6xl px-6 mx-auto flex flex-col lg:flex-row items-stretch">
             <div class="flex flex-col w-full lg:w-5/12 justify-center lg:pt-6 items-start text-center lg:text-left mb-5 md:mb-0">
                 <h1 data-aos="fade-right" data-aos-once="true" class="my-4 text-5xl sm:text-6xl font-bold leading-tight text-navy dark:text-gray-100">
-                    <span class="text-green-600 dark:text-green-400">Build Your Own</span> Quote Calculator
+                    {{ $hero->heading }}
                 </h1>
-                <p data-aos="fade-down" data-aos-once="true" data-aos-delay="300" class="leading-normal text-xl mb-8 text-gray-600 dark:text-gray-400">Create custom quote calculators for your business. Set your products, options, pricing and rules, then use them internally or give your customers a simple way to get a quote online.</p>
+                <p data-aos="fade-down" data-aos-once="true" data-aos-delay="300" class="leading-normal text-xl mb-8 text-gray-600 dark:text-gray-400">{{ $hero->subheading }}</p>
                 <div data-aos="fade-up" data-aos-once="true" data-aos-delay="700" class="w-full md:flex items-center justify-center lg:justify-start md:space-x-5">
                     @auth
                         <a href="{{ url('/dashboard') }}" class="lg:mx-0 inline-block bg-green-600 text-white text-xl font-bold rounded-full py-4 px-9 hover:bg-green-700 transform transition hover:scale-105 duration-300 ease-in-out">

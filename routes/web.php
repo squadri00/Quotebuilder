@@ -11,6 +11,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemoController;
 use App\Http\Controllers\FeaturesController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InternalQuoteController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\OptionController;
@@ -33,9 +34,7 @@ use App\Http\Controllers\Stripe\WebhookController as StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Cashier\Http\Controllers\PaymentController as CashierPaymentController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'show']);
 
 Route::get('/features', [FeaturesController::class, 'show'])->name('features');
 
