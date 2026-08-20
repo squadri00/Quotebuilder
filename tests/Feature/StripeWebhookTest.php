@@ -309,6 +309,37 @@ class StripeWebhookTest extends TestCase
         $this->assertEquals($originalPaidAt->timestamp, $order->paid_at->timestamp);
     }
 
+    /**
+     * 'abandoned' is a best-effort label (set once a checkout link looks
+     * stale — see ExpireAbandonedImplementationOrders), never a guarantee
+     * Stripe can no longer accept payment on it. A real, late payment
+     * must still be able to mark the order paid rather than being
+     * silently dropped because the order wasn't sitting in
+     * 'awaiting_payment' anymore.
+     */
+    public function test_checkout_session_completed_recovers_an_abandoned_order(): void
+    {
+        $business = Business::create(['name' => 'Acme Co']);
+        $order = ImplementationOrder::create([
+            'business_id' => $business->id,
+            'tier_name' => 'Starter Build-Out',
+            'product_count' => 5,
+            'price' => 500,
+            'status' => 'abandoned',
+        ]);
+
+        $this->dispatch('checkout.session.completed', [
+            'id' => 'cs_late_payment',
+            'mode' => 'payment',
+            'metadata' => ['implementation_order_id' => (string) $order->id],
+        ]);
+
+        $order->refresh();
+        $this->assertSame('paid', $order->status);
+        $this->assertSame('cs_late_payment', $order->stripe_checkout_session_id);
+        $this->assertNotNull($order->paid_at);
+    }
+
     public function test_invoice_payment_succeeded_records_tax_collected(): void
     {
         $plan = $this->plan();
@@ -318,6 +349,8 @@ class StripeWebhookTest extends TestCase
             'id' => 'in_tax_1',
             'customer' => $business->stripe_id,
             'currency' => 'cad',
+            'subtotal' => 4900,
+            'total' => 5537,
             'parent' => ['subscription_details' => ['subscription' => 'sub_tax_1']],
             'total_taxes' => [
                 ['amount' => 637, 'tax_rate_details' => ['tax_rate' => 'txr_ontario']],
@@ -330,6 +363,8 @@ class StripeWebhookTest extends TestCase
         $this->assertSame($business->id, $record->business_id);
         $this->assertSame('default', $record->subscription_type);
         $this->assertSame('6.37', $record->amount);
+        $this->assertSame('49.00', $record->base_amount);
+        $this->assertSame('55.37', $record->total_amount);
         $this->assertSame('CAD', $record->currency);
     }
 
@@ -356,8 +391,11 @@ class StripeWebhookTest extends TestCase
         );
     }
 
-    public function test_invoice_payment_succeeded_records_nothing_when_no_tax_was_charged(): void
+    public function test_invoice_payment_succeeded_still_records_revenue_when_no_tax_was_charged(): void
     {
+        // A non-Canadian business's renewal — no tax attached, but it must
+        // still be logged so the Financial Activity report's revenue
+        // totals aren't silently missing every non-Canadian payment.
         $plan = $this->plan();
         $business = $this->businessWithSubscription('sub_tax_3', 'default', $plan->id);
 
@@ -365,11 +403,18 @@ class StripeWebhookTest extends TestCase
             'id' => 'in_tax_3',
             'customer' => $business->stripe_id,
             'currency' => 'usd',
+            'subtotal' => 4900,
+            'total' => 4900,
             'parent' => ['subscription_details' => ['subscription' => 'sub_tax_3']],
             'total_taxes' => [],
         ]);
 
-        $this->assertSame(0, \App\Models\TaxCollection::where('stripe_invoice_id', 'in_tax_3')->count());
+        $record = \App\Models\TaxCollection::where('stripe_invoice_id', 'in_tax_3')->first();
+
+        $this->assertNotNull($record, 'Revenue must still be logged even when no tax applies.');
+        $this->assertSame('0.00', $record->amount);
+        $this->assertSame('49.00', $record->base_amount);
+        $this->assertSame('49.00', $record->total_amount);
     }
 
     private function businessWithSubscription(string $stripeSubscriptionId, string $type, ?int $planId = null): Business

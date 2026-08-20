@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+[x-cloak] { display: none !important; }
+
 /*
  * Per-business branding. --brand-color is set inline (per request, since
  * it varies by business) on a page's <html> or wrapping element; these

@@ -17,11 +17,18 @@ class ImplementationOrderController extends Controller
 
         if ($request->filled('status')) {
             $query->where('status', $request->string('status'));
+        } else {
+            // Abandoned checkouts (never paid, Stripe's own link expired)
+            // are noise in the default queue — still reachable via the
+            // status filter for anyone who wants to see them.
+            $query->where('status', '!=', 'abandoned');
         }
 
         $orders = $query->paginate(20)->withQueryString();
 
-        return view('superadmin.implementation-orders.index', compact('orders'));
+        $abandonedCount = $request->filled('status') ? 0 : ImplementationOrder::where('status', 'abandoned')->count();
+
+        return view('superadmin.implementation-orders.index', compact('orders', 'abandonedCount'));
     }
 
     public function updateStatus(Request $request, ImplementationOrder $implementationOrder): RedirectResponse

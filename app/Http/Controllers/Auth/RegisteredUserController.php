@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Mail\RegistrationOtpMail;
+use App\Models\Country;
 use App\Models\PendingRegistration;
 use App\Models\Plan;
 use App\Models\User;
@@ -38,7 +39,9 @@ class RegisteredUserController extends Controller
             return redirect()->route('pricing');
         }
 
-        return view('auth.register', compact('selectedPlan'));
+        $countries = Country::where('is_active', true)->orderBy('name')->get();
+
+        return view('auth.register', compact('selectedPlan', 'countries'));
     }
 
     /**

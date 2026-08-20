@@ -5,7 +5,7 @@
         <input type="hidden" name="plan_id" value="{{ $selectedPlan->id }}">
         <div class="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3">
             <p class="text-sm font-medium text-indigo-900">
-                Selected plan: {{ $selectedPlan->name }} — ${{ number_format($selectedPlan->price, 0) }}/{{ $selectedPlan->billing_interval === 'yearly' ? 'yr' : 'mo' }}
+                Selected plan: {{ $selectedPlan->name }} — {{ \App\Models\PlatformSetting::formatPrice($selectedPlan->price) }}/{{ $selectedPlan->billing_interval === 'yearly' ? 'yr' : 'mo' }}
             </p>
             <a href="{{ route('pricing') }}" class="text-xs font-medium text-indigo-700 hover:text-indigo-900 underline">Change plan</a>
         </div>
@@ -26,25 +26,31 @@
     </div>
 
     {{--
-        Only two countries are supported today, so both are a fixed
-        dropdown rather than free text — and the State/Province list
-        switches to match whichever one is selected (Canadian provinces
-        vs US states). PlatformTaxCalculator only ever taxes Canadian
-        addresses (see its HOME_COUNTRY_CODES check against "Canada"/"CA"),
-        so the exact US state value is stored but never keyed on for tax.
+        Country options come from the Countries table (Super Admin >
+        Countries), so adding a country there is enough to open
+        registration to it here — no code change needed. Canada and the
+        US get a real State/Province dropdown (needed for
+        PlatformTaxCalculator's per-province lookup and for US state
+        data); any other country gets a plain free-text region field,
+        since we don't hold subdivision lists for the rest of the world.
+        PlatformTaxCalculator only ever taxes Canadian addresses (see its
+        HOME_COUNTRY_CODES check against "Canada"/"CA"), so a non-Canadian
+        value here is stored but never keyed on for tax.
     --}}
     <div
         class="mt-4"
         x-data="{
-            country: @js(old('country') === 'United States' ? 'United States' : 'Canada'),
+            country: @js(old('country', $countries->firstWhere('name', 'Canada')?->name ?? $countries->first()?->name)),
             stateProvince: @js(old('state_province', '')),
             canadaProvinces: @js(\App\Support\ProvinceCodes::options()),
             usStates: @js(\App\Support\StateCodes::options()),
             get options() {
-                return this.country === 'United States' ? this.usStates : this.canadaProvinces;
+                if (this.country === 'Canada') return this.canadaProvinces;
+                if (this.country === 'United States') return this.usStates;
+                return null;
             },
         }"
-        x-effect="if (! (stateProvince in options)) stateProvince = ''"
+        x-effect="if (options && ! (stateProvince in options)) stateProvince = ''"
     >
         <x-input-label for="country" :value="__('Country')" />
         {{--
@@ -56,20 +62,28 @@
         --}}
         <select id="country" name="country" x-model="country" @if ($selectedPlan) required @endif
             class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm">
-            <option value="Canada">Canada</option>
-            <option value="United States">United States</option>
+            @foreach ($countries as $option)
+                <option value="{{ $option->name }}">{{ $option->name }}</option>
+            @endforeach
         </select>
         <x-input-error :messages="$errors->get('country')" class="mt-2" />
 
         <div class="mt-4">
-            <x-input-label for="state_province" :value="__('State / Province')" />
-            <select id="state_province" name="state_province" x-model="stateProvince" @if ($selectedPlan) required @endif
-                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm">
-                <option value="">— Select —</option>
-                <template x-for="[code, name] in Object.entries(options)" :key="code">
-                    <option :value="code" x-text="name + ' (' + code + ')'"></option>
-                </template>
-            </select>
+            <x-input-label for="state_province" :value="__('State / Province / Region')" />
+            <template x-if="options">
+                <select id="state_province" name="state_province" x-model="stateProvince" @if ($selectedPlan) required @endif
+                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm">
+                    <option value="">— Select —</option>
+                    <template x-for="[code, name] in Object.entries(options)" :key="code">
+                        <option :value="code" x-text="name + ' (' + code + ')'"></option>
+                    </template>
+                </select>
+            </template>
+            <template x-if="! options">
+                <input id="state_province" name="state_province" type="text" x-model="stateProvince" @if ($selectedPlan) required @endif
+                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400"
+                    placeholder="e.g. your state, region, or county">
+            </template>
             <p class="mt-1 text-xs text-gray-500">Used to work out any tax that applies to your subscription{{ $selectedPlan ? '.' : " — leave blank if you're not subscribing to a paid plan right now." }}</p>
             <x-input-error :messages="$errors->get('state_province')" class="mt-2" />
         </div>

@@ -15,6 +15,15 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],
+                display: ['Poppins', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                // Quotaire marketing-site palette (public pages only — the
+                // logged-in app keeps its existing indigo). "cream" is the
+                // mint-green hero background, "navy" is the dark heading/
+                // footer color, from the brand's own template.
+                cream: '#c6f0d0',
+                navy: '#2f327d',
             },
         },
     },

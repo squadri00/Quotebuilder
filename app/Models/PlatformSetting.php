@@ -103,4 +103,24 @@ class PlatformSetting extends Model
             'aud' => 'AUD — Australian Dollar',
         ];
     }
+
+    /**
+     * Formats an amount using the actual master currency's real symbol
+     * and position (from the Countries table), never a hardcoded "$" —
+     * every plan price, tax breakdown, and one-time charge is genuinely
+     * billed in this currency, so showing the wrong symbol would make
+     * the price look cheaper or different than what Stripe actually
+     * charges. Falls back to "$"-before if the master currency isn't in
+     * the Countries table yet (e.g. right after a fresh install).
+     */
+    public static function formatPrice(float $amount, int $decimals = 0): string
+    {
+        $code = strtoupper(static::get()->default_currency ?? 'CAD');
+        $country = Country::where('currency_code', $code)->first();
+
+        $symbol = $country->currency_symbol ?? '$';
+        $number = number_format($amount, $decimals);
+
+        return $country?->currency_position === 'after' ? $number.$symbol : $symbol.$number;
+    }
 }

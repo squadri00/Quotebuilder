@@ -7,7 +7,9 @@ use App\Models\PlatformTaxRate;
 use App\Support\ProvinceCodes;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Laravel\Cashier\Cashier;
 
 class PlatformTaxRateController extends Controller
 {
@@ -27,10 +29,12 @@ class PlatformTaxRateController extends Controller
     {
         $validated = $this->validated($request);
 
-        PlatformTaxRate::create([
+        $rate = PlatformTaxRate::create([
             ...$validated,
             'is_active' => $request->boolean('is_active'),
         ]);
+
+        $this->syncStripeTaxRate($rate);
 
         return redirect()->route('superadmin.platform-tax-rates.index')->with('status', 'Tax rate added.');
     }
@@ -43,11 +47,25 @@ class PlatformTaxRateController extends Controller
     public function update(Request $request, PlatformTaxRate $platformTaxRate): RedirectResponse
     {
         $validated = $this->validated($request);
+        $rateChanged = (float) $validated['rate'] !== (float) $platformTaxRate->rate;
 
         $platformTaxRate->update([
             ...$validated,
             'is_active' => $request->boolean('is_active'),
         ]);
+
+        // Stripe Tax Rate objects are immutable once created — a changed
+        // percentage needs a brand new one, not an edit. The old object is
+        // simply never referenced again (Stripe keeps it, harmlessly
+        // unused) rather than something this app tries to delete or
+        // deactivate, since other historical invoices may still point at
+        // it and Stripe itself recommends against reusing a rate id
+        // across different percentages.
+        if ($rateChanged) {
+            $platformTaxRate->update(['stripe_tax_rate_id' => null]);
+        }
+
+        $this->syncStripeTaxRate($platformTaxRate);
 
         return redirect()->route('superadmin.platform-tax-rates.index')->with('status', 'Tax rate updated.');
     }
@@ -57,6 +75,47 @@ class PlatformTaxRateController extends Controller
         $platformTaxRate->delete();
 
         return redirect()->route('superadmin.platform-tax-rates.index')->with('status', 'Tax rate deleted.');
+    }
+
+    /**
+     * Every local tax rate row needs a real Stripe Tax Rate object behind
+     * it — Business::taxRates() attaches this to subscriptions, and
+     * PlatformTaxCalculator uses the local row purely for display/
+     * one-time-charge math. A row with a local percentage but no Stripe
+     * object would show correctly here while silently charging $0 extra
+     * tax on the actual subscription, so this runs on every save rather
+     * than being a manual, easy-to-forget extra step. A Stripe hiccup
+     * here must not block saving the local row — the admin can retry by
+     * saving again, since this only fires when stripe_tax_rate_id is
+     * still empty.
+     */
+    private function syncStripeTaxRate(PlatformTaxRate $rate): void
+    {
+        if ($rate->stripe_tax_rate_id) {
+            return;
+        }
+
+        $description = $rate->province
+            ? ($rate->province.' '.$rate->tax_label.' — Quote Builder subscription billing')
+            : ($rate->country_code.'-wide '.$rate->tax_label.' — Quote Builder subscription billing');
+
+        try {
+            $stripeTaxRate = Cashier::stripe()->taxRates->create([
+                'display_name' => $rate->tax_label,
+                'description' => $description,
+                'percentage' => (float) $rate->rate,
+                'inclusive' => false,
+                'country' => $rate->country_code,
+                'state' => $rate->province,
+            ]);
+
+            $rate->update(['stripe_tax_rate_id' => $stripeTaxRate->id]);
+        } catch (\Throwable $e) {
+            Log::warning('Could not create Stripe Tax Rate for platform tax rate.', [
+                'platform_tax_rate_id' => $rate->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     private function validated(Request $request): array

@@ -18,24 +18,24 @@
 <div class="mt-6 bg-white border border-gray-200 rounded-xl shadow-sm p-6">
     <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Plan</p>
     <p class="mt-1 text-lg font-semibold text-gray-900">
-        {{ $plan->name }} — ${{ number_format($plan->price, 2) }} / {{ $plan->billing_interval === 'yearly' ? 'yr' : 'mo' }}
+        {{ $plan->name }} — {{ \App\Models\PlatformSetting::formatPrice($plan->price, 2) }} / {{ $plan->billing_interval === 'yearly' ? 'yr' : 'mo' }}
     </p>
 
     <div class="mt-6 border-t border-gray-100 pt-4">
         <ul class="space-y-1 text-sm">
             <li class="flex justify-between gap-4 text-gray-600">
                 <span>Subtotal</span>
-                <span>${{ number_format($tax['base'], 2) }}</span>
+                <span>{{ \App\Models\PlatformSetting::formatPrice($tax['base'], 2) }}</span>
             </li>
             @if ($tax['tax'] > 0)
                 <li class="flex justify-between gap-4 text-gray-500">
                     <span>{{ $tax['label'] }} ({{ $tax['rate'] }}%)</span>
-                    <span>${{ number_format($tax['tax'], 2) }}</span>
+                    <span>{{ \App\Models\PlatformSetting::formatPrice($tax['tax'], 2) }}</span>
                 </li>
             @endif
             <li class="flex justify-between gap-4 font-semibold text-gray-900 border-t border-gray-100 pt-1 mt-1">
                 <span>Total</span>
-                <span>${{ number_format($tax['total'], 2) }} / {{ $plan->billing_interval === 'yearly' ? 'yr' : 'mo' }}</span>
+                <span>{{ \App\Models\PlatformSetting::formatPrice($tax['total'], 2) }} / {{ $plan->billing_interval === 'yearly' ? 'yr' : 'mo' }}</span>
             </li>
         </ul>
     </div>

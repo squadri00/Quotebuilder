@@ -4,9 +4,11 @@ use App\Http\Controllers\SuperAdmin\AnnouncementController;
 use App\Http\Controllers\SuperAdmin\AuditLogController;
 use App\Http\Controllers\SuperAdmin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\SuperAdmin\BusinessController;
+use App\Http\Controllers\SuperAdmin\CountryController;
 use App\Http\Controllers\SuperAdmin\DashboardController;
 use App\Http\Controllers\SuperAdmin\ExportController;
 use App\Http\Controllers\SuperAdmin\FeatureController;
+use App\Http\Controllers\SuperAdmin\FinancialController;
 use App\Http\Controllers\SuperAdmin\ImplementationOrderController;
 use App\Http\Controllers\SuperAdmin\ImplementationTierController;
 use App\Http\Controllers\SuperAdmin\IndustryController;
@@ -135,6 +137,9 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::resource('features', FeatureController::class)->except('show');
         Route::resource('industries', IndustryController::class)->except('show');
 
+        Route::resource('countries', CountryController::class)->except('show');
+        Route::patch('/countries/{country}/toggle-active', [CountryController::class, 'toggleActive'])->name('countries.toggle-active');
+
         Route::resource('announcements', AnnouncementController::class)->except('show');
         Route::patch('/announcements/{announcement}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');
 
@@ -157,6 +162,7 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
 
         Route::get('/implementation-orders', [ImplementationOrderController::class, 'index'])->name('implementation-orders.index');
         Route::patch('/implementation-orders/{implementation_order}/status', [ImplementationOrderController::class, 'updateStatus'])->name('implementation-orders.update-status');
+        Route::get('/financial', [FinancialController::class, 'index'])->name('financial.index');
 
         Route::get('/support', [SupportTicketController::class, 'index'])->name('support.index');
         Route::get('/support/{ticket}', [SupportTicketController::class, 'show'])->name('support.show');

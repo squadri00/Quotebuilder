@@ -97,24 +97,22 @@ class WebhookController extends CashierWebhookController
     }
 
     /**
-     * The local record-keeping side of Business::taxRates() — every paid
-     * invoice that actually carried tax (Stripe's own total_taxes array,
-     * present whenever a Tax Rate was attached) gets logged here, so the
-     * platform owner has a running total for their own HST/GST remittance
-     * instead of having to reconstruct it from raw Stripe data. Guarded by
-     * stripe_invoice_id's unique constraint against a redelivered webhook
-     * double-recording the same invoice.
+     * The local record-keeping side of Business::taxRates() — every
+     * successfully paid subscription invoice gets logged here (base, tax,
+     * total), regardless of whether tax actually applied, so the platform
+     * owner has both a running HST/GST remittance total AND a real
+     * revenue ledger for the Financial Activity report — neither has to
+     * be reconstructed from raw Stripe data. Implementation Service
+     * purchases never reach this: those are one-off Checkout charges, not
+     * Invoices, so they're recorded separately on ImplementationOrder.
+     * Guarded by stripe_invoice_id's unique constraint against a
+     * redelivered webhook double-recording the same invoice.
      */
     protected function handleInvoicePaymentSucceeded(array $payload): Response
     {
         $response = parent::handleInvoicePaymentSucceeded($payload);
 
         $invoice = $payload['data']['object'];
-        $taxTotal = collect($invoice['total_taxes'] ?? [])->sum('amount');
-
-        if ($taxTotal <= 0) {
-            return $response;
-        }
 
         $business = $this->getUserByStripeId($invoice['customer'] ?? null);
 
@@ -122,6 +120,7 @@ class WebhookController extends CashierWebhookController
             return $response;
         }
 
+        $taxTotal = collect($invoice['total_taxes'] ?? [])->sum('amount');
         $subscriptionId = $invoice['parent']['subscription_details']['subscription'] ?? null;
         $subscriptionType = $subscriptionId
             ? Subscription::where('stripe_id', $subscriptionId)->value('type')
@@ -133,6 +132,8 @@ class WebhookController extends CashierWebhookController
                 'business_id' => $business->id,
                 'subscription_type' => $subscriptionType,
                 'amount' => $taxTotal / 100,
+                'base_amount' => ($invoice['subtotal'] ?? 0) / 100,
+                'total_amount' => ($invoice['total'] ?? 0) / 100,
                 'currency' => strtoupper($invoice['currency'] ?? 'cad'),
                 'collected_at' => now(),
             ]
@@ -164,15 +165,14 @@ class WebhookController extends CashierWebhookController
 
         $order = ImplementationOrder::find($orderId);
 
-        if (! $order || $order->status !== 'awaiting_payment') {
+        // 'abandoned' is deliberately not treated as settled here — see
+        // ImplementationOrder::markPaidFromCheckoutSession()'s docblock.
+        // A real, late payment must still be able to mark the order paid.
+        if (! $order || in_array($order->status, ['paid', 'in_progress', 'completed'], true)) {
             return $this->successMethod();
         }
 
-        $order->update([
-            'status' => 'paid',
-            'stripe_checkout_session_id' => $session['id'],
-            'paid_at' => now(),
-        ]);
+        $order->markPaidFromCheckoutSession($session['id']);
 
         Log::info('Implementation order paid.', [
             'implementation_order_id' => $order->id,

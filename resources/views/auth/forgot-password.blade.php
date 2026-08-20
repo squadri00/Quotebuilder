@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Forgot Password — ' . config('app.name', 'Runwrk'))
+@section('title', 'Forgot Password — ' . config('app.name', 'Quotaire'))
 
 @section('content')
     <div class="max-w-md mx-auto px-6 py-16">

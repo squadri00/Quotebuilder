@@ -1,7 +1,8 @@
 <div class="max-w-6xl mx-auto px-6 py-16" x-data="{ interval: 'monthly' }">
-    <div class="text-center max-w-2xl mx-auto">
-        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Simple, transparent pricing</h1>
-        <p class="mt-3 text-lg text-gray-500">Pick the plan that fits your business. Upgrade or cancel any time.</p>
+    <div class="text-center max-w-2xl mx-auto" data-aos="fade-up" data-aos-once="true">
+        <div class="inline-flex items-center px-4 py-2 mb-6 rounded-full bg-green-50 text-green-700 text-sm font-semibold">Simple, transparent pricing</div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Pick the plan that fits your business</h1>
+        <p class="mt-3 text-lg text-gray-500">Upgrade or cancel any time.</p>
     </div>
 
     @if ($tiers->isEmpty())
@@ -9,14 +10,14 @@
     @else
         <!-- Monthly / Yearly toggle -->
         <div class="mt-10 flex justify-center">
-            <div class="inline-flex items-center gap-6 rounded-full border-2 border-indigo-200 bg-white px-6 py-3 shadow-md" role="radiogroup" aria-label="Billing interval">
+            <div class="inline-flex items-center gap-6 rounded-full border-2 border-green-200 bg-white px-6 py-3 shadow-md" role="radiogroup" aria-label="Billing interval">
                 <button type="button" @click="interval = 'monthly'"
                     role="radio" :aria-checked="interval === 'monthly'"
                     class="flex items-center gap-2 text-base font-semibold transition"
-                    :class="interval === 'monthly' ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-600'">
+                    :class="interval === 'monthly' ? 'text-green-600' : 'text-gray-400 hover:text-gray-600'">
                     <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition"
-                        :class="interval === 'monthly' ? 'border-indigo-600' : 'border-gray-300'">
-                        <span class="h-2.5 w-2.5 rounded-full bg-indigo-600" x-show="interval === 'monthly'"></span>
+                        :class="interval === 'monthly' ? 'border-green-600' : 'border-gray-300'">
+                        <span class="h-2.5 w-2.5 rounded-full bg-green-600" x-show="interval === 'monthly'"></span>
                     </span>
                     Monthly
                 </button>
@@ -24,10 +25,10 @@
                 <button type="button" @click="interval = 'yearly'"
                     role="radio" :aria-checked="interval === 'yearly'"
                     class="flex items-center gap-2 text-base font-semibold transition"
-                    :class="interval === 'yearly' ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-600'">
+                    :class="interval === 'yearly' ? 'text-green-600' : 'text-gray-400 hover:text-gray-600'">
                     <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition"
-                        :class="interval === 'yearly' ? 'border-indigo-600' : 'border-gray-300'">
-                        <span class="h-2.5 w-2.5 rounded-full bg-indigo-600" x-show="interval === 'yearly'"></span>
+                        :class="interval === 'yearly' ? 'border-green-600' : 'border-gray-300'">
+                        <span class="h-2.5 w-2.5 rounded-full bg-green-600" x-show="interval === 'yearly'"></span>
                     </span>
                     Yearly
                 </button>
@@ -68,11 +69,27 @@
                             'discountDisplay' => $yearly->discount_display,
                         ] : null),
                         get plan() { return interval === 'yearly' && this.yearly ? this.yearly : this.monthly; },
+                        fxRates: @js($fxRates),
+                        currencySymbols: @js($currencySymbols),
+                        masterSymbol: @js($masterSymbol),
+                        masterSymbolAfter: @js($masterSymbolAfter),
+                        fmt(amount) {
+                            const n = Math.round(amount);
+                            return this.masterSymbolAfter ? (n + this.masterSymbol) : (this.masterSymbol + n);
+                        },
+                        get converted() {
+                            return Object.entries(this.fxRates).map(([code, rate]) => ({
+                                code,
+                                symbol: this.currencySymbols[code] ?? code,
+                                amount: Math.round(this.plan.price * rate),
+                            }));
+                        },
                     }"
-                    class="relative rounded-2xl border bg-white p-8 flex flex-col h-full {{ $anyVariant->is_highlighted ? 'border-indigo-600 shadow-lg ring-1 ring-indigo-600' : 'border-gray-200 shadow-sm' }}"
+                    class="relative rounded-2xl border bg-white p-8 flex flex-col h-full {{ $anyVariant->is_highlighted ? 'border-green-600 shadow-lg ring-1 ring-green-600' : 'border-gray-200 shadow-sm' }}"
+                    data-aos="fade-up" data-aos-once="true"
                 >
                     @if ($anyVariant->is_highlighted)
-                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white">
+                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white">
                             Most Popular
                         </span>
                     @endif
@@ -80,23 +97,30 @@
                     <h2 class="text-lg font-semibold text-gray-900">{{ $anyVariant->name }}</h2>
 
                     <div class="mt-2">
-                        <p class="text-sm text-gray-400 line-through" x-show="plan.hasDiscount" x-cloak x-text="'$' + Math.round(plan.comparePrice)"></p>
+                        <p class="text-sm text-gray-400 line-through" x-show="plan.hasDiscount" x-cloak x-text="fmt(plan.comparePrice)"></p>
                         <p class="flex items-baseline gap-1">
-                            <span class="text-4xl font-bold text-gray-900" x-text="'$' + Math.round(plan.price)"></span>
+                            <span class="text-4xl font-bold text-gray-900" x-text="fmt(plan.price)"></span>
                             <span class="text-sm font-medium text-gray-500" x-text="interval === 'yearly' ? '/yr' : '/mo'"></span>
                         </p>
                         <span
                             class="inline-flex items-center mt-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-bold text-green-700"
                             x-show="plan.hasDiscount"
                             x-cloak
-                            x-text="plan.discountDisplay === 'fixed' ? 'Save $' + Math.round(plan.discountAmount) : 'Save ' + plan.discountPercent + '%'"
+                            x-text="plan.discountDisplay === 'fixed' ? 'Save ' + fmt(plan.discountAmount) : 'Save ' + plan.discountPercent + '%'"
                         ></span>
+
+                        <p class="mt-1 text-xs text-gray-400" x-show="converted.length && plan.price > 0" x-cloak>
+                            &asymp;
+                            <template x-for="(c, i) in converted" :key="c.code">
+                                <span x-text="c.symbol + c.amount + ' ' + c.code + (i < converted.length - 1 ? ' &middot; ' : '')"></span>
+                            </template>
+                        </p>
                     </div>
 
                     <ul class="mt-6 space-y-3 text-sm text-gray-700 flex-1">
                         <template x-for="bullet in plan.bullets" :key="bullet">
                             <li class="flex items-start gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5 shrink-0 text-indigo-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5 shrink-0 text-green-600">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                 </svg>
                                 <span x-text="bullet"></span>
@@ -105,7 +129,7 @@
                     </ul>
 
                     <a :href="'{{ $registerUrl ?? route('register') }}?plan=' + plan.id" {!! $linkTarget ?? '' !!}
-                        class="mt-8 inline-flex items-center justify-center w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition {{ $anyVariant->is_highlighted ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50' }}">
+                        class="mt-8 inline-flex items-center justify-center w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition {{ $anyVariant->is_highlighted ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50' }}">
                         Sign Up
                     </a>
                 </div>

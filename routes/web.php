@@ -7,7 +7,9 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\BusinessSettingsController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DemoController;
 use App\Http\Controllers\InternalQuoteController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\OptionController;
@@ -32,6 +34,15 @@ use Laravel\Cashier\Http\Controllers\PaymentController as CashierPaymentControll
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/features', function () {
+    return view('features');
+})->name('features');
+
+Route::get('/demo', [DemoController::class, 'index'])->name('demo');
+
+Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [ContactController::class, 'submit'])->middleware('throttle:5,1')->name('contact.submit');
 
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
 

@@ -5,11 +5,14 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Models\Quote;
+use App\Services\FinancialSummaryService;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    public function __construct(private FinancialSummaryService $financials) {}
+
     public function index(): View
     {
         $businesses = Business::where('is_template', false);
@@ -32,6 +35,8 @@ class DashboardController extends Controller
 
         $signups = $this->dailySignupCounts();
 
+        $monthStart = now()->startOfMonth();
+
         return view('superadmin.dashboard', [
             'totalBusinesses' => $totalBusinesses,
             'activeBusinesses' => $activeBusinesses,
@@ -39,6 +44,12 @@ class DashboardController extends Controller
             'totalQuotes' => $totalQuotes,
             'topBusinessesByQuotes' => $topBusinessesByQuotes,
             'signups' => $signups,
+            'mrr' => $this->financials->mrr(),
+            'activeSubscriptionCounts' => $this->financials->activeSubscriptionCounts(),
+            'pastDue' => $this->financials->pastDue(),
+            'revenueThisMonth' => $this->financials->revenue($monthStart),
+            'taxThisMonth' => $this->financials->tax($monthStart),
+            'financialBreakdownThisMonth' => $this->financials->breakdown($monthStart),
         ]);
     }
 

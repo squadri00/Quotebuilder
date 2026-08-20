@@ -60,6 +60,17 @@ class BillingController extends Controller
         $implementationTiers = ImplementationTier::where('is_active', true)->orderBy('price')->get();
         $implementationOrders = $business->implementationOrders()->latest()->get();
 
+        // Real, forward-looking breakdown per tier — shown before the
+        // business ever clicks Purchase, so the tax-inclusive total isn't
+        // a surprise they only discover on Stripe's own payment page. This
+        // is the exact same addToBase() call purchaseImplementation() uses
+        // to build the real charge, so it can never drift from what
+        // actually gets billed.
+        $taxCalculator = new PlatformTaxCalculator;
+        $implementationTierTax = $implementationTiers->mapWithKeys(
+            fn (ImplementationTier $tier) => [$tier->id => $taxCalculator->addToBase($business, (float) $tier->price)]
+        );
+
         // Display-only — informational for the business, never changes what
         // Stripe actually charges (that's always the plan's one fixed
         // price). Only computed when there's a real plan price to split.
@@ -69,7 +80,7 @@ class BillingController extends Controller
 
         return view('billing.index', compact(
             'business', 'tiers', 'subscription', 'renewalDate', 'invoices', 'supportAddon', 'supportSubscription',
-            'implementationTiers', 'implementationOrders', 'platformTaxSplit'
+            'implementationTiers', 'implementationOrders', 'implementationTierTax', 'platformTaxSplit'
         ));
     }
 
@@ -242,7 +253,7 @@ class BillingController extends Controller
             'status' => 'awaiting_payment',
         ]);
 
-        return $business->checkout([[
+        $checkout = $business->checkout([[
             'price_data' => [
                 'currency' => $business->preferredCurrency(),
                 'product_data' => [
@@ -256,5 +267,13 @@ class BillingController extends Controller
             'cancel_url' => route('billing.index').'?implementation_checkout=cancelled',
             'metadata' => ['implementation_order_id' => $order->id],
         ]);
+
+        // Stamped on immediately (not just on the webhook's payment
+        // confirmation) so a stuck 'awaiting_payment' order can later be
+        // reconciled against Stripe's own record of what happened to
+        // this specific checkout link — see ExpireAbandonedImplementationOrders.
+        $order->update(['stripe_checkout_session_id' => $checkout->id]);
+
+        return $checkout;
     }
 }

@@ -17,6 +17,13 @@
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    @if ($abandonedCount > 0)
+        <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+            {{ $abandonedCount }} abandoned {{ Str::plural('checkout', $abandonedCount) }} hidden (never paid, Stripe's checkout link expired) —
+            <a href="{{ route('superadmin.implementation-orders.index', ['status' => 'abandoned']) }}" class="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300">view them</a>.
+        </p>
+    @endif
+
     @if ($orders->isEmpty())
         <x-card class="text-center text-gray-500 dark:text-gray-400">
             No orders{{ request('status') ? ' with that status' : '' }} yet.

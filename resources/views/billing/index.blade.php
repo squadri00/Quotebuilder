@@ -179,21 +179,47 @@
         @if ($implementationTiers->isEmpty())
             <p class="mt-4 text-xs text-gray-400 dark:text-gray-500">Not currently available.</p>
         @else
-            <div class="mt-4 flex items-end gap-3 flex-wrap" x-data="{ tierId: {{ $implementationTiers->first()->id }} }">
-                <div>
-                    <x-input-label for="implementation_tier" value="Package" />
-                    <select id="implementation_tier" x-model.number="tierId"
-                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
-                        @foreach ($implementationTiers as $tier)
-                            <option value="{{ $tier->id }}">{{ $tier->name }} — {{ $tier->product_count }} products — ${{ number_format($tier->price, 0) }}</option>
-                        @endforeach
-                    </select>
+            @php
+                // Keyed by tier id so Alpine can look up the right
+                // breakdown instantly as the dropdown selection changes,
+                // without a round-trip — these are the exact same numbers
+                // purchaseImplementation() will actually charge.
+                $tierTaxJson = $implementationTierTax->mapWithKeys(fn ($tax, $id) => [$id => $tax])->toJson();
+            @endphp
+            <div class="mt-4" x-data="{ tierId: {{ $implementationTiers->first()->id }}, tax: {{ $tierTaxJson }} }">
+                <div class="flex items-end gap-3 flex-wrap">
+                    <div>
+                        <x-input-label for="implementation_tier" value="Package" />
+                        <select id="implementation_tier" x-model.number="tierId"
+                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                            @foreach ($implementationTiers as $tier)
+                                <option value="{{ $tier->id }}">{{ $tier->name }} — {{ $tier->product_count }} products — ${{ number_format($tier->price, 0) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <form method="POST" :action="'{{ url('/billing/implementation') }}/' + tierId">
+                        @csrf
+                        <x-primary-button type="submit">Purchase</x-primary-button>
+                    </form>
                 </div>
 
-                <form method="POST" :action="'{{ url('/billing/implementation') }}/' + tierId">
-                    @csrf
-                    <x-primary-button type="submit">Purchase</x-primary-button>
-                </form>
+                <div class="mt-3 text-sm text-gray-600 dark:text-gray-300 space-y-0.5">
+                    <div class="flex justify-between max-w-xs">
+                        <span>Subtotal</span>
+                        <span x-text="'$' + tax[tierId].base.toFixed(2)"></span>
+                    </div>
+                    <template x-if="tax[tierId].tax > 0">
+                        <div class="flex justify-between max-w-xs">
+                            <span x-text="tax[tierId].label + ' (' + tax[tierId].rate + '%)'"></span>
+                            <span x-text="'$' + tax[tierId].tax.toFixed(2)"></span>
+                        </div>
+                    </template>
+                    <div class="flex justify-between max-w-xs font-semibold text-gray-900 dark:text-gray-100 pt-0.5">
+                        <span>Total charged today</span>
+                        <span x-text="'$' + tax[tierId].total.toFixed(2)"></span>
+                    </div>
+                </div>
             </div>
         @endif
 
@@ -341,14 +367,24 @@
                         <thead class="bg-gray-50 dark:bg-gray-700/50">
                             <tr>
                                 <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Date</th>
+                                <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">For</th>
                                 <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">Total</th>
                                 <th class="px-4 py-3"></th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @foreach ($invoices as $invoice)
+                                @php
+                                    // Stripe already writes a human-readable
+                                    // description onto each invoice line
+                                    // (e.g. "1 × Growth (at $49.00 / month)")
+                                    // — no extra API call needed, it's part
+                                    // of the same invoice list response.
+                                    $lineDescription = $invoice->asStripeInvoice()->lines->data[0]->description ?? null;
+                                @endphp
                                 <tr>
                                     <td class="px-4 py-3 text-gray-900 dark:text-gray-100">{{ $invoice->date()->format('M j, Y') }}</td>
+                                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $lineDescription ?? '—' }}</td>
                                     <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $invoice->total() }}</td>
                                     <td class="px-4 py-3 text-right">
                                         <a href="{{ $invoice->hosted_invoice_url }}" target="_blank" rel="noopener" class="text-sm font-medium brand-text">View</a>

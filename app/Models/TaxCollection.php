@@ -6,12 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * One row per paid subscription-renewal invoice that actually carried
- * tax (see Business::taxRates()) — the local record-keeping the platform
- * owner needs for their own HST/GST remittance, since Stripe's own
- * invoice history has no simple aggregate view for this. Written once,
- * from Stripe\WebhookController::handleInvoicePaymentSucceeded(), never
- * edited afterward — it's a ledger, not a live-editable total.
+ * One row per successfully paid subscription-renewal invoice (default
+ * plan or Priority Support) — started as purely a tax ledger for the
+ * platform owner's own HST/GST remittance, since Stripe's own invoice
+ * history has no simple aggregate view for that; now doubles as the
+ * general revenue ledger behind Super Admin's Financial Activity report,
+ * since the same one row per invoice already has everything needed
+ * (base_amount + amount [tax] = total_amount). Written once, from
+ * Stripe\WebhookController::handleInvoicePaymentSucceeded(), for every
+ * successful invoice regardless of whether tax applied (amount is simply
+ * 0 for a non-Canadian business) — never edited afterward, it's a
+ * ledger, not a live-editable total.
  */
 class TaxCollection extends Model
 {
@@ -20,6 +25,8 @@ class TaxCollection extends Model
         'subscription_type',
         'stripe_invoice_id',
         'amount',
+        'base_amount',
+        'total_amount',
         'currency',
         'collected_at',
     ];
@@ -28,6 +35,8 @@ class TaxCollection extends Model
     {
         return [
             'amount' => 'decimal:2',
+            'base_amount' => 'decimal:2',
+            'total_amount' => 'decimal:2',
             'collected_at' => 'datetime',
         ];
     }

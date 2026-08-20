@@ -19,7 +19,6 @@ class BusinessFactory extends Factory
     {
         return [
             'name' => fake()->unique()->company(),
-            'industry' => fake()->randomElement(['Printing', 'Landscaping', 'Auto Repair', 'Catering']),
         ];
     }
 }

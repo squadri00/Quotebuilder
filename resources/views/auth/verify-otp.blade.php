@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Verify your email — ' . config('app.name', 'Runwrk'))
+@section('title', 'Verify your email — ' . config('app.name', 'Quotaire'))
 
 @section('content')
     <div class="max-w-md mx-auto px-6 py-16">
