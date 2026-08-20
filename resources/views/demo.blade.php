@@ -7,13 +7,13 @@
 
         <section class="pt-16 lg:pt-20 pb-10">
             <div class="max-w-3xl mx-auto text-center" data-aos="fade-up" data-aos-once="true">
-                <div class="inline-flex items-center px-4 py-2 mb-6 rounded-full bg-green-50 text-green-700 text-sm font-semibold">
+                <div class="inline-flex items-center px-4 py-2 mb-6 rounded-full bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm font-semibold">
                     See {{ config('app.name', 'Quotaire') }} In Action
                 </div>
-                <h1 class="text-4xl sm:text-5xl font-bold leading-tight text-gray-900">
-                    Try a live quote calculator <span class="text-green-600">built for your industry</span>
+                <h1 class="text-4xl sm:text-5xl font-bold leading-tight text-gray-900 dark:text-gray-100">
+                    Try a live quote calculator <span class="text-green-600 dark:text-green-400">built for your industry</span>
                 </h1>
-                <p class="mt-6 text-lg leading-relaxed text-gray-600">
+                <p class="mt-6 text-lg leading-relaxed text-gray-600 dark:text-gray-400">
                     Every business prices differently. That's why we built real, working demo calculators for six industries — so you can click through the exact questions, pricing rules, and instant PDF quote your customers would see. Pick an industry below and try it for yourself.
                 </p>
             </div>
@@ -46,12 +46,15 @@
             <!-- Inline embedded calculator — same public/embed.js an industry's -->
             <!-- own iframe embed on a real website would use, so this is the -->
             <!-- exact experience a customer gets, right inside the Quotaire layout. -->
+            <!-- The embedded calculator itself is business-branded (its own -->
+            <!-- --brand-color) and intentionally stays light regardless of this -->
+            <!-- site's theme, same as the mockup screenshots elsewhere on the site. -->
             <div x-show="active" x-cloak x-ref="embedPanel" class="mb-10">
-                <button type="button" @click="close()" class="inline-flex items-center text-sm font-semibold text-gray-600 hover:text-gray-900 mb-4">
+                <button type="button" @click="close()" class="inline-flex items-center text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4">
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     All industries
                 </button>
-                <div class="rounded-2xl border border-gray-200 shadow-lg overflow-hidden bg-white">
+                <div class="rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg overflow-hidden bg-white">
                     <div class="px-5 py-3 bg-gray-900 flex items-center gap-2">
                         <span class="w-3 h-3 rounded-full bg-red-400"></span>
                         <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
@@ -64,15 +67,15 @@
 
             <div x-show="!active" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($industries as $i => $industry)
-                    <div data-aos="fade-up" data-aos-once="true" data-aos-delay="{{ ($i % 3) * 100 }}" class="group flex flex-col bg-white rounded-2xl border border-gray-200 p-8 hover:shadow-xl hover:-translate-y-1.5 hover:border-green-200 transition duration-300">
-                        <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600 mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <div data-aos="fade-up" data-aos-once="true" data-aos-delay="{{ ($i % 3) * 100 }}" class="group flex flex-col bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 hover:shadow-xl hover:-translate-y-1.5 hover:border-green-200 dark:hover:border-green-800 transition duration-300">
+                        <div class="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 mb-6 group-hover:scale-110 transition-transform duration-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $industry['icon'] }}" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $industry['name'] }}</h3>
-                        <p class="text-gray-600 leading-relaxed flex-1">{{ $industry['description'] }}</p>
-                        <button type="button" @click="open('{{ $industry['business']->slug }}', '{{ addslashes($industry['name']) }}')" class="inline-flex items-center mt-6 font-semibold text-green-600">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ $industry['name'] }}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed flex-1">{{ $industry['description'] }}</p>
+                        <button type="button" @click="open('{{ $industry['business']->slug }}', '{{ addslashes($industry['name']) }}')" class="inline-flex items-center mt-6 font-semibold text-green-600 dark:text-green-400">
                             Try the demo
                             <svg class="w-4 h-4 ml-1.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>

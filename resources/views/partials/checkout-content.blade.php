@@ -1,9 +1,9 @@
-<h1 class="text-2xl font-bold text-gray-900">Complete Your Subscription</h1>
-<p class="mt-1 text-sm text-gray-500">Your account is created once payment succeeds — no charge yet.</p>
+<h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Complete Your Subscription</h1>
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Your account is created once payment succeeds — no charge yet.</p>
 
 @if (request('checkout') === 'cancelled')
-    <div class="mt-6 rounded-xl border border-gray-200 bg-white px-4 py-3">
-        <p class="text-sm text-gray-600">Checkout was cancelled — no charge was made. Try again whenever you're ready.</p>
+    <div class="mt-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3">
+        <p class="text-sm text-gray-600 dark:text-gray-400">Checkout was cancelled — no charge was made. Try again whenever you're ready.</p>
     </div>
 @endif
 
@@ -15,25 +15,25 @@
     nothing left to edit on this page, so the whole thing is static PHP
     output rather than an Alpine-driven live preview.
 --}}
-<div class="mt-6 bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Plan</p>
-    <p class="mt-1 text-lg font-semibold text-gray-900">
+<div class="mt-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6">
+    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Plan</p>
+    <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">
         {{ $plan->name }} — {{ \App\Models\PlatformSetting::formatPrice($plan->price, 2) }} / {{ $plan->billing_interval === 'yearly' ? 'yr' : 'mo' }}
     </p>
 
-    <div class="mt-6 border-t border-gray-100 pt-4">
+    <div class="mt-6 border-t border-gray-100 dark:border-gray-700 pt-4">
         <ul class="space-y-1 text-sm">
-            <li class="flex justify-between gap-4 text-gray-600">
+            <li class="flex justify-between gap-4 text-gray-600 dark:text-gray-400">
                 <span>Subtotal</span>
                 <span>{{ \App\Models\PlatformSetting::formatPrice($tax['base'], 2) }}</span>
             </li>
             @if ($tax['tax'] > 0)
-                <li class="flex justify-between gap-4 text-gray-500">
+                <li class="flex justify-between gap-4 text-gray-500 dark:text-gray-400">
                     <span>{{ $tax['label'] }} ({{ $tax['rate'] }}%)</span>
                     <span>{{ \App\Models\PlatformSetting::formatPrice($tax['tax'], 2) }}</span>
                 </li>
             @endif
-            <li class="flex justify-between gap-4 font-semibold text-gray-900 border-t border-gray-100 pt-1 mt-1">
+            <li class="flex justify-between gap-4 font-semibold text-gray-900 dark:text-gray-100 border-t border-gray-100 dark:border-gray-700 pt-1 mt-1">
                 <span>Total</span>
                 <span>{{ \App\Models\PlatformSetting::formatPrice($tax['total'], 2) }} / {{ $plan->billing_interval === 'yearly' ? 'yr' : 'mo' }}</span>
             </li>
@@ -50,13 +50,13 @@
 
         <div class="flex items-center gap-3">
             <x-primary-button type="submit">Proceed to Payment</x-primary-button>
-            <a href="{{ route('pricing') }}" target="_top" class="text-sm font-medium text-gray-500 hover:text-gray-700">Cancel</a>
+            <a href="{{ route('pricing') }}" target="_top" class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">Cancel</a>
         </div>
     </form>
 </div>
 
-<div class="mt-4 space-y-2 text-xs leading-relaxed text-gray-500">
-    <p class="font-semibold text-gray-600">Secure Payment Processing</p>
+<div class="mt-4 space-y-2 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+    <p class="font-semibold text-gray-600 dark:text-gray-300">Secure Payment Processing</p>
     <p>{{ config('app.name') }} is a product of {{ optional($platformSettings ?? null)->legal_business_name ?: 'Eformics Systems' }}.</p>
     <p>You are now being redirected to Stripe, our trusted payment processing partner, to securely complete your purchase. Your payment information will be processed directly by Stripe using industry-standard security measures.</p>
     <p>By continuing, you acknowledge that you are leaving the {{ config('app.name') }} checkout environment and proceeding to Stripe to complete your payment.</p>

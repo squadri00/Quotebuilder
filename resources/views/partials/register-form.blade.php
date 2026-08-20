@@ -3,11 +3,11 @@
 
     @if ($selectedPlan)
         <input type="hidden" name="plan_id" value="{{ $selectedPlan->id }}">
-        <div class="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3">
-            <p class="text-sm font-medium text-indigo-900">
+        <div class="mb-4 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-3">
+            <p class="text-sm font-medium text-indigo-900 dark:text-indigo-200">
                 Selected plan: {{ $selectedPlan->name }} — {{ \App\Models\PlatformSetting::formatPrice($selectedPlan->price) }}/{{ $selectedPlan->billing_interval === 'yearly' ? 'yr' : 'mo' }}
             </p>
-            <a href="{{ route('pricing') }}" class="text-xs font-medium text-indigo-700 hover:text-indigo-900 underline">Change plan</a>
+            <a href="{{ route('pricing') }}" class="text-xs font-medium text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-indigo-100 underline">Change plan</a>
         </div>
     @endif
 
@@ -61,7 +61,7 @@
             Stripe subscription instead of just getting caught downstream.
         --}}
         <select id="country" name="country" x-model="country" @if ($selectedPlan) required @endif
-            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm">
+            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
             @foreach ($countries as $option)
                 <option value="{{ $option->name }}">{{ $option->name }}</option>
             @endforeach
@@ -72,7 +72,7 @@
             <x-input-label for="state_province" :value="__('State / Province / Region')" />
             <template x-if="options">
                 <select id="state_province" name="state_province" x-model="stateProvince" @if ($selectedPlan) required @endif
-                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm">
+                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                     <option value="">— Select —</option>
                     <template x-for="[code, name] in Object.entries(options)" :key="code">
                         <option :value="code" x-text="name + ' (' + code + ')'"></option>
@@ -84,7 +84,7 @@
                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400"
                     placeholder="e.g. your state, region, or county">
             </template>
-            <p class="mt-1 text-xs text-gray-500">Used to work out any tax that applies to your subscription{{ $selectedPlan ? '.' : " — leave blank if you're not subscribing to a paid plan right now." }}</p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Used to work out any tax that applies to your subscription{{ $selectedPlan ? '.' : " — leave blank if you're not subscribing to a paid plan right now." }}</p>
             <x-input-error :messages="$errors->get('state_province')" class="mt-2" />
         </div>
     </div>
@@ -120,7 +120,7 @@
     </div>
 
     <div class="flex items-center justify-end mt-4">
-        <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+        <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
             {{ __('Already registered?') }}
         </a>
 
