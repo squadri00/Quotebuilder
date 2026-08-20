@@ -79,7 +79,7 @@
                         @if ($quote->revisesQuote)
                             <div>Revised Quote (was #{{ $quote->revisesQuote->displayReference() }})</div>
                         @endif
-                        <div>Date: <strong>{{ $quote->created_at->format('M j, Y g:i A') }}</strong></div>
+                        <div>Date: <strong>{{ $quote->displayedAt()->format('M j, Y g:i A') }}</strong></div>
                         @if ($quote->expires_at)
                             <div>{{ $quote->isExpired() ? 'Expired:' : 'Valid until:' }} <strong>{{ $quote->expires_at->format('M j, Y') }}</strong></div>
                         @endif
@@ -169,7 +169,7 @@
         @endif
 
         <div class="footer">
-            This quotation was prepared for {{ $quote->customer_name }} on {{ $quote->created_at->format('M j, Y g:i A') }} &middot; Quote #{{ $quote->displayReference() }}
+            This quotation was prepared for {{ $quote->customer_name }} on {{ $quote->displayedAt()->format('M j, Y g:i A') }} &middot; Quote #{{ $quote->displayReference() }}
             @if ($quote->prepared_by_name)
                 <br>Prepared by {{ $quote->prepared_by_name }} ({{ $quote->prepared_by_email }})
             @endif

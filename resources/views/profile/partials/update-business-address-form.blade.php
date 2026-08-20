@@ -60,6 +60,25 @@
         </div>
 
         <div>
+            <x-input-label for="timezone" :value="__('Time Zone')" />
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                {{ __('Used to show the correct local date and time on your quotes — in the inbox, on the customer-facing result page, and on PDFs.') }}
+            </p>
+            <select id="timezone" name="timezone"
+                class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                <option value="" @selected(! old('timezone', $business->timezone))>{{ __('Use platform default (:tz)', ['tz' => config('app.timezone')]) }}</option>
+                @foreach (\App\Support\TimezoneOptions::grouped() as $region => $zones)
+                    <optgroup label="{{ $region }}">
+                        @foreach ($zones as $identifier => $label)
+                            <option value="{{ $identifier }}" @selected(old('timezone', $business->timezone) === $identifier)>{{ $label }}</option>
+                        @endforeach
+                    </optgroup>
+                @endforeach
+            </select>
+            <x-input-error class="mt-2" :messages="$errors->get('timezone')" />
+        </div>
+
+        <div>
             <x-input-label for="phone" :value="__('Phone Number')" />
             <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full" :value="old('phone', $business->phone)" autocomplete="tel" placeholder="(555) 123-4567" />
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">

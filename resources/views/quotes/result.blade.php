@@ -19,7 +19,7 @@
                 @endif
 
                 <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ $product?->name ?? 'Product no longer available' }} — {{ $quote->customer_name }} ({{ $quote->customer_email }})</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $quote->created_at->format('M j, Y \a\t g:i A') }}</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $quote->displayedAt()->format('M j, Y \a\t g:i A') }}</p>
 
                 <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">Quoted Price</p>
                 <p class="text-4xl font-bold text-gray-900 dark:text-gray-100 mt-1">${{ number_format($quote->final_price, 2) }}</p>

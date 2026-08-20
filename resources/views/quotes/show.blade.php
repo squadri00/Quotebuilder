@@ -134,7 +134,7 @@
                 @endif
 
                 <p class="mt-6 text-xs text-gray-400 dark:text-gray-500">
-                    Submitted {{ $quote->created_at->format('M j, Y \a\t g:i A') }}
+                    Submitted {{ $quote->displayedAt()->format('M j, Y \a\t g:i A') }}
                     @if ($quote->emailed_at)
                         &middot; Emailed {{ $quote->emailed_at->diffForHumans() }}
                     @endif

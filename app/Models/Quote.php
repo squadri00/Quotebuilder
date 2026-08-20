@@ -198,4 +198,16 @@ class Quote extends Model
     {
         return $this->expires_at !== null && $this->expires_at->isPast();
     }
+
+    /**
+     * When this quote was created, converted to the owning business's own
+     * timezone (Business Settings) — created_at itself stays stored in
+     * UTC as always; every view should read the date through this rather
+     * than created_at directly so "what time does the business see" is
+     * decided in one place.
+     */
+    public function displayedAt(): \Illuminate\Support\Carbon
+    {
+        return $this->created_at->clone()->setTimezone($this->business->timezone());
+    }
 }

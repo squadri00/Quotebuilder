@@ -36,6 +36,7 @@ class Business extends Model
         'state_province',
         'postal_code',
         'country',
+        'timezone',
         'notification_email',
         'phone',
         'quotation_disclaimer',
@@ -370,6 +371,18 @@ class Business extends Model
         $limit = $this->userLimit();
 
         return $limit !== null && $this->activeUserCount() >= $limit;
+    }
+
+    /**
+     * The PHP timezone identifier to display this business's dates in
+     * (quote submission times, etc.) — everything is still stored in UTC
+     * exactly as before; this only controls what a viewer sees. Falls
+     * back to the platform's own timezone for a business that hasn't set
+     * one, same "unset means default" pattern as brand_color.
+     */
+    public function timezone(): string
+    {
+        return $this->timezone ?: config('app.timezone');
     }
 
     /**

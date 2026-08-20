@@ -123,7 +123,7 @@
                                         <span class="block text-xs text-amber-600 dark:text-amber-400">was ${{ number_format($quote->calculated_price, 2) }}</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $quote->created_at->format('M j, Y g:i A') }}</td>
+                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ $quote->displayedAt()->format('M j, Y g:i A') }}</td>
                                 @if ($statusTrackingEnabled)
                                     <td class="px-4 py-3" onclick="event.stopPropagation()">
                                         <form method="POST" action="{{ route('quotes.update-status', $quote) }}">

@@ -115,7 +115,7 @@
                         <p>Thanks, {{ $quote->customer_name }} — we've saved this quote for {{ $quote->customer_email }}.</p>
                     @endif
 
-                    <p class="mt-1 text-xs">Quoted on {{ $quote->created_at->format('M j, Y \a\t g:i A') }}</p>
+                    <p class="mt-1 text-xs">Quoted on {{ $quote->displayedAt()->format('M j, Y \a\t g:i A') }}</p>
 
                     @if ($quote->prepared_by_name)
                         <p class="mt-1 text-xs">Prepared by {{ $quote->prepared_by_name }} ({{ $quote->prepared_by_email }})</p>
