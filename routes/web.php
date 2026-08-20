@@ -10,6 +10,7 @@ use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemoController;
+use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\InternalQuoteController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\OptionController;
@@ -36,9 +37,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/features', function () {
-    return view('features');
-})->name('features');
+Route::get('/features', [FeaturesController::class, 'show'])->name('features');
 
 Route::get('/demo', [DemoController::class, 'index'])->name('demo');
 

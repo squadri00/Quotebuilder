@@ -9,6 +9,7 @@ use App\Http\Controllers\SuperAdmin\DashboardController;
 use App\Http\Controllers\SuperAdmin\DemoCalculatorController;
 use App\Http\Controllers\SuperAdmin\ExportController;
 use App\Http\Controllers\SuperAdmin\FeatureController;
+use App\Http\Controllers\SuperAdmin\FeaturesPageController;
 use App\Http\Controllers\SuperAdmin\FinancialController;
 use App\Http\Controllers\SuperAdmin\ImplementationOrderController;
 use App\Http\Controllers\SuperAdmin\ImplementationTierController;
@@ -148,6 +149,15 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::patch('/demo-calculators/{demo_calculator}/toggle-active', [DemoCalculatorController::class, 'toggleActive'])->name('demo-calculators.toggle-active');
 
         Route::resource('site-pages', SitePageController::class)->except('show');
+
+        Route::get('/features-page', [FeaturesPageController::class, 'index'])->name('features-page.index');
+        Route::put('/features-page/hero', [FeaturesPageController::class, 'updateHero'])->name('features-page.hero.update');
+        Route::get('/features-page/cards/create', [FeaturesPageController::class, 'createCard'])->name('features-page.cards.create');
+        Route::post('/features-page/cards', [FeaturesPageController::class, 'storeCard'])->name('features-page.cards.store');
+        Route::get('/features-page/cards/{card}/edit', [FeaturesPageController::class, 'editCard'])->name('features-page.cards.edit');
+        Route::put('/features-page/cards/{card}', [FeaturesPageController::class, 'updateCard'])->name('features-page.cards.update');
+        Route::delete('/features-page/cards/{card}', [FeaturesPageController::class, 'destroyCard'])->name('features-page.cards.destroy');
+        Route::patch('/features-page/cards/{card}/toggle-active', [FeaturesPageController::class, 'toggleCardActive'])->name('features-page.cards.toggle-active');
 
         Route::resource('announcements', AnnouncementController::class)->except('show');
         Route::patch('/announcements/{announcement}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');
