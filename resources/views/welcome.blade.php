@@ -8,7 +8,7 @@
         <div class="max-w-6xl px-6 mx-auto flex flex-col lg:flex-row items-stretch">
             <div class="flex flex-col w-full lg:w-5/12 justify-center lg:pt-6 items-start text-center lg:text-left mb-5 md:mb-0">
                 <h1 data-aos="fade-right" data-aos-once="true" class="my-4 text-5xl sm:text-6xl font-bold leading-tight text-navy dark:text-gray-100">
-                    {{ $hero->heading }}
+                    {!! $hero->headingHtml() !!}
                 </h1>
                 <p data-aos="fade-down" data-aos-once="true" data-aos-delay="300" class="leading-normal text-xl mb-8 text-gray-600 dark:text-gray-400">{{ $hero->subheading }}</p>
                 <div data-aos="fade-up" data-aos-once="true" data-aos-delay="700" class="w-full md:flex items-center justify-center lg:justify-start md:space-x-5">

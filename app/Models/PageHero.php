@@ -17,4 +17,15 @@ class PageHero extends Model
     {
         return static::firstOrCreate(['page_key' => $key], $defaults);
     }
+
+    /**
+     * Renders the heading with **text** wrapped in a green accent span,
+     * matching the two-tone style used on the rest of the site's
+     * section headers. The whole string is escaped first, so the
+     * ** markers are the only thing that can introduce markup.
+     */
+    public function headingHtml(): string
+    {
+        return preg_replace('/\*\*(.+?)\*\*/s', '<span class="text-green-600 dark:text-green-400">$1</span>', e($this->heading));
+    }
 }

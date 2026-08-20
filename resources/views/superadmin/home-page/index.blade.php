@@ -19,8 +19,11 @@
             <div class="space-y-5">
                 <div>
                     <x-input-label for="heading" value="Headline" />
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Wrap part of the headline in <code class="text-xs bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">**double asterisks**</code> to make it green — for example <code class="text-xs bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">**Build Your Own** Quote Calculator</code>.
+                    </p>
                     <textarea id="heading" name="heading" rows="2" required maxlength="200"
-                        class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg font-semibold"
+                        class="mt-2 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg font-semibold"
                     >{{ old('heading', $hero->heading) }}</textarea>
                     <x-input-error :messages="$errors->get('heading')" class="mt-2" />
                 </div>
