@@ -39,6 +39,19 @@
                     </div>
 
                     <div class="flex shrink-0 items-center gap-2">
+                        <a
+                            href="{{ url('/') }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition duration-150 ease-in-out dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+                            title="Visit {{ config('app.name', 'Quotaire') }}.com"
+                            aria-label="Visit {{ config('app.name', 'Quotaire') }}.com (opens in a new tab)"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                            </svg>
+                        </a>
+
                         <button
                             type="button"
                             onclick="toggleAppTheme()"
