@@ -23,6 +23,7 @@ use App\Http\Controllers\SuperAdmin\ProductController;
 use App\Http\Controllers\SuperAdmin\QuestionController;
 use App\Http\Controllers\SuperAdmin\QuoteHubController;
 use App\Http\Controllers\SuperAdmin\RuleController;
+use App\Http\Controllers\SuperAdmin\SitePageController;
 use App\Http\Controllers\SuperAdmin\SupportAddonController;
 use App\Http\Controllers\SuperAdmin\SupportTicketController;
 use App\Http\Controllers\SuperAdmin\TemplateController;
@@ -145,6 +146,8 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
 
         Route::resource('demo-calculators', DemoCalculatorController::class)->except('show');
         Route::patch('/demo-calculators/{demo_calculator}/toggle-active', [DemoCalculatorController::class, 'toggleActive'])->name('demo-calculators.toggle-active');
+
+        Route::resource('site-pages', SitePageController::class)->except('show');
 
         Route::resource('announcements', AnnouncementController::class)->except('show');
         Route::patch('/announcements/{announcement}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');

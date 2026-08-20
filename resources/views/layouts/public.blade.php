@@ -101,8 +101,8 @@
                     </div>
                     <div class="flex items-center gap-6">
                         <a href="{{ route('contact') }}" class="hover:text-white transition">Contact</a>
-                        <a href="#" class="hover:text-white transition">Privacy Policy</a>
-                        <a href="#" class="hover:text-white transition">Terms of Use</a>
+                        <a href="{{ route('legal.show', 'privacy-policy') }}" class="hover:text-white transition">Privacy Policy</a>
+                        <a href="{{ route('legal.show', 'terms-of-use') }}" class="hover:text-white transition">Terms of Use</a>
                     </div>
                 </div>
             </div>

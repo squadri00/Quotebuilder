@@ -21,6 +21,7 @@ use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\QuoteHubController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RuleController;
+use App\Http\Controllers\SitePageController;
 use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\TaxRateController;
 use App\Http\Controllers\TeamController;
@@ -45,6 +46,8 @@ Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->middleware('throttle:5,1')->name('contact.submit');
 
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
+
+Route::get('/legal/{slug}', [SitePageController::class, 'show'])->name('legal.show');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified', 'business.active'])->name('dashboard');
 
