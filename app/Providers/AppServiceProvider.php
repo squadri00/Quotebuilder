@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Announcement;
 use App\Models\Business;
 use App\Models\PlatformSetting;
+use App\Models\SocialLink;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -68,6 +69,16 @@ class AppServiceProvider extends ServiceProvider
             $announcements = Announcement::unreadForBusiness($business, $userId);
 
             $view->with(['headerAnnouncementCount' => $count, 'headerAnnouncements' => $announcements]);
+        });
+
+        // The footer's social icon row only ever appears on the public
+        // site, so this stays scoped here rather than a global share.
+        View::composer('layouts.public', function ($view) {
+            $socialLinks = Schema::hasTable('social_links')
+                ? SocialLink::where('is_active', true)->orderBy('sort_order')->orderBy('id')->get()
+                : collect();
+
+            $view->with('socialLinks', $socialLinks);
         });
     }
 

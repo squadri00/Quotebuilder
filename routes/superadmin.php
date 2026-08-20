@@ -26,6 +26,7 @@ use App\Http\Controllers\SuperAdmin\QuestionController;
 use App\Http\Controllers\SuperAdmin\QuoteHubController;
 use App\Http\Controllers\SuperAdmin\RuleController;
 use App\Http\Controllers\SuperAdmin\SitePageController;
+use App\Http\Controllers\SuperAdmin\SocialLinkController;
 use App\Http\Controllers\SuperAdmin\SupportAddonController;
 use App\Http\Controllers\SuperAdmin\SupportTicketController;
 use App\Http\Controllers\SuperAdmin\TemplateController;
@@ -162,6 +163,9 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
 
         Route::get('/home-page', [HomePageController::class, 'index'])->name('home-page.index');
         Route::put('/home-page/hero', [HomePageController::class, 'updateHero'])->name('home-page.hero.update');
+
+        Route::resource('social-links', SocialLinkController::class)->except('show');
+        Route::patch('/social-links/{social_link}/toggle-active', [SocialLinkController::class, 'toggleActive'])->name('social-links.toggle-active');
 
         Route::resource('announcements', AnnouncementController::class)->except('show');
         Route::patch('/announcements/{announcement}/toggle-active', [AnnouncementController::class, 'toggleActive'])->name('announcements.toggle-active');

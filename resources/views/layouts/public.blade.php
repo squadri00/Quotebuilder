@@ -93,6 +93,18 @@
                 <div class="flex flex-col items-center py-12 text-white">
                     <img src="{{ asset('images/quotaire/logo-for-black.png') }}" alt="{{ config('app.name', 'Quotaire') }}" class="h-7 w-auto">
                     <p class="mt-4 text-sm text-indigo-200">The quote calculator builder for businesses that quote by products, options, and rules.</p>
+
+                    @if (($socialLinks ?? collect())->isNotEmpty())
+                        <div class="mt-5 flex items-center gap-3">
+                            @foreach ($socialLinks as $socialLink)
+                                @php $icon = $socialLink->icon(); @endphp
+                                <a href="{{ $socialLink->url }}" target="_blank" rel="noopener noreferrer" title="{{ $socialLink->displayLabel() }}"
+                                    class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="{{ $icon['viewBox'] }}" fill="currentColor"><path d="{{ $icon['path'] }}" /></svg>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
 
                 <div class="flex flex-col md:flex-row items-center justify-between text-gray-300 text-sm py-6 border-t border-white/10">
