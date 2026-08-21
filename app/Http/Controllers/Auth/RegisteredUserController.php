@@ -39,7 +39,13 @@ class RegisteredUserController extends Controller
             return redirect()->route('pricing');
         }
 
-        $countries = Country::where('is_active', true)->orderBy('name')->get();
+        // Canada and the US lead the list since they're the only countries
+        // with a real state/province dropdown — everyone else sorts
+        // alphabetically after them.
+        $countries = Country::where('is_active', true)
+            ->orderByRaw("CASE WHEN short_code = 'CA' THEN 0 WHEN short_code = 'US' THEN 1 ELSE 2 END")
+            ->orderBy('name')
+            ->get();
 
         return view('auth.register', compact('selectedPlan', 'countries'));
     }
