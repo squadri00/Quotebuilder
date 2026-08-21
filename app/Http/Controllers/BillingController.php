@@ -112,6 +112,25 @@ class BillingController extends Controller
      * Upgrade/downgrade an existing subscription to a different plan's
      * price. Like subscribe(), plan_id itself is only ever updated by the
      * webhook once Stripe confirms the change.
+     *
+     * An upgrade invoices the prorated difference immediately
+     * (swapAndInvoice) rather than leaving it as a pending line item for
+     * the next regular invoice — otherwise a business could switch to a
+     * pricier plan, use its higher limits, then switch back down before
+     * their renewal date and never actually be billed for the days spent
+     * on the higher tier. A downgrade still just credits the difference
+     * toward the next invoice, same as before — never an instant refund.
+     *
+     * The explicit metadata here matters: a subscription created through
+     * the tax-inclusive checkout flow (CheckoutController::confirm) is
+     * stamped with the plan_id it started on, and the webhook's plan sync
+     * prefers that metadata over the subscription's actual Stripe price
+     * when both are present (see WebhookController::syncPlanFromSubscriptionPayload).
+     * Without refreshing it here, that metadata goes stale the moment
+     * someone swaps plans — the webhook keeps reading the *original*
+     * plan_id forever, so a business's local plan (and every hasFeature()
+     * check gated on it) silently stops tracking their real Stripe plan
+     * after the very first swap.
      */
     public function swap(Request $request, Plan $plan): RedirectResponse
     {
@@ -121,13 +140,44 @@ class BillingController extends Controller
 
         abort_unless($business->subscribed('default'), 404, 'No active subscription to change.');
 
+        $subscription = $business->subscription('default');
+
+        // Stripe replaces the whole metadata object on update rather than
+        // merging it, so the existing keys (pending_registration_token,
+        // etc.) are read back first and kept — only plan_id is meant to
+        // change here.
+        $currentMetadata = $subscription->asStripeSubscription()->metadata->toArray();
+        $options = ['metadata' => array_merge($currentMetadata, ['plan_id' => (string) $plan->id])];
+
         try {
-            $business->subscription('default')->swap($plan->stripe_price_id);
+            if ($this->isPriceIncrease($business->plan, $plan)) {
+                $subscription->swapAndInvoice($plan->stripe_price_id, $options);
+            } else {
+                $subscription->swap($plan->stripe_price_id, $options);
+            }
         } catch (IncompletePayment $exception) {
             return redirect()->route('cashier.payment', [$exception->payment->id, 'redirect' => route('billing.index')]);
         }
 
         return redirect()->route('billing.index')->with('status', "Plan change to \"{$plan->name}\" submitted.");
+    }
+
+    /**
+     * Compares on a monthly-equivalent basis so switching between a
+     * monthly and yearly price (not just same-interval swaps) is still
+     * judged correctly as an upgrade or downgrade.
+     */
+    private function isPriceIncrease(?Plan $current, Plan $new): bool
+    {
+        if (! $current) {
+            return false;
+        }
+
+        $monthlyEquivalent = fn (Plan $plan) => $plan->billing_interval === 'yearly'
+            ? (float) $plan->price / 12
+            : (float) $plan->price;
+
+        return $monthlyEquivalent($new) > $monthlyEquivalent($current);
     }
 
     /**
