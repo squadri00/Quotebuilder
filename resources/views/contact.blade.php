@@ -71,6 +71,20 @@
                 </div>
 
                 <div>
+                    <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Subject</label>
+                    <select id="subject" name="subject" required
+                        class="block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-lg shadow-sm text-sm py-2.5 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-100">
+                        <option value="">— Select a subject —</option>
+                        @foreach (\App\Support\ContactSubjects::options() as $value => $label)
+                            <option value="{{ $value }}" @selected(old('subject') === $value)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('subject')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
                     <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Message</label>
                     <textarea id="message" name="message" rows="5" required
                         class="block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-lg shadow-sm text-sm py-2.5 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-500">{{ old('message') }}</textarea>

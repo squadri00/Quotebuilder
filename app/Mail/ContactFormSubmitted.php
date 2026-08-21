@@ -19,6 +19,7 @@ class ContactFormSubmitted extends Mailable
     public function __construct(
         public string $name,
         public string $email,
+        public string $topic,
         public string $message,
     ) {
     }
@@ -26,7 +27,7 @@ class ContactFormSubmitted extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "New contact form message from {$this->name}",
+            subject: "[{$this->topic}] New contact form message from {$this->name}",
             replyTo: [$this->email],
         );
     }
@@ -38,6 +39,7 @@ class ContactFormSubmitted extends Mailable
             with: [
                 'name' => $this->name,
                 'email' => $this->email,
+                'topic' => $this->topic,
                 'body' => $this->message,
             ],
         );

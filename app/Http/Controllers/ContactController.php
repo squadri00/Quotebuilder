@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Mail\ContactFormSubmitted;
 use App\Models\PlatformSetting;
+use App\Support\ContactSubjects;
 use App\Support\TurnstileVerifier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ContactController extends Controller
@@ -22,6 +24,7 @@ class ContactController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
+            'subject' => ['required', 'string', Rule::in(ContactSubjects::keys())],
             'message' => ['required', 'string', 'max:5000'],
         ]);
 
@@ -36,11 +39,12 @@ class ContactController extends Controller
             return back()->withInput()->withErrors(['turnstile' => "We couldn't verify you're not a robot — please try again."]);
         }
 
-        $to = PlatformSetting::get()->contact_email ?: config('mail.from.address');
+        $to = PlatformSetting::get()->contact_email ?: 'hello@quotaire.com';
 
         Mail::to($to)->send(new ContactFormSubmitted(
             $validated['name'],
             $validated['email'],
+            ContactSubjects::label($validated['subject']),
             $validated['message'],
         ));
 
