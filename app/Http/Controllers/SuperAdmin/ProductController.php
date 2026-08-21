@@ -7,9 +7,11 @@ use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\Option;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Support\QuestionVisibility;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 /**
@@ -28,6 +30,8 @@ use Illuminate\View\View;
  */
 class ProductController extends Controller
 {
+    private const MAX_IMAGES = 5;
+
     public function index(Business $business): View
     {
         // Every nested relation needs its own withoutGlobalScopes() — see
@@ -153,6 +157,70 @@ class ProductController extends Controller
 
         return redirect()->route('superadmin.products.edit', [$business, $product])
             ->with('status', 'Product published.');
+    }
+
+    /**
+     * Same upload/remove mechanics as the business-side ProductController —
+     * see its storeImages()/destroyImage() docblock. Kept here too so
+     * staff can add images to a template's products (templates have no
+     * logged-in business user to do it themselves) or to a real
+     * customer's product while working in their account.
+     */
+    public function storeImages(Request $request, Business $business, Product $product): RedirectResponse
+    {
+        abort_unless($product->business_id === $business->id, 404);
+
+        $existingCount = $product->images()->count();
+        $remaining = max(0, self::MAX_IMAGES - $existingCount);
+
+        if ($remaining === 0) {
+            return back()->with('error', 'This product already has the maximum of '.self::MAX_IMAGES.' images — remove one before adding another.');
+        }
+
+        $validated = $request->validate([
+            'images' => ['required', 'array', 'max:'.$remaining],
+            'images.*' => ['image', 'max:4096'],
+        ]);
+
+        $nextSortOrder = ($product->images()->max('sort_order') ?? -1) + 1;
+
+        foreach ($validated['images'] as $file) {
+            ProductImage::create([
+                'business_id' => $product->business_id,
+                'product_id' => $product->id,
+                'path' => $file->store('product-images', 'public'),
+                'sort_order' => $nextSortOrder++,
+            ]);
+        }
+
+        AuditLog::record(
+            $request->user('admin'),
+            'product.images.uploaded',
+            $business,
+            'Uploaded '.count($validated['images'])." image(s) to \"{$product->name}\" (#{$product->id})."
+        );
+
+        return redirect()->route('superadmin.products.edit', [$business, $product])
+            ->with('status', 'Image(s) uploaded — publish to make them visible to customers and staff.');
+    }
+
+    public function destroyImage(Request $request, Business $business, Product $product, ProductImage $image): RedirectResponse
+    {
+        abort_unless($product->business_id === $business->id, 404);
+        abort_unless($image->product_id === $product->id, 404);
+
+        Storage::disk('public')->delete($image->path);
+        $image->delete();
+
+        AuditLog::record(
+            $request->user('admin'),
+            'product.images.removed',
+            $business,
+            "Removed an image from \"{$product->name}\" (#{$product->id})."
+        );
+
+        return redirect()->route('superadmin.products.edit', [$business, $product])
+            ->with('status', 'Image removed — publish to update the customer-facing pages.');
     }
 
     /**

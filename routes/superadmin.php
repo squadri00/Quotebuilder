@@ -93,6 +93,8 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::delete('/businesses/{business}/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
         Route::post('/businesses/{business}/products/{product}/publish', [ProductController::class, 'publish'])->name('products.publish');
         Route::get('/businesses/{business}/products/{product}/preview', [ProductController::class, 'preview'])->name('products.preview');
+        Route::post('/businesses/{business}/products/{product}/images', [ProductController::class, 'storeImages'])->name('products.images.store');
+        Route::delete('/businesses/{business}/products/{product}/images/{image}', [ProductController::class, 'destroyImage'])->name('products.images.destroy');
         Route::patch('/businesses/{business}/quote-hub', [QuoteHubController::class, 'update'])->name('quote-hub.update');
 
         /*
