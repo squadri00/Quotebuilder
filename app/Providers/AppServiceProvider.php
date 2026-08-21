@@ -10,6 +10,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Cashier;
@@ -35,6 +36,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->applyPlatformSettings();
+
+        // Belt-and-suspenders alongside trustProxies() in bootstrap/app.php:
+        // forces every generated URL (email links, redirects) to https://
+        // outside local dev, regardless of what scheme the incoming
+        // request appears to use.
+        if (! $this->app->environment('local', 'testing')) {
+            URL::forceScheme('https');
+        }
 
         // Default limiter for public, unauthenticated routes (e.g. the
         // future customer-facing quote builder). Apply with the

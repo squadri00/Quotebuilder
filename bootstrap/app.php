@@ -57,6 +57,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\CheckMaintenanceMode::class,
         ]);
+
+        // Most production hosts (shared hosting, a managed VPS behind
+        // Nginx/Certbot, a CDN) terminate TLS at a reverse proxy in
+        // front of PHP, so the request Laravel actually sees is plain
+        // HTTP. Without this, Laravel can't tell the original request
+        // was HTTPS — breaking secure-cookie detection and generating
+        // http:// links in emails/redirects. '*' trusts whatever proxy
+        // sits in front of the app, which is the standard choice when
+        // you don't control the exact proxy IP but trust the host's
+        // own network (shared hosting, most managed VPS setups).
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

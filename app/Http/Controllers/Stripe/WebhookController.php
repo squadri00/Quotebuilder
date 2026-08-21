@@ -26,6 +26,26 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class WebhookController extends CashierWebhookController
 {
+    /**
+     * Cashier's own constructor only attaches signature verification
+     * IF a webhook secret is configured — meaning an empty secret
+     * (e.g. a fresh deploy where nobody filled in Super Admin >
+     * Platform Settings yet) would silently accept unsigned,
+     * unverified POSTs as if they were real Stripe events. Fail loudly
+     * instead: refuse every webhook call until the secret is set,
+     * rather than quietly trusting forged requests.
+     */
+    public function __construct()
+    {
+        abort_if(
+            ! config('cashier.webhook.secret'),
+            500,
+            'Stripe webhook secret is not configured — set it in Super Admin > Platform Settings before webhooks can be processed.'
+        );
+
+        parent::__construct();
+    }
+
     protected function handleCustomerSubscriptionCreated(array $payload): Response
     {
         // Must happen before parent:: — Cashier's own handling can only
