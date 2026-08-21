@@ -134,69 +134,6 @@
                         @endif
                     </x-superadmin-nav-group>
 
-                    <x-superadmin-nav-group title="Website" :active="request()->routeIs(['superadmin.demo-calculators.*', 'superadmin.site-pages.*', 'superadmin.features-page.*', 'superadmin.home-page.*', 'superadmin.social-links.*'])">
-                        <x-slot name="icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-                            </svg>
-                        </x-slot>
-
-                        @if (Route::has('superadmin.home-page.index'))
-                            <x-superadmin-nav-link :href="route('superadmin.home-page.index')" :active="request()->routeIs('superadmin.home-page.*')">
-                                <x-slot name="icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                                    </svg>
-                                </x-slot>
-                                {{ __('Home Page') }}
-                            </x-superadmin-nav-link>
-                        @endif
-
-                        @if (Route::has('superadmin.social-links.index'))
-                            <x-superadmin-nav-link :href="route('superadmin.social-links.index')" :active="request()->routeIs('superadmin.social-links.*')">
-                                <x-slot name="icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
-                                    </svg>
-                                </x-slot>
-                                {{ __('Social Links') }}
-                            </x-superadmin-nav-link>
-                        @endif
-
-                        @if (Route::has('superadmin.demo-calculators.index'))
-                            <x-superadmin-nav-link :href="route('superadmin.demo-calculators.index')" :active="request()->routeIs('superadmin.demo-calculators.*')">
-                                <x-slot name="icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m-6 4h6m-6 4h3m5 5H7a2 2 0 01-2-2V6a2 2 0 012-2h6l6 6v8a2 2 0 01-2 2z" />
-                                    </svg>
-                                </x-slot>
-                                {{ __('Demo Calculators') }}
-                            </x-superadmin-nav-link>
-                        @endif
-
-                        @if (Route::has('superadmin.site-pages.index'))
-                            <x-superadmin-nav-link :href="route('superadmin.site-pages.index')" :active="request()->routeIs('superadmin.site-pages.*')">
-                                <x-slot name="icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-1.519-2.394a2.25 2.25 0 10-3.463 2.874L12 17.25m-1.519-2.394L9 17.25m3-14.25H6.75a1.125 1.125 0 00-1.125 1.125v15.75c0 .621.504 1.125 1.125 1.125h10.5a1.125 1.125 0 001.125-1.125V11.25a9 9 0 00-9-9z" />
-                                    </svg>
-                                </x-slot>
-                                {{ __('Site Pages') }}
-                            </x-superadmin-nav-link>
-                        @endif
-
-                        @if (Route::has('superadmin.features-page.index'))
-                            <x-superadmin-nav-link :href="route('superadmin.features-page.index')" :active="request()->routeIs('superadmin.features-page.*')">
-                                <x-slot name="icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
-                                    </svg>
-                                </x-slot>
-                                {{ __('Features Page') }}
-                            </x-superadmin-nav-link>
-                        @endif
-                    </x-superadmin-nav-group>
-
                     <x-superadmin-nav-group title="Billing" :active="request()->routeIs(['superadmin.plans.*', 'superadmin.features.*', 'superadmin.platform-tax-rates.*', 'superadmin.implementation-tiers.*', 'superadmin.implementation-orders.*'])">
                         <x-slot name="icon">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
@@ -312,7 +249,7 @@
                         @endif
                     </x-superadmin-nav-group>
 
-                    <x-superadmin-nav-group title="System" :active="request()->routeIs(['superadmin.audit-log.*', 'superadmin.settings.*', 'superadmin.password.*'])">
+                    <x-superadmin-nav-group title="System" :active="request()->routeIs(['superadmin.audit-log.*', 'superadmin.settings.*', 'superadmin.password.*', 'superadmin.system-info.*'])">
                         <x-slot name="icon">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.559-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.164-.398.142-.854-.108-1.204l-.526-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
@@ -351,6 +288,80 @@
                                     </svg>
                                 </x-slot>
                                 {{ __('Change Password') }}
+                            </x-superadmin-nav-link>
+                        @endif
+
+                        @if (Route::has('superadmin.system-info.index'))
+                            <x-superadmin-nav-link :href="route('superadmin.system-info.index')" :active="request()->routeIs('superadmin.system-info.*')">
+                                <x-slot name="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                                    </svg>
+                                </x-slot>
+                                {{ __('System Info') }}
+                            </x-superadmin-nav-link>
+                        @endif
+                    </x-superadmin-nav-group>
+
+                    <x-superadmin-nav-group title="Website" :active="request()->routeIs(['superadmin.demo-calculators.*', 'superadmin.site-pages.*', 'superadmin.features-page.*', 'superadmin.home-page.*', 'superadmin.social-links.*'])">
+                        <x-slot name="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                            </svg>
+                        </x-slot>
+
+                        @if (Route::has('superadmin.home-page.index'))
+                            <x-superadmin-nav-link :href="route('superadmin.home-page.index')" :active="request()->routeIs('superadmin.home-page.*')">
+                                <x-slot name="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                    </svg>
+                                </x-slot>
+                                {{ __('Home Page') }}
+                            </x-superadmin-nav-link>
+                        @endif
+
+                        @if (Route::has('superadmin.social-links.index'))
+                            <x-superadmin-nav-link :href="route('superadmin.social-links.index')" :active="request()->routeIs('superadmin.social-links.*')">
+                                <x-slot name="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                                    </svg>
+                                </x-slot>
+                                {{ __('Social Links') }}
+                            </x-superadmin-nav-link>
+                        @endif
+
+                        @if (Route::has('superadmin.demo-calculators.index'))
+                            <x-superadmin-nav-link :href="route('superadmin.demo-calculators.index')" :active="request()->routeIs('superadmin.demo-calculators.*')">
+                                <x-slot name="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m-6 4h6m-6 4h3m5 5H7a2 2 0 01-2-2V6a2 2 0 012-2h6l6 6v8a2 2 0 01-2 2z" />
+                                    </svg>
+                                </x-slot>
+                                {{ __('Demo Calculators') }}
+                            </x-superadmin-nav-link>
+                        @endif
+
+                        @if (Route::has('superadmin.site-pages.index'))
+                            <x-superadmin-nav-link :href="route('superadmin.site-pages.index')" :active="request()->routeIs('superadmin.site-pages.*')">
+                                <x-slot name="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-1.519-2.394a2.25 2.25 0 10-3.463 2.874L12 17.25m-1.519-2.394L9 17.25m3-14.25H6.75a1.125 1.125 0 00-1.125 1.125v15.75c0 .621.504 1.125 1.125 1.125h10.5a1.125 1.125 0 001.125-1.125V11.25a9 9 0 00-9-9z" />
+                                    </svg>
+                                </x-slot>
+                                {{ __('Site Pages') }}
+                            </x-superadmin-nav-link>
+                        @endif
+
+                        @if (Route::has('superadmin.features-page.index'))
+                            <x-superadmin-nav-link :href="route('superadmin.features-page.index')" :active="request()->routeIs('superadmin.features-page.*')">
+                                <x-slot name="icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+                                    </svg>
+                                </x-slot>
+                                {{ __('Features Page') }}
                             </x-superadmin-nav-link>
                         @endif
                     </x-superadmin-nav-group>

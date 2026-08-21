@@ -3,17 +3,19 @@
         <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">Platform Settings</h2>
     </x-slot>
 
-    <p class="max-w-xl mb-4 text-sm text-gray-500 dark:text-gray-400">
+    <p class="max-w-3xl mb-4 text-sm text-gray-500 dark:text-gray-400">
         Stripe and outgoing-email credentials for the whole platform. Anything saved here overrides the server's .env file — leave a field blank to keep whatever .env already provides. Secret fields are never shown again once saved; leave them blank when editing to keep the current value.
     </p>
 
-    <x-auth-session-status class="max-w-xl mb-4" :status="session('status')" />
+    <x-auth-session-status class="max-w-3xl mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('superadmin.settings.update') }}" enctype="multipart/form-data" class="max-w-xl space-y-6">
+    <form method="POST" action="{{ route('superadmin.settings.update') }}" enctype="multipart/form-data" class="max-w-6xl">
         @csrf
         @method('PATCH')
 
-        <x-card>
+        <div class="columns-1 lg:columns-2 gap-6 [column-fill:_balance]">
+
+        <x-card class="break-inside-avoid mb-6">
             <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Branding</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">The product name, logo, and version shown across page titles, navigation, emails, the Super Admin area, and the customer portal.</p>
 
@@ -75,7 +77,7 @@
             </div>
         </x-card>
 
-        <x-card class="{{ $settings->maintenance_mode ? 'border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30' : '' }}">
+        <x-card class="break-inside-avoid mb-6 {{ $settings->maintenance_mode ? 'border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30' : '' }}">
             <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Maintenance Mode</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 When on, nobody can log in, sign up, or purchase/change anything — everywhere that touches Login, Register, Checkout, or Billing shows a "temporarily unavailable" page with the message below instead. <strong>Everything else keeps working as normal</strong>: the marketing site, every public quote page and embedded widget, and anyone already logged into a business dashboard. <strong>Super Admin is never affected</strong> — you can still log in and turn this back off at any time.
@@ -100,7 +102,7 @@
             </div>
         </x-card>
 
-        <x-card>
+        <x-card class="break-inside-avoid mb-6">
             <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Spam Protection</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Cloudflare Turnstile — a free, usually-invisible "prove you're not a robot" check shown on public quote forms, on top of the honeypot field that's always on. Get a site key and secret key at <span class="font-mono">dash.cloudflare.com</span> → Turnstile (free, no card required). Leave both blank to leave it off — every submission passes straight through, same as today.
@@ -122,7 +124,7 @@
             </div>
         </x-card>
 
-        <x-card>
+        <x-card class="break-inside-avoid mb-6">
             <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Business Profile</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Your own company's identity — not any business using the platform. Nothing prints this automatically today (Stripe hosts and brands subscription invoices from your own Stripe Dashboard settings, outside this app), but it's here ready for anything platform-generated that needs it later.
@@ -203,7 +205,7 @@
             </div>
         </x-card>
 
-        <x-card>
+        <x-card class="break-inside-avoid mb-6">
             <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Stripe</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">From your Stripe Dashboard → Developers → API keys (and Webhooks, for the signing secret).</p>
 
@@ -245,7 +247,7 @@
             </div>
         </x-card>
 
-        <x-card>
+        <x-card class="break-inside-avoid mb-6">
             <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Outgoing Email (SMTP)</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 For Brevo: host <code class="text-xs">smtp-relay.brevo.com</code>, port <code class="text-xs">587</code>, username is your Brevo account email, password is your SMTP key (not your account password) — leave Encryption blank.
@@ -316,6 +318,10 @@
             </div>
         </x-card>
 
-        <x-primary-button>Save Changes</x-primary-button>
+        </div>
+
+        <div class="mt-6">
+            <x-primary-button>Save Changes</x-primary-button>
+        </div>
     </form>
 </x-superadmin-layout>

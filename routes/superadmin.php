@@ -29,6 +29,7 @@ use App\Http\Controllers\SuperAdmin\SitePageController;
 use App\Http\Controllers\SuperAdmin\SocialLinkController;
 use App\Http\Controllers\SuperAdmin\SupportAddonController;
 use App\Http\Controllers\SuperAdmin\SupportTicketController;
+use App\Http\Controllers\SuperAdmin\SystemInfoController;
 use App\Http\Controllers\SuperAdmin\TemplateController;
 use App\Http\Controllers\SuperAdmin\ThemeController;
 use App\Http\Controllers\SuperAdmin\TrainingArtifactController;
@@ -54,6 +55,8 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
 
         Route::get('/password', [PasswordController::class, 'edit'])->name('password.edit');
         Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
+
+        Route::get('/system-info', [SystemInfoController::class, 'index'])->name('system-info.index');
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
