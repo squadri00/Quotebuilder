@@ -3,6 +3,20 @@
         <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100">Billing</h2>
     </x-slot>
 
+    <x-card class="mb-6 border-indigo-100 bg-indigo-50/60 dark:border-indigo-900 dark:bg-indigo-950/30">
+        <div class="flex items-start gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 shrink-0 mt-0.5 text-indigo-500 dark:text-indigo-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+            </svg>
+            <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                <span class="font-semibold text-gray-900 dark:text-gray-100">Billing Notice:</span>
+                {{ config('app.name', 'Quotaire') }} is a product of
+                <a href="https://eformics.com" target="_blank" rel="noopener noreferrer" class="font-medium underline hover:no-underline text-indigo-700 dark:text-indigo-300">Eformics Systems</a>,
+                a registered company. Payments are processed securely by <span class="font-medium">Stripe</span>, our payment processing partner, on Eformics Systems' behalf — so your card statement or Stripe invoice may show <span class="font-medium">Eformics Systems</span> rather than {{ config('app.name', 'Quotaire') }}. This is expected and not a billing error.
+            </p>
+        </div>
+    </x-card>
+
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     @if (session('error'))
