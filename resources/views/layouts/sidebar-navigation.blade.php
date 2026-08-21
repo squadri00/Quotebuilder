@@ -147,6 +147,12 @@
         @endif
     </nav>
 
+    @if (($platformSettings ?? null)?->version)
+        <div class="border-t border-gray-200 px-3 py-2 dark:border-gray-700">
+            <p x-show="sidebarOpen" x-cloak class="text-center text-xs text-gray-400 dark:text-gray-500">v{{ $platformSettings->version }}</p>
+        </div>
+    @endif
+
     <!-- Collapse toggle -->
     <div class="border-t border-gray-200 p-3 dark:border-gray-700">
         <button
