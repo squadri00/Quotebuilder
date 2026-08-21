@@ -41,6 +41,7 @@ class Product extends Model
     protected function casts(): array
     {
         return [
+            'business_id' => 'integer',
             'base_price' => 'decimal:2',
             'is_active' => 'boolean',
             'show_in_quote_hub' => 'boolean',
