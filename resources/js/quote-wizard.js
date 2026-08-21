@@ -154,6 +154,28 @@ export default function quoteWizard(questions, priceUrl = null, autoFinish = fal
             this.draftToastVisible = false;
         },
 
+        // Manual escape hatch for the draft-resume behaviour above — a
+        // customer who wants a genuinely blank form (e.g. quoting a second,
+        // different job) rather than picking up where a saved draft left
+        // off. Clears the saved draft too, so reloading afterward doesn't
+        // just resurrect what was just cleared.
+        resetWizard() {
+            this.answers = {};
+            if (this.draftKey) {
+                try {
+                    localStorage.removeItem(this.draftKey);
+                } catch (e) {
+                    // Storage disabled — nothing to clear.
+                }
+            }
+            this.dismissDraftToast();
+            this._draftToastShown = false;
+            this.runningTotal = null;
+            const visible = this.visibleQuestions();
+            this.currentQuestionId = visible.length ? visible[0].id : 'DONE';
+            this.focusCurrentHeading();
+        },
+
         // Moves keyboard/screen-reader focus to the newly-current
         // question's heading — without this, a screen reader has no signal
         // that the "page" changed at all, since this is a single-page

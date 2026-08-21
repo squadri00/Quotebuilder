@@ -88,7 +88,6 @@
         >
             <div
                 x-show="draftToastVisible"
-                x-transition
                 x-cloak
                 class="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-50 sm:max-w-sm sm:w-auto bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg shadow-lg px-4 py-3 flex items-center gap-3"
                 role="status"
@@ -161,8 +160,17 @@
                     <!-- Main card -->
                     <div class="flex-1 order-1 md:order-2">
                         <div class="mb-6">
-                            <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1.5">
-                                <span x-text="'Step ' + stepNumber + ' of ' + totalSteps"></span>
+                            <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+                                <span class="flex items-center gap-2">
+                                    <span x-text="'Step ' + stepNumber + ' of ' + totalSteps"></span>
+                                    <button
+                                        type="button"
+                                        x-show="answeredQuestions().length > 0"
+                                        x-cloak
+                                        @click="if (confirm('Start over? This clears your answers so far.')) resetWizard()"
+                                        class="font-medium text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 underline underline-offset-2 brand-focus-ring rounded"
+                                    >Start Over</button>
+                                </span>
                                 <span x-text="progressPercent + '%'"></span>
                             </div>
                             <div
