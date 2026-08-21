@@ -15,6 +15,14 @@
     <x-input-error :messages="$errors->get('question_text')" class="mt-2" />
 </div>
 
+<div class="mt-4" x-data="{ count: {{ Js::from(strlen(old('description', $question?->description ?? ''))) }} }">
+    <x-input-label for="description" value="Help Text (optional)" />
+    <textarea id="description" name="description" rows="2" maxlength="160" @input="count = $event.target.value.length"
+        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">{{ old('description', $question?->description) }}</textarea>
+    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Shown as an "i" tooltip next to this question in the quote builder. <span x-text="count"></span>/160</p>
+    <x-input-error :messages="$errors->get('description')" class="mt-2" />
+</div>
+
 <div class="mt-4">
     <x-input-label for="type" value="Answer Type" />
     @php $selectedType = old('type', $question?->type ?? 'single_choice'); @endphp

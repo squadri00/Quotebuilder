@@ -120,12 +120,14 @@ class Product extends Model
             'questions' => $this->questions->sortBy('sort_order')->values()->map(fn (Question $question) => [
                 'id' => $question->id,
                 'question_text' => $question->question_text,
+                'description' => $question->description,
                 'type' => $question->type,
                 'sort_order' => $question->sort_order,
                 'display_conditions' => $question->display_conditions,
                 'options' => $question->options->sortBy('id')->values()->map(fn (Option $option) => [
                     'id' => $option->id,
                     'label' => $option->label,
+                    'description' => $option->description,
                     'price_modifier' => (float) $option->price_modifier,
                 ])->all(),
             ])->all(),

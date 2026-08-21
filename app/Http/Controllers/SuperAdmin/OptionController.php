@@ -96,6 +96,7 @@ class OptionController extends Controller
     {
         return $request->validate([
             'label' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:160'],
             'price_modifier' => ['required', 'numeric'],
         ]);
     }

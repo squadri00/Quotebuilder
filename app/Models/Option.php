@@ -18,6 +18,7 @@ class Option extends Model
         'business_id',
         'question_id',
         'label',
+        'description',
         'price_modifier',
         'is_published',
         'attrib1',

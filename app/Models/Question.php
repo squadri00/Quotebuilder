@@ -18,6 +18,7 @@ class Question extends Model
         'business_id',
         'product_id',
         'question_text',
+        'description',
         'type',
         'sort_order',
         'display_conditions',

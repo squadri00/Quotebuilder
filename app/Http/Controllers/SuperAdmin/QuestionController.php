@@ -126,6 +126,7 @@ class QuestionController extends Controller
     {
         $validated = $request->validate([
             'question_text' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:160'],
             'type' => ['required', 'in:single_choice,number,text'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ]);

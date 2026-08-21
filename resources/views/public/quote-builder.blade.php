@@ -64,11 +64,13 @@
                 return [
                     'id' => $q['id'],
                     'question_text' => $q['question_text'],
+                    'description' => $q['description'] ?? null,
                     'type' => $q['type'],
                     'display_conditions' => $q['display_conditions'] ?? null,
                     'options' => $options->map(fn ($o) => [
                         'id' => $o['id'],
                         'label' => $o['label'],
+                        'description' => $o['description'] ?? null,
                         'isStandard' => $standardOptionId !== null && $o['id'] === $standardOptionId,
                     ])->values(),
                 ];
@@ -179,12 +181,14 @@
                             <template x-for="question in questions" :key="question.id">
                                 <div x-show="currentQuestionId === question.id" x-cloak>
                                     <h2
-                                        class="text-xl font-bold text-gray-900 dark:text-gray-100 text-center brand-focus-ring rounded"
+                                        class="text-xl font-bold text-gray-900 dark:text-gray-100 text-center brand-focus-ring rounded flex items-center justify-center gap-1.5"
                                         :id="'question-heading-' + question.id"
                                         :data-question-heading="question.id"
                                         tabindex="-1"
-                                        x-text="question.question_text"
-                                    ></h2>
+                                    >
+                                        <span x-text="question.question_text"></span>
+                                        <x-wizard-tooltip bind="question.description" />
+                                    </h2>
 
                                     <div
                                         class="mt-6 space-y-3"
@@ -193,23 +197,26 @@
                                         :aria-labelledby="'question-heading-' + question.id"
                                     >
                                         <template x-for="option in question.options" :key="option.id">
-                                            <button
-                                                type="button"
-                                                role="radio"
-                                                :aria-checked="String(answers[question.id]) === String(option.id)"
-                                                @click="selectOption(question.id, option.id)"
-                                                class="w-full flex items-center justify-between gap-3 text-left px-4 py-4 rounded-xl border-2 font-medium transition brand-focus-ring"
-                                                :class="String(answers[question.id]) === String(option.id)
-                                                    ? 'brand-selected'
-                                                    : 'border-gray-200 hover:border-gray-300 text-gray-900 dark:border-gray-600 dark:hover:border-gray-500 dark:text-gray-100'"
-                                            >
-                                                <span x-text="option.label"></span>
-                                                <span
-                                                    x-show="option.isStandard"
-                                                    x-cloak
-                                                    class="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300"
-                                                >Most Popular</span>
-                                            </button>
+                                            <div class="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    role="radio"
+                                                    :aria-checked="String(answers[question.id]) === String(option.id)"
+                                                    @click="selectOption(question.id, option.id)"
+                                                    class="flex-1 flex items-center justify-between gap-3 text-left px-4 py-4 rounded-xl border-2 font-medium transition brand-focus-ring"
+                                                    :class="String(answers[question.id]) === String(option.id)
+                                                        ? 'brand-selected'
+                                                        : 'border-gray-200 hover:border-gray-300 text-gray-900 dark:border-gray-600 dark:hover:border-gray-500 dark:text-gray-100'"
+                                                >
+                                                    <span x-text="option.label"></span>
+                                                    <span
+                                                        x-show="option.isStandard"
+                                                        x-cloak
+                                                        class="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300"
+                                                    >Most Popular</span>
+                                                </button>
+                                                <x-wizard-tooltip bind="option.description" />
+                                            </div>
                                         </template>
                                         <div class="text-center" x-show="question.options.length === 0">
                                             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">No options available for this question yet.</p>

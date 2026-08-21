@@ -14,9 +14,10 @@
                 {{ Js::from(collect($snapshot['questions'])->map(fn ($q) => [
                     'id' => $q['id'],
                     'question_text' => $q['question_text'],
+                    'description' => $q['description'] ?? null,
                     'type' => $q['type'],
                     'display_conditions' => $q['display_conditions'] ?? null,
-                    'options' => collect($q['options'])->map(fn ($o) => ['id' => $o['id'], 'label' => $o['label']])->values(),
+                    'options' => collect($q['options'])->map(fn ($o) => ['id' => $o['id'], 'label' => $o['label'], 'description' => $o['description'] ?? null])->values(),
                 ])) }},
                 {{ Js::from(route('superadmin.quotes.create.price', $product)) }},
                 true
@@ -87,20 +88,26 @@
                 <x-card>
                     <template x-for="question in questions" :key="question.id">
                         <div x-show="currentQuestionId === question.id" x-cloak>
-                            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 text-center" x-text="question.question_text"></h2>
+                            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 text-center flex items-center justify-center gap-1.5">
+                                <span x-text="question.question_text"></span>
+                                <x-wizard-tooltip bind="question.description" />
+                            </h2>
 
                             <div class="mt-6 space-y-3" x-show="question.type === 'single_choice'">
                                 <template x-for="option in question.options" :key="option.id">
-                                    <button
-                                        type="button"
-                                        @click="selectOption(question.id, option.id)"
-                                        class="w-full text-left px-4 py-4 rounded-xl border-2 font-medium transition"
-                                        :class="String(answers[question.id]) === String(option.id)
-                                            ? 'brand-selected'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 text-gray-900 dark:text-gray-100'"
-                                    >
-                                        <span x-text="option.label"></span>
-                                    </button>
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            @click="selectOption(question.id, option.id)"
+                                            class="flex-1 text-left px-4 py-4 rounded-xl border-2 font-medium transition"
+                                            :class="String(answers[question.id]) === String(option.id)
+                                                ? 'brand-selected'
+                                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 text-gray-900 dark:text-gray-100'"
+                                        >
+                                            <span x-text="option.label"></span>
+                                        </button>
+                                        <x-wizard-tooltip bind="option.description" />
+                                    </div>
                                 </template>
                                 <div class="text-center" x-show="question.options.length === 0">
                                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">No options available for this question yet.</p>
