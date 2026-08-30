@@ -502,7 +502,7 @@
                     </div>
                 </header>
 
-                <main class="flex-1 overflow-y-auto bg-gray-100 p-6 dark:bg-gray-900 lg:p-8">
+                <main class="flex-1 overflow-y-auto bg-gray-100 p-6 text-gray-900 dark:bg-gray-900 dark:text-gray-100 lg:p-8">
                     {{ $slot }}
                 </main>
             </div>
