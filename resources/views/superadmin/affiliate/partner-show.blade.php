@@ -46,11 +46,11 @@
         <x-card>
             <div class="text-xs text-gray-400">Commission ({{ $stats['currency'] }})</div>
             <table class="mt-1 w-full text-sm">
-                <tr><td>This month</td><td class="text-right font-semibold">{{ $m($stats['commission_month']) }}</td></tr>
+                <tr><td>This month</td><td class="text-right font-semibold text-gray-900 dark:text-gray-100">{{ $m($stats['commission_month']) }}</td></tr>
                 <tr><td>Pending approval</td><td class="text-right">{{ $m($stats['commission_pending']) }}</td></tr>
                 <tr><td>Approved, unpaid</td><td class="text-right">{{ $m($stats['commission_unpaid']) }}</td></tr>
                 <tr><td>Paid to date</td><td class="text-right">{{ $m($stats['commission_paid']) }}</td></tr>
-                <tr><td class="font-semibold">Lifetime</td><td class="text-right font-bold">{{ $m($stats['commission_lifetime']) }}</td></tr>
+                <tr><td class="font-semibold text-gray-900 dark:text-gray-100">Lifetime</td><td class="text-right font-bold">{{ $m($stats['commission_lifetime']) }}</td></tr>
             </table>
         </x-card>
     </div>
@@ -64,7 +64,7 @@
 
     @if ($tab === 'referrals')
         <x-card class="mb-4">
-            <h3 class="mb-3 text-sm font-semibold">Attach a business to this partner</h3>
+            <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">Attach a business to this partner</h3>
             <form method="POST" action="{{ route('superadmin.affiliate.partners.attach', $partner) }}" class="flex flex-wrap items-end gap-3">
                 @csrf
                 <div>
@@ -82,7 +82,7 @@
         <x-card class="!p-0 overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700/50"><tr>
-                    @foreach (['Business', 'Plan', 'Source', 'Rate', 'Status', 'First commission'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500">{{ $h }}</th>@endforeach
+                    @foreach (['Business', 'Plan', 'Source', 'Rate', 'Status', 'First commission'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">{{ $h }}</th>@endforeach
                 </tr></thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse ($referrals as $r)
@@ -105,7 +105,7 @@
         <x-card class="!p-0 overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700/50"><tr>
-                    @foreach (['Company', 'Region', 'Status', 'Claimed', 'Locked until', 'Converted'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500">{{ $h }}</th>@endforeach
+                    @foreach (['Company', 'Region', 'Status', 'Claimed', 'Locked until', 'Converted'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">{{ $h }}</th>@endforeach
                 </tr></thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse ($prospects as $p)
@@ -128,7 +128,7 @@
         <x-card class="!p-0 overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700/50"><tr>
-                    @foreach (['Period', 'Business', 'Kind', 'Base', 'Rate', 'Amount', 'Status'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500">{{ $h }}</th>@endforeach
+                    @foreach (['Period', 'Business', 'Kind', 'Base', 'Rate', 'Amount', 'Status'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">{{ $h }}</th>@endforeach
                 </tr></thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse ($commissions as $c)
@@ -138,7 +138,7 @@
                             <td class="px-4 py-3">{{ $c->kind }}</td>
                             <td class="px-4 py-3">{{ $m($c->base_amount) }}</td>
                             <td class="px-4 py-3">{{ rtrim(rtrim(number_format((float) $c->rate, 3), '0'), '.') }}%</td>
-                            <td class="px-4 py-3 font-semibold">{{ $m($c->commission_amount) }}</td>
+                            <td class="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">{{ $m($c->commission_amount) }}</td>
                             <td class="px-4 py-3"><x-affiliate-badge :status="$c->status" /></td>
                         </tr>
                     @empty
@@ -153,7 +153,7 @@
         <x-card class="!p-0 overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700/50"><tr>
-                    @foreach (['Number', 'Period', 'Lines', 'Amount', 'Status', 'Paid', ''] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500">{{ $h }}</th>@endforeach
+                    @foreach (['Number', 'Period', 'Lines', 'Amount', 'Status', 'Paid', ''] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">{{ $h }}</th>@endforeach
                 </tr></thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse ($payouts as $p)
@@ -161,7 +161,7 @@
                             <td class="px-4 py-3 font-mono text-xs">{{ $p->payout_number }}</td>
                             <td class="px-4 py-3">{{ sprintf('%04d-%02d', $p->period_year, $p->period_month) }}</td>
                             <td class="px-4 py-3">{{ $p->commission_count }}</td>
-                            <td class="px-4 py-3 font-semibold">{{ $m($p->amount) }} {{ $p->currency }}</td>
+                            <td class="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">{{ $m($p->amount) }} {{ $p->currency }}</td>
                             <td class="px-4 py-3"><x-affiliate-badge :status="$p->status" /></td>
                             <td class="px-4 py-3 text-gray-400">{{ $p->paid_at?->format('d/m/Y') ?? '—' }}</td>
                             <td class="px-4 py-3 text-right"><a href="{{ route('superadmin.affiliate.payouts.show', $p) }}" class="text-indigo-600">Open</a></td>
@@ -176,8 +176,8 @@
 
     @if ($partner->notes)
         <x-card class="mt-4">
-            <div class="text-sm font-semibold">Internal notes</div>
-            <div class="mt-1 whitespace-pre-wrap text-sm text-gray-500">{{ $partner->notes }}</div>
+            <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">Internal notes</div>
+            <div class="mt-1 whitespace-pre-wrap text-sm text-gray-500 dark:text-gray-400">{{ $partner->notes }}</div>
         </x-card>
     @endif
 </x-superadmin-layout>

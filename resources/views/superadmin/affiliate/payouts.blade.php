@@ -7,7 +7,7 @@
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <x-card class="mb-5">
-        <h3 class="mb-3 text-sm font-semibold">Generate a statement</h3>
+        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">Generate a statement</h3>
         @if ($candidates->isEmpty())
             <p class="text-sm text-gray-400">No partner has approved, un-invoiced commission right now.</p>
         @else
@@ -44,7 +44,7 @@
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700/50"><tr>
-                    @foreach (['Number', 'Partner', 'Period', 'Lines', 'Amount', 'Status', 'Paid', ''] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500">{{ $h }}</th>@endforeach
+                    @foreach (['Number', 'Partner', 'Period', 'Lines', 'Amount', 'Status', 'Paid', ''] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">{{ $h }}</th>@endforeach
                 </tr></thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                 @forelse ($payouts as $p)
@@ -53,7 +53,7 @@
                         <td class="px-4 py-3">{{ $p->partner?->partner_code }}</td>
                         <td class="px-4 py-3">{{ \Carbon\Carbon::create($p->period_year, $p->period_month, 1)->format('M Y') }}</td>
                         <td class="px-4 py-3">{{ $p->commission_count }}</td>
-                        <td class="px-4 py-3 font-semibold">{{ $m($p->amount) }} {{ $p->currency }}</td>
+                        <td class="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">{{ $m($p->amount) }} {{ $p->currency }}</td>
                         <td class="px-4 py-3"><x-affiliate-badge :status="$p->status" /></td>
                         <td class="px-4 py-3 text-gray-400">{{ $p->paid_at?->format('d/m/Y') ?? '—' }}</td>
                         <td class="px-4 py-3 text-right"><a href="{{ route('superadmin.affiliate.payouts.show', $p) }}" class="text-indigo-600">Open</a></td>

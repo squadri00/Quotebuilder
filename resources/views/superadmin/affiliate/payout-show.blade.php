@@ -13,7 +13,7 @@
     <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <x-card>
             <div class="text-xs text-gray-400">Partner</div>
-            <div class="font-semibold">{{ $payout->partner->name }}
+            <div class="font-semibold text-gray-900 dark:text-gray-100">{{ $payout->partner->name }}
                 <span class="rounded bg-orange-100 px-2 py-0.5 font-mono text-xs text-orange-700">{{ $payout->partner->partner_code }}</span></div>
             <div class="text-xs text-gray-400">{{ $payout->partner->email }}</div>
             <div class="mt-2 text-xs text-gray-400">Payout method: {{ $payout->partner->payout_method ?: '—' }}</div>
@@ -32,7 +32,7 @@
     <x-card class="mb-4 !p-0 overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-700/50"><tr>
-                @foreach (['Period', 'Business', 'Kind', 'Base', 'Rate', 'Amount'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500">{{ $h }}</th>@endforeach
+                @foreach (['Period', 'Business', 'Kind', 'Base', 'Rate', 'Amount'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">{{ $h }}</th>@endforeach
             </tr></thead>
             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
             @foreach ($payout->items as $it)
@@ -42,7 +42,7 @@
                     <td class="px-4 py-3">{{ $it->kind }}</td>
                     <td class="px-4 py-3">{{ $it->kind === 'commission' ? $m($it->base_amount) : '—' }}</td>
                     <td class="px-4 py-3">{{ $it->kind === 'commission' ? rtrim(rtrim(number_format((float) $it->rate, 3), '0'), '.') . '%' : '—' }}</td>
-                    <td class="px-4 py-3 font-semibold">{{ $m($it->commission_amount) }}</td>
+                    <td class="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">{{ $m($it->commission_amount) }}</td>
                 </tr>
             @endforeach
             </tbody>
@@ -63,7 +63,7 @@
                 <form method="POST" action="{{ route('superadmin.affiliate.payouts.update', $payout) }}"
                       onsubmit="return confirm('Void this statement? Its lines go back to Approved.')">
                     @csrf @method('PATCH')<input type="hidden" name="action" value="void">
-                    <p class="text-sm text-gray-500">Voiding releases every line on this statement so it can be re-generated.</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Voiding releases every line on this statement so it can be re-generated.</p>
                     <x-secondary-button class="mt-2">Void statement</x-secondary-button>
                 </form>
             </x-card>

@@ -12,11 +12,11 @@
         @csrf @method('PATCH')
 
         <x-card>
-            <h3 class="mb-3 text-sm font-semibold">Program</h3>
+            <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">Program</h3>
             <div class="space-y-3 text-sm">
-                <label class="flex items-start gap-2"><input type="checkbox" name="affiliate_program_enabled" value="1" @checked($settings->affiliate_program_enabled) class="mt-0.5 rounded border-gray-300"> Program enabled — attribution, accrual and the partner portal are live</label>
-                <label class="flex items-start gap-2"><input type="checkbox" name="affiliate_auto_approve_partners" value="1" @checked($settings->affiliate_auto_approve_partners) class="mt-0.5 rounded border-gray-300"> Auto-activate new partner signups (skip manual review)</label>
-                <label class="flex items-start gap-2"><input type="checkbox" name="affiliate_auto_approve_referrals" value="1" @checked($settings->affiliate_auto_approve_referrals) class="mt-0.5 rounded border-gray-300"> Auto-approve referrals that arrive through a valid active link</label>
+                <label class="flex items-start gap-2 text-gray-700 dark:text-gray-300"><input type="checkbox" name="affiliate_program_enabled" value="1" @checked($settings->affiliate_program_enabled) class="mt-0.5 rounded border-gray-300"> Program enabled — attribution, accrual and the partner portal are live</label>
+                <label class="flex items-start gap-2 text-gray-700 dark:text-gray-300"><input type="checkbox" name="affiliate_auto_approve_partners" value="1" @checked($settings->affiliate_auto_approve_partners) class="mt-0.5 rounded border-gray-300"> Auto-activate new partner signups (skip manual review)</label>
+                <label class="flex items-start gap-2 text-gray-700 dark:text-gray-300"><input type="checkbox" name="affiliate_auto_approve_referrals" value="1" @checked($settings->affiliate_auto_approve_referrals) class="mt-0.5 rounded border-gray-300"> Auto-approve referrals that arrive through a valid active link</label>
                 <div>
                     <x-input-label value="Partner agreement URL" />
                     <x-text-input name="affiliate_terms_url" type="url" class="mt-1 block w-full" :value="$settings->affiliate_terms_url" placeholder="https://…/partner-agreement" />
@@ -25,7 +25,7 @@
         </x-card>
 
         <x-card>
-            <h3 class="mb-3 text-sm font-semibold">Commission</h3>
+            <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">Commission</h3>
             <div class="space-y-3">
                 <div><x-input-label value="Default commission rate (%)" /><x-text-input name="affiliate_default_commission_rate" type="number" step="0.001" class="mt-1 w-40" :value="$settings->affiliate_default_commission_rate" required /></div>
                 <div>
@@ -37,10 +37,10 @@
         </x-card>
 
         <x-card>
-            <h3 class="mb-3 text-sm font-semibold">Prospect claims (territory lock)</h3>
+            <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">Prospect claims (territory lock)</h3>
             <div class="space-y-3 text-sm">
                 <div><x-input-label value="Claim lock duration (days)" /><x-text-input name="affiliate_claim_days" type="number" class="mt-1 w-40" :value="$settings->affiliate_claim_days" required /></div>
-                <label class="flex items-start gap-2"><input type="checkbox" name="affiliate_claim_renew_on_activity" value="1" @checked($settings->affiliate_claim_renew_on_activity) class="mt-0.5 rounded border-gray-300"> Editing a claim pushes its expiry forward</label>
+                <label class="flex items-start gap-2 text-gray-700 dark:text-gray-300"><input type="checkbox" name="affiliate_claim_renew_on_activity" value="1" @checked($settings->affiliate_claim_renew_on_activity) class="mt-0.5 rounded border-gray-300"> Editing a claim pushes its expiry forward</label>
                 <div><x-input-label value="Attribution cookie window (days)" /><x-text-input name="affiliate_cookie_days" type="number" class="mt-1 w-40" :value="$settings->affiliate_cookie_days" required /></div>
             </div>
         </x-card>

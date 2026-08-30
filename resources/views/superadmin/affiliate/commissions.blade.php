@@ -21,7 +21,7 @@
         <x-card class="!p-0 overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700/50"><tr>
-                    @foreach (['Business', 'Partner', 'Source', 'Accrued (pending)', 'Created', 'Actions'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500">{{ $h }}</th>@endforeach
+                    @foreach (['Business', 'Partner', 'Source', 'Accrued (pending)', 'Created', 'Actions'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">{{ $h }}</th>@endforeach
                 </tr></thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                 @forelse ($pendingReferrals as $r)
@@ -46,7 +46,7 @@
         </x-card>
     @else
         <x-card class="mb-4">
-            <h3 class="mb-3 text-sm font-semibold">Add manual adjustment / clawback</h3>
+            <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">Add manual adjustment / clawback</h3>
             <form method="POST" action="{{ route('superadmin.affiliate.adjustments.store') }}" class="flex flex-wrap items-end gap-3">
                 @csrf
                 <div>
@@ -79,7 +79,7 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-700/50"><tr>
-                        @foreach (['Period', 'Partner', 'Business', 'Kind', 'Base', 'Rate', 'Amount', 'Status', 'Statement', ''] as $h)<th class="px-3 py-3 text-left font-medium text-gray-500">{{ $h }}</th>@endforeach
+                        @foreach (['Period', 'Partner', 'Business', 'Kind', 'Base', 'Rate', 'Amount', 'Status', 'Statement', ''] as $h)<th class="px-3 py-3 text-left font-medium text-gray-500 dark:text-gray-400">{{ $h }}</th>@endforeach
                     </tr></thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @forelse ($ledger as $c)

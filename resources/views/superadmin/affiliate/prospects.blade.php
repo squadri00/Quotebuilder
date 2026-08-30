@@ -9,7 +9,7 @@
         <x-card class="mb-5 border-red-200">
             <h3 class="mb-3 text-sm font-semibold text-red-700">⚠ Overlap — same client worked by multiple partners (last 180 days)</h3>
             <table class="min-w-full text-sm">
-                <thead><tr class="text-left text-gray-500"><th class="py-1">Company</th><th>Partners</th><th>Claims</th><th>Latest expiry</th></tr></thead>
+                <thead><tr class="text-left text-gray-500 dark:text-gray-400"><th class="py-1">Company</th><th>Partners</th><th>Claims</th><th>Latest expiry</th></tr></thead>
                 <tbody>
                 @foreach ($overlap as $o)
                     <tr class="border-t border-gray-100 dark:border-gray-700">
@@ -41,7 +41,7 @@
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700/50"><tr>
-                    @foreach (['Company', 'Contact', 'Region', 'Partner', 'Status', 'Locked until', 'Actions'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500">{{ $h }}</th>@endforeach
+                    @foreach (['Company', 'Contact', 'Region', 'Partner', 'Status', 'Locked until', 'Actions'] as $h)<th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400">{{ $h }}</th>@endforeach
                 </tr></thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                 @forelse ($rows as $r)
