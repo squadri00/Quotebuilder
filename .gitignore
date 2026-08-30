@@ -23,3 +23,8 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# local-only artifacts
+.env-server
+*.tar.gz
+*.zip
