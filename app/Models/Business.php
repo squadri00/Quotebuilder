@@ -150,6 +150,12 @@ class Business extends Model
         return $this->hasMany(ImplementationOrder::class);
     }
 
+    /** The referral partner that brought this business in, if any. */
+    public function affiliateReferral(): HasOne
+    {
+        return $this->hasOne(AffiliateReferral::class);
+    }
+
     /**
      * Named shopTaxRates (not taxRates) — Cashier's own Billable trait
      * already defines a taxRates() method for its unrelated built-in

@@ -52,6 +52,14 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
+
+        // Referral partners — a third, fully independent portal. Being
+        // signed in here says nothing about the web/admin guards, so a
+        // staff member and a partner can share one browser session.
+        'affiliate' => [
+            'driver' => 'session',
+            'provider' => 'affiliate_partners',
+        ],
     ],
 
     /*
@@ -80,6 +88,11 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => Admin::class,
+        ],
+
+        'affiliate_partners' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\AffiliatePartner::class,
         ],
 
         // 'users' => [

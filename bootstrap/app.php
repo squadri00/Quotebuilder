@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'team.manage' => \App\Http\Middleware\EnsureCanManageTeam::class,
             'billing.access' => \App\Http\Middleware\EnsureCanAccessBilling::class,
             'permission' => \App\Http\Middleware\EnsureHasPermission::class,
+            'affiliate.active' => \App\Http\Middleware\EnsureAffiliateActive::class,
         ]);
 
         // Without this, Laravel's default guest-redirect always points at the
@@ -25,6 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // super admin login instead so the two portals stay visually and
         // functionally separate, as required.
         $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('affiliate*')) {
+                return route('affiliate.portal.login');
+            }
+
             return $request->is('superadmin*')
                 ? route('superadmin.login')
                 : route('login');

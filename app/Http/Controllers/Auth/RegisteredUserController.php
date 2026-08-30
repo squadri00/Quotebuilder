@@ -90,6 +90,9 @@ class RegisteredUserController extends Controller
                 'country' => $request->country,
                 'state_province' => $request->state_province,
                 'plan_id' => $plan->id,
+                'affiliate_code' => \App\Services\Affiliate\AttributionService::normalizeCode(
+                    $request->cookie(\App\Services\Affiliate\AttributionService::COOKIE)
+                ) ?: null,
             ]);
 
             return redirect()->route('checkout.show', $pending->token);

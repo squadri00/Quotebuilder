@@ -200,5 +200,38 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/support/{ticket}', [SupportTicketController::class, 'show'])->name('support.show');
         Route::post('/support/{ticket}/reply', [SupportTicketController::class, 'reply'])->name('support.reply');
         Route::patch('/support/{ticket}/status', [SupportTicketController::class, 'updateStatus'])->name('support.update-status');
+
+        /*
+        |--------------------------------------------------------------------
+        | Referral partner program
+        |--------------------------------------------------------------------
+        */
+        Route::prefix('affiliate')->name('affiliate.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\SuperAdmin\Affiliate\PartnerController::class, 'index'])->name('index');
+            Route::get('/partners/create', [\App\Http\Controllers\SuperAdmin\Affiliate\PartnerController::class, 'create'])->name('partners.create');
+            Route::post('/partners', [\App\Http\Controllers\SuperAdmin\Affiliate\PartnerController::class, 'store'])->name('partners.store');
+            Route::get('/partners/{partner}', [\App\Http\Controllers\SuperAdmin\Affiliate\PartnerController::class, 'show'])->name('partners.show');
+            Route::get('/partners/{partner}/edit', [\App\Http\Controllers\SuperAdmin\Affiliate\PartnerController::class, 'edit'])->name('partners.edit');
+            Route::patch('/partners/{partner}', [\App\Http\Controllers\SuperAdmin\Affiliate\PartnerController::class, 'update'])->name('partners.update');
+            Route::patch('/partners/{partner}/status', [\App\Http\Controllers\SuperAdmin\Affiliate\PartnerController::class, 'setStatus'])->name('partners.status');
+            Route::post('/partners/{partner}/attach', [\App\Http\Controllers\SuperAdmin\Affiliate\PartnerController::class, 'attachBusiness'])->name('partners.attach');
+            Route::post('/partners/{partner}/impersonate', [\App\Http\Controllers\SuperAdmin\Affiliate\PartnerController::class, 'impersonate'])->name('partners.impersonate');
+
+            Route::get('/prospects', [\App\Http\Controllers\SuperAdmin\Affiliate\ProspectController::class, 'index'])->name('prospects.index');
+            Route::patch('/prospects/{prospect}', [\App\Http\Controllers\SuperAdmin\Affiliate\ProspectController::class, 'update'])->name('prospects.update');
+
+            Route::get('/commissions', [\App\Http\Controllers\SuperAdmin\Affiliate\CommissionController::class, 'index'])->name('commissions.index');
+            Route::patch('/referrals/{referral}', [\App\Http\Controllers\SuperAdmin\Affiliate\CommissionController::class, 'updateReferral'])->name('referrals.update');
+            Route::patch('/commissions/{commission}', [\App\Http\Controllers\SuperAdmin\Affiliate\CommissionController::class, 'updateCommission'])->name('commissions.update');
+            Route::post('/adjustments', [\App\Http\Controllers\SuperAdmin\Affiliate\CommissionController::class, 'storeAdjustment'])->name('adjustments.store');
+
+            Route::get('/payouts', [\App\Http\Controllers\SuperAdmin\Affiliate\PayoutController::class, 'index'])->name('payouts.index');
+            Route::post('/payouts', [\App\Http\Controllers\SuperAdmin\Affiliate\PayoutController::class, 'store'])->name('payouts.store');
+            Route::get('/payouts/{payout}', [\App\Http\Controllers\SuperAdmin\Affiliate\PayoutController::class, 'show'])->name('payouts.show');
+            Route::patch('/payouts/{payout}', [\App\Http\Controllers\SuperAdmin\Affiliate\PayoutController::class, 'update'])->name('payouts.update');
+
+            Route::get('/settings', [\App\Http\Controllers\SuperAdmin\Affiliate\SettingsController::class, 'edit'])->name('settings.edit');
+            Route::patch('/settings', [\App\Http\Controllers\SuperAdmin\Affiliate\SettingsController::class, 'update'])->name('settings.update');
+        });
     });
 });

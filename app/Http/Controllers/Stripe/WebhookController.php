@@ -146,7 +146,7 @@ class WebhookController extends CashierWebhookController
             ? Subscription::where('stripe_id', $subscriptionId)->value('type')
             : null;
 
-        TaxCollection::firstOrCreate(
+        $taxCollection = TaxCollection::firstOrCreate(
             ['stripe_invoice_id' => $invoice['id']],
             [
                 'business_id' => $business->id,
@@ -159,7 +159,43 @@ class WebhookController extends CashierWebhookController
             ]
         );
 
+        // Referral-partner commission accrual for this payment.
+        try {
+            app(\App\Services\Affiliate\CommissionService::class)
+                ->accrueForTaxCollection($taxCollection);
+        } catch (\Throwable $e) {
+            Log::warning('Affiliate accrual failed: ' . $e->getMessage());
+        }
+
         return $response;
+    }
+
+    /**
+     * Estimate a commission clawback when a referred business is refunded.
+     * Stripe's charge.refunded carries no per-invoice tax split, so the
+     * clawback is base-of-refund × current partner rate — the super admin
+     * can fine-tune the line on the commission ledger.
+     */
+    protected function handleChargeRefunded(array $payload): Response
+    {
+        $charge = $payload['data']['object'];
+        $refunded = ($charge['amount_refunded'] ?? 0) / 100;
+        $business = $this->getUserByStripeId($charge['customer'] ?? null);
+
+        if ($business instanceof Business && $refunded > 0) {
+            try {
+                app(\App\Services\Affiliate\CommissionService::class)->clawbackForRefund(
+                    $business->id,
+                    $charge['id'] ?? '',
+                    $refunded,
+                    $charge['currency'] ?? null
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Affiliate clawback failed: ' . $e->getMessage());
+            }
+        }
+
+        return $this->successMethod();
     }
 
     /**
@@ -265,6 +301,12 @@ class WebhookController extends CashierWebhookController
             ]);
 
             $pending->update(['business_id' => $business->id]);
+
+            // Referral attribution — the cookie captured at registration
+            // was carried on the PendingRegistration; the Business only
+            // exists now, in this webhook, so this is where it attaches.
+            app(\App\Services\Affiliate\AttributionService::class)
+                ->attach($business, $pending->affiliate_code);
 
             event(new Registered($user));
 

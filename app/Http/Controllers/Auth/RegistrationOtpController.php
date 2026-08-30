@@ -61,6 +61,13 @@ class RegistrationOtpController extends Controller
 
         $user = $pending->finalizeToBusiness();
 
+        // Referral attribution for a free-plan signup (paid plans attach
+        // in Stripe\WebhookController once payment confirms the Business).
+        if ($user->business) {
+            app(\App\Services\Affiliate\AttributionService::class)
+                ->attach($user->business, $pending->affiliate_code);
+        }
+
         event(new Registered($user));
 
         Auth::login($user);

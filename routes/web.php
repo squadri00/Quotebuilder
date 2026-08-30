@@ -36,6 +36,11 @@ use Laravel\Cashier\Http\Controllers\PaymentController as CashierPaymentControll
 
 Route::get('/', [HomeController::class, 'show']);
 
+// Referral-link entry point — logs the click, drops the attribution
+// cookie, forwards to the marketing site.
+Route::get('/r/{code}', [\App\Http\Controllers\Affiliate\ReferralController::class, 'track'])
+    ->name('affiliate.referral.track');
+
 Route::get('/features', [FeaturesController::class, 'show'])->name('features');
 
 Route::get('/demo', [DemoController::class, 'index'])->name('demo');
@@ -207,3 +212,4 @@ Route::middleware('throttle:public')->group(function () {
 
 require __DIR__.'/auth.php';
 require __DIR__.'/superadmin.php';
+require __DIR__.'/affiliate.php';

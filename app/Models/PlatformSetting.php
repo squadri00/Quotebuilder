@@ -59,6 +59,16 @@ class PlatformSetting extends Model
         'turnstile_secret_key',
         'maintenance_mode',
         'maintenance_message',
+        'affiliate_program_enabled',
+        'affiliate_default_commission_rate',
+        'affiliate_claim_days',
+        'affiliate_claim_renew_on_activity',
+        'affiliate_cookie_days',
+        'affiliate_min_payout',
+        'affiliate_auto_approve_partners',
+        'affiliate_auto_approve_referrals',
+        'affiliate_payout_currency',
+        'affiliate_terms_url',
     ];
 
     protected function casts(): array
@@ -70,6 +80,14 @@ class PlatformSetting extends Model
             'mail_port' => 'integer',
             'turnstile_secret_key' => 'encrypted',
             'maintenance_mode' => 'boolean',
+            'affiliate_program_enabled' => 'boolean',
+            'affiliate_claim_renew_on_activity' => 'boolean',
+            'affiliate_auto_approve_partners' => 'boolean',
+            'affiliate_auto_approve_referrals' => 'boolean',
+            'affiliate_default_commission_rate' => 'decimal:3',
+            'affiliate_min_payout' => 'decimal:2',
+            'affiliate_claim_days' => 'integer',
+            'affiliate_cookie_days' => 'integer',
         ];
     }
 

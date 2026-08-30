@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('implementation-orders:expire-abandoned')->hourly();
+Schedule::command('affiliate:reconcile')->dailyAt('02:30');

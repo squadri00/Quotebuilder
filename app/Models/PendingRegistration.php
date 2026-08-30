@@ -30,6 +30,7 @@ class PendingRegistration extends Model
         'country',
         'state_province',
         'plan_id',
+        'affiliate_code',
         'otp_code',
         'otp_expires_at',
         'business_id',
