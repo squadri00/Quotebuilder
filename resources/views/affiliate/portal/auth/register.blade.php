@@ -50,7 +50,7 @@
 
         <label class="flex items-start gap-2 pt-2 text-sm">
             <input type="checkbox" name="agree" value="1" required class="mt-0.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500">
-            <span>I have read and accept the partner agreement@if($termsUrl) (<a href="{{ $termsUrl }}" target="_blank" class="text-orange-600 underline">read</a>)@endif.</span>
+            <span>I have read and accept the partner agreement @if($termsUrl)(<a href="{{ $termsUrl }}" target="_blank" class="text-orange-600 underline">read</a>) @endif.</span>
         </label>
         @error('agree') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
 
