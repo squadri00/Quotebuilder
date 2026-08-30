@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('implementation-orders:expire-abandoned')->hourly();
 Schedule::command('affiliate:reconcile')->dailyAt('02:30');
+Schedule::command('sync:check')->twiceDailyAt(1, 13, 30)->withoutOverlapping();

@@ -32,6 +32,7 @@ use App\Http\Controllers\SuperAdmin\SupportTicketController;
 use App\Http\Controllers\SuperAdmin\SystemInfoController;
 use App\Http\Controllers\SuperAdmin\TemplateController;
 use App\Http\Controllers\SuperAdmin\ThemeController;
+use App\Http\Controllers\SuperAdmin\SyncController;
 use App\Http\Controllers\SuperAdmin\TrainingArtifactController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +58,11 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
 
         Route::get('/system-info', [SystemInfoController::class, 'index'])->name('system-info.index');
+
+        // Environment Sync (local <-> live drift detection)
+        Route::get('/sync', [SyncController::class, 'index'])->name('sync.index');
+        Route::post('/sync/push', [SyncController::class, 'push'])->name('sync.push');
+        Route::post('/sync/apply-live', [SyncController::class, 'applyLive'])->name('sync.apply-live');
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
