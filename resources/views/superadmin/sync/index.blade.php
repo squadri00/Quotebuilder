@@ -42,7 +42,7 @@
         </x-card>
     @endif
 
-    @unless ($configured)
+    @if (! $configured)
         <x-card>
             <h3 class="font-semibold">Not configured yet</h3>
             <p class="mt-1 text-sm text-slate-500">
@@ -53,8 +53,7 @@
                 <code>php artisan config:clear</code> and reload.
             </p>
         </x-card>
-        @php return; @endphp
-    @endunless
+    @else
 
     {{-- Verdict --}}
     @php
@@ -306,4 +305,5 @@ LIVE:  {{ json_encode($pair[1]) }}</pre></div>
                 <pre class="mt-1 max-h-96 overflow-auto rounded bg-slate-900 p-2 text-[11px] text-slate-100">{{ $live ? json_encode($live, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : ($liveError ?: 'not fetched') }}</pre></div>
         </div>
     </details>
+    @endif
 </x-superadmin-layout>
