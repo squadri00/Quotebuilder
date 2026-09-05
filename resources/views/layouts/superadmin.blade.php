@@ -11,27 +11,42 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+        <!-- PWA -->
+        <link rel="manifest" href="{{ asset('manifest-superadmin.json') }}">
+        <meta name="theme-color" content="#111827">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="{{ config('app.name', 'Quotaire') }} Admin">
+        <link rel="apple-touch-icon" href="{{ asset('icons/superadmin-192.png') }}">
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div x-data="{ sidebarOpen: true }" class="flex h-screen bg-gray-100 dark:bg-gray-900">
+        <div x-data="{ sidebarOpen: true, mobileNavOpen: false }" class="flex h-screen bg-gray-100 dark:bg-gray-900">
+            <div x-show="mobileNavOpen" x-cloak x-transition.opacity class="fixed inset-0 z-30 bg-black/50 md:hidden" @click="mobileNavOpen = false"></div>
+
             <!-- Dark sidebar — deliberately distinct from the light business-admin sidebar -->
             <aside
-                :class="sidebarOpen ? 'w-64' : 'w-20'"
-                class="flex shrink-0 flex-col border-r border-gray-800 bg-gray-900 transition-all duration-200"
+                :class="{ 'md:w-64': sidebarOpen, 'md:w-20': !sidebarOpen, 'translate-x-0': mobileNavOpen, '-translate-x-full': !mobileNavOpen }"
+                class="fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-gray-800 bg-gray-900 transition-all duration-200 md:static md:z-auto md:translate-x-0"
             >
                 @php $logoFull = ($platformSettings ?? null)?->logo_path && $platformSettings->logo_display_style === 'full'; @endphp
                 <div class="flex h-16 shrink-0 items-center {{ $logoFull ? 'justify-center' : '' }} border-b border-gray-800 px-3">
-                    <a href="{{ route('superadmin.dashboard') }}" class="flex items-center overflow-hidden {{ $logoFull ? 'w-full justify-center' : '' }}">
+                    <a href="{{ route('superadmin.dashboard') }}" class="flex flex-1 items-center overflow-hidden {{ $logoFull ? 'w-full justify-center' : '' }}">
                         <x-platform-logo :settings="$platformSettings ?? null"
                             :img-class="$logoFull ? 'max-h-14 w-full object-contain' : 'h-10 w-10 shrink-0 rounded-lg object-contain'" />
                         @unless ($logoFull)
                             <span x-show="sidebarOpen" x-cloak class="ml-2 whitespace-nowrap font-bold text-white">{{ config('app.name') }}</span>
                         @endunless
                     </a>
+                    <button type="button" @click="mobileNavOpen = false" class="shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-gray-800 md:hidden" aria-label="Close menu">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
 
-                <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+                <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4" @click="mobileNavOpen = false">
                     <x-superadmin-nav-link :href="route('superadmin.dashboard')" :active="request()->routeIs('superadmin.dashboard')">
                         <x-slot name="icon">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
@@ -457,13 +472,27 @@
 
             <div class="flex flex-1 flex-col overflow-hidden">
                 <header class="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-gray-200 bg-white px-6 dark:border-gray-700 dark:bg-gray-800">
-                    <div class="min-w-0 flex-1">
-                        @isset($header)
-                            {{ $header }}
-                        @endisset
+                    <div class="flex min-w-0 flex-1 items-center gap-2">
+                        <button type="button" @click="mobileNavOpen = true" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 md:hidden dark:text-gray-400 dark:hover:bg-gray-700" aria-label="Open menu">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+                            </svg>
+                        </button>
+                        <div class="min-w-0 flex-1">
+                            @isset($header)
+                                {{ $header }}
+                            @endisset
+                        </div>
                     </div>
 
                     <div class="flex shrink-0 items-center gap-2">
+                        <button id="pwa-install-btn" onclick="pwaInstall()" class="flex items-center gap-1.5 rounded-lg bg-gray-900 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-gray-700 sm:px-3 dark:bg-gray-700 dark:hover:bg-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                            </svg>
+                            <span class="hidden sm:inline">Install app</span>
+                        </button>
+
                         @php $wmHealth = \App\Services\Sync\SyncEngine::pill(); @endphp
                         <a href="{{ $wmHealth['href'] ? route($wmHealth['href']) : route('superadmin.sync.index') }}"
                            class="hidden items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700 sm:flex"
@@ -520,6 +549,42 @@
                     },
                     body: JSON.stringify({ theme: isDark ? 'dark' : 'light' }),
                 });
+            }
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('{{ asset('sw.js') }}', { scope: '{{ url('/superadmin') }}/' }).catch(() => {});
+            }
+
+            var pwaDeferredPrompt = null;
+            var pwaBtn = document.getElementById('pwa-install-btn');
+            var pwaStorageKey = 'quotaire-superadmin-installed';
+            if (window.matchMedia('(display-mode: standalone)').matches
+                || window.navigator.standalone
+                || localStorage.getItem(pwaStorageKey) === '1') {
+                pwaBtn.classList.add('hidden');
+            }
+            window.addEventListener('beforeinstallprompt', function (e) {
+                e.preventDefault();
+                pwaDeferredPrompt = e;
+            });
+            window.addEventListener('appinstalled', function () {
+                pwaDeferredPrompt = null;
+                pwaBtn.classList.add('hidden');
+                try { localStorage.setItem(pwaStorageKey, '1'); } catch (e) {}
+            });
+            function pwaInstall() {
+                if (pwaDeferredPrompt) {
+                    pwaDeferredPrompt.prompt();
+                    pwaDeferredPrompt.userChoice.finally(function () { pwaDeferredPrompt = null; });
+                    return;
+                }
+                var ua = navigator.userAgent;
+                var msg = /iphone|ipad|ipod/i.test(ua)
+                    ? 'To install: tap the Share icon in Safari, then "Add to Home Screen".'
+                    : /android/i.test(ua)
+                        ? 'To install: open Chrome\'s ⋮ menu (top right) and tap "Add to Home screen" or "Install app".'
+                        : 'To install Quotaire Super Admin as a desktop app:\n\n1. Click the ⋮ menu (top right)\n2. Go to "Cast, save, and share"\n3. Click "Install page as app…" (not "Create shortcut")\n4. Confirm in the dialog that appears\n\nThis installs it as a real app — its own window, its own icon, listed in chrome://apps.';
+                alert(msg);
             }
         </script>
     </body>

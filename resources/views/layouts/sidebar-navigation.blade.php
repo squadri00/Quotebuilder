@@ -1,21 +1,28 @@
+<div x-show="mobileNavOpen" x-cloak x-transition.opacity class="fixed inset-0 z-30 bg-black/50 md:hidden" @click="mobileNavOpen = false"></div>
+
 <aside
-    :class="sidebarOpen ? 'w-64' : 'w-20'"
-    class="flex shrink-0 flex-col border-r border-gray-200 bg-white transition-all duration-200 dark:border-gray-700 dark:bg-gray-800"
+    :class="{ 'md:w-64': sidebarOpen, 'md:w-20': !sidebarOpen, 'translate-x-0': mobileNavOpen, '-translate-x-full': !mobileNavOpen }"
+    class="fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-gray-200 bg-white transition-all duration-200 md:static md:z-auto md:translate-x-0 dark:border-gray-700 dark:bg-gray-800"
 >
     <!-- Logo -->
     @php $logoFull = ($platformSettings ?? null)?->logo_path && $platformSettings->logo_display_style === 'full'; @endphp
     <div class="flex h-16 shrink-0 items-center {{ $logoFull ? 'justify-center' : '' }} border-b border-gray-200 px-3 dark:border-gray-700">
-        <a href="{{ route('dashboard') }}" class="flex items-center overflow-hidden {{ $logoFull ? 'w-full justify-center' : '' }}">
+        <a href="{{ route('dashboard') }}" class="flex flex-1 items-center overflow-hidden {{ $logoFull ? 'w-full justify-center' : '' }}">
             <x-platform-logo :settings="$platformSettings ?? null"
                 :img-class="$logoFull ? 'max-h-14 w-full object-contain' : 'h-10 w-10 shrink-0 rounded-lg object-contain'" />
             @unless ($logoFull)
                 <span x-show="sidebarOpen" x-cloak class="ml-2 font-bold text-gray-900 whitespace-nowrap dark:text-gray-100">{{ config('app.name') }}</span>
             @endunless
         </a>
+        <button type="button" @click="mobileNavOpen = false" class="shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 md:hidden dark:hover:bg-gray-700" aria-label="Close menu">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
     </div>
 
     <!-- Nav links -->
-    <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+    <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4" @click="mobileNavOpen = false">
         <x-sidebar-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
             <x-slot name="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">

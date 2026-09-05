@@ -12,11 +12,19 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+        <!-- PWA -->
+        <link rel="manifest" href="{{ asset('manifest-business.json') }}">
+        <meta name="theme-color" content="#4f46e5">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="{{ config('app.name', 'Quotaire') }}">
+        <link rel="apple-touch-icon" href="{{ asset('icons/business-192.png') }}">
+
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div x-data="{ sidebarOpen: true }" class="flex h-screen bg-gray-50 dark:bg-gray-900">
+        <div x-data="{ sidebarOpen: true, mobileNavOpen: false }" class="flex h-screen bg-gray-50 dark:bg-gray-900">
             @include('layouts.sidebar-navigation')
 
             <div class="flex flex-1 flex-col overflow-hidden">
@@ -32,13 +40,27 @@
 
                 <!-- Page header -->
                 <header class="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-gray-200 bg-white px-6 dark:border-gray-700 dark:bg-gray-800">
-                    <div class="min-w-0 flex-1">
-                        @isset($header)
-                            {{ $header }}
-                        @endisset
+                    <div class="flex min-w-0 flex-1 items-center gap-2">
+                        <button type="button" @click="mobileNavOpen = true" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 md:hidden dark:text-gray-400 dark:hover:bg-gray-700" aria-label="Open menu">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+                            </svg>
+                        </button>
+                        <div class="min-w-0 flex-1">
+                            @isset($header)
+                                {{ $header }}
+                            @endisset
+                        </div>
                     </div>
 
                     <div class="flex shrink-0 items-center gap-2">
+                        <button id="pwa-install-btn" onclick="pwaInstall()" class="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 sm:px-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                            </svg>
+                            <span class="hidden sm:inline">Install app</span>
+                        </button>
+
                         <a
                             href="{{ url('/') }}"
                             target="_blank"
@@ -179,6 +201,42 @@
                     },
                     body: JSON.stringify({ theme: isDark ? 'dark' : 'light' }),
                 });
+            }
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('{{ asset('sw.js') }}', { scope: '{{ url('/') }}/' }).catch(() => {});
+            }
+
+            var pwaDeferredPrompt = null;
+            var pwaBtn = document.getElementById('pwa-install-btn');
+            var pwaStorageKey = 'quotaire-business-installed';
+            if (window.matchMedia('(display-mode: standalone)').matches
+                || window.navigator.standalone
+                || localStorage.getItem(pwaStorageKey) === '1') {
+                pwaBtn.classList.add('hidden');
+            }
+            window.addEventListener('beforeinstallprompt', function (e) {
+                e.preventDefault();
+                pwaDeferredPrompt = e;
+            });
+            window.addEventListener('appinstalled', function () {
+                pwaDeferredPrompt = null;
+                pwaBtn.classList.add('hidden');
+                try { localStorage.setItem(pwaStorageKey, '1'); } catch (e) {}
+            });
+            function pwaInstall() {
+                if (pwaDeferredPrompt) {
+                    pwaDeferredPrompt.prompt();
+                    pwaDeferredPrompt.userChoice.finally(function () { pwaDeferredPrompt = null; });
+                    return;
+                }
+                var ua = navigator.userAgent;
+                var msg = /iphone|ipad|ipod/i.test(ua)
+                    ? 'To install: tap the Share icon in Safari, then "Add to Home Screen".'
+                    : /android/i.test(ua)
+                        ? 'To install: open Chrome\'s ⋮ menu (top right) and tap "Add to Home screen" or "Install app".'
+                        : 'To install Quotaire as a desktop app:\n\n1. Click the ⋮ menu (top right)\n2. Go to "Cast, save, and share"\n3. Click "Install page as app…" (not "Create shortcut")\n4. Confirm in the dialog that appears\n\nThis installs it as a real app — its own window, its own icon, listed in chrome://apps.';
+                alert(msg);
             }
         </script>
     </body>

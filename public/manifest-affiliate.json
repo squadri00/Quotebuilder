@@ -1,0 +1,15 @@
+{
+    "name": "Quotaire Partners",
+    "short_name": "Q Partners",
+    "start_url": "affiliate",
+    "scope": "affiliate",
+    "display": "standalone",
+    "background_color": "#f1f5f9",
+    "theme_color": "#ea580c",
+    "icons": [
+        { "src": "icons/affiliate-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "icons/affiliate-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+        { "src": "icons/affiliate-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+        { "src": "icons/affiliate-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    ]
+}
