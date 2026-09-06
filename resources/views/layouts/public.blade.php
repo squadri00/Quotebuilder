@@ -22,7 +22,7 @@
 
         <title>@yield('title', config('app.name', 'Quotaire') . ' — The Quotation Builder')</title>
 
-        <link rel="icon" type="image/png" href="{{ asset('images/quotaire/favicon.png') }}">
+        <link rel="icon" type="image/png" href="{{ asset('images/quotaire/favicon.png') }}?v={{ @filemtime(public_path('images/quotaire/favicon.png')) }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,8 +45,7 @@
             <div class="flex flex-col max-w-6xl mx-auto px-6 md:items-center md:justify-between md:flex-row">
                 <div class="flex flex-row items-center justify-between py-6">
                     <a href="{{ url('/') }}" class="relative z-50 flex items-center shrink-0">
-                        <img src="{{ asset('images/quotaire/logo-for-white.png') }}" alt="{{ config('app.name', 'Quotaire') }}" class="h-8 w-auto dark:hidden">
-                        <img src="{{ asset('images/quotaire/logo-for-black.png') }}" alt="{{ config('app.name', 'Quotaire') }}" class="h-8 w-auto hidden dark:block">
+                        <x-platform-logo :settings="\App\Models\PlatformSetting::get()" img-class="h-10 w-auto object-contain" />
                     </a>
 
                     <button class="rounded-lg md:hidden focus:outline-none focus:shadow-outline" @click="open = !open" aria-label="Toggle navigation">
@@ -75,10 +74,10 @@
                     </button>
 
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="px-10 py-3 mt-2 text-sm text-center font-semibold bg-green-600 text-white rounded-full md:ml-4 hover:bg-green-700 transition">Go to Dashboard</a>
+                        <a href="{{ url('/dashboard') }}" class="whitespace-nowrap px-10 py-3 mt-2 text-sm text-center font-semibold bg-green-600 text-white rounded-full md:ml-4 hover:bg-green-700 transition">Go to Dashboard</a>
                     @else
-                        <a href="{{ route('login') }}" class="px-10 py-3 mt-2 text-sm text-center font-semibold bg-gray-100 text-gray-800 rounded-full md:ml-4 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 transition">Login</a>
-                        <a href="{{ route('pricing') }}" class="px-10 py-3 mt-2 text-sm text-center font-semibold bg-green-600 text-white rounded-full md:ml-4 hover:bg-green-700 transition">Sign Up</a>
+                        <a href="{{ route('login') }}" class="whitespace-nowrap px-10 py-3 mt-2 text-sm text-center font-semibold bg-gray-100 text-gray-800 rounded-full md:ml-4 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 transition">Login</a>
+                        <a href="{{ route('pricing') }}" class="whitespace-nowrap px-10 py-3 mt-2 text-sm text-center font-semibold bg-green-600 text-white rounded-full md:ml-4 hover:bg-green-700 transition">Sign Up</a>
                     @endauth
                 </nav>
             </div>
@@ -91,7 +90,18 @@
         <footer class="mt-24" style="background-color: #2f327d;">
             <div class="max-w-6xl mx-auto px-6">
                 <div class="flex flex-col items-center py-12 text-white">
-                    <img src="{{ asset('images/quotaire/logo-for-black.png') }}" alt="{{ config('app.name', 'Quotaire') }}" class="h-7 w-auto">
+                    @php $footerSettings = \App\Models\PlatformSetting::get(); @endphp
+                    @if ($footerSettings->dark_logo_path || $footerSettings->logo_path)
+                        {{-- This footer's background is always dark regardless of the
+                             site's own light/dark toggle, so the logo variant here is
+                             fixed to whichever one actually reads on a dark background
+                             — not swapped by <x-platform-logo>'s dark: classes, which
+                             track the page theme instead of this section's own fixed
+                             background. --}}
+                        <img src="{{ Storage::url($footerSettings->dark_logo_path ?: $footerSettings->logo_path) }}" alt="{{ $footerSettings->platform_name ?: config('app.name') }}" class="h-16 w-auto object-contain">
+                    @else
+                        <span class="text-lg font-bold">{{ $footerSettings->platform_name ?: config('app.name') }}</span>
+                    @endif
                     <p class="mt-4 text-sm text-indigo-200">The quote calculator builder for businesses that quote by products, options, and rules.</p>
 
                     @if (($socialLinks ?? collect())->isNotEmpty())

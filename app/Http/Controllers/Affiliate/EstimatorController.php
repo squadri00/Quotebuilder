@@ -29,7 +29,7 @@ class EstimatorController extends PortalController
 
         return view('affiliate.portal.estimator', [
             'partner' => $partner,
-            'plans' => Plan::where('is_active', true)->orderBy('price_monthly')->get(['name', 'price_monthly']),
+            'plans' => Plan::where('is_active', true)->where('billing_interval', 'monthly')->orderBy('price')->get(['name', 'price']),
             'inputs' => compact('rate', 'price', 'count', 'months', 'newPerMonth'),
             'results' => [
                 'per_account_monthly' => $perAccountMonthly,

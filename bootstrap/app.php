@@ -4,7 +4,20 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Route;
+
+// This server (XAMPP on Windows, mod_php) runs multiple Laravel apps in the
+// same Apache process, and Apache's WinNT MPM serves ALL sites from one
+// process with many shared threads. Laravel's .env loader normally also
+// writes values via PHP's putenv(), which mutates that shared OS-level
+// process environment — so a value set while handling a request for one
+// app can leak into a later request for a *different* app on this same
+// server (this is exactly what caused quotebuilder to briefly query
+// Chantley's database on 2026-09-06). Disabling putenv keeps env values
+// confined to the current request's own $_ENV/$_SERVER, which Apache
+// already resets per-request, so they can no longer cross between apps.
+Env::disablePutenv();
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -81,5 +94,20 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // If a Super Admin's session sits idle long enough that the CSRF
+        // token on the logout form expires before they click it, Laravel
+        // would otherwise show the raw "419 Page Expired" error page for
+        // what is really just an already-effectively-logged-out session.
+        // Send them to the main site instead — scoped to just this one
+        // route so every other 419 elsewhere keeps its normal behavior.
+        // Note: by the time renderable callbacks run, Laravel's Handler has
+        // already converted TokenMismatchException into a generic
+        // Symfony HttpException(419) (see Handler::prepareException()),
+        // so that's what has to be type-hinted here, not the original
+        // TokenMismatchException.
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, \Illuminate\Http\Request $request) {
+            if ($e->getStatusCode() === 419 && $request->routeIs('superadmin.logout')) {
+                return redirect('/');
+            }
+        });
     })->create();

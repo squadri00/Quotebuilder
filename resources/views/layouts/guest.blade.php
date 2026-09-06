@@ -7,6 +7,8 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        <link rel="icon" type="image/png" href="{{ asset('images/quotaire/favicon.png') }}?v={{ @filemtime(public_path('images/quotaire/favicon.png')) }}">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,11 +18,17 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
+        @php
+            $platformSettings = \App\Models\PlatformSetting::get();
+            $logoFull = $platformSettings->logo_path && $platformSettings->logo_display_style === 'full';
+        @endphp
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-50">
             <div>
                 <a href="/" class="flex items-center gap-2">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-lg font-bold text-white">{{ Str::upper(Str::substr(config('app.name'), 0, 1)) }}</span>
-                    <span class="text-xl font-bold text-gray-900">{{ config('app.name') }}</span>
+                    <x-platform-logo :settings="$platformSettings" :img-class="$logoFull ? 'h-10 w-auto max-w-[220px] object-contain' : 'h-10 w-10 shrink-0 rounded-lg object-contain'" />
+                    @unless ($logoFull)
+                        <span class="text-xl font-bold text-gray-900">{{ $platformSettings->platform_name ?: config('app.name') }}</span>
+                    @endunless
                 </a>
             </div>
 

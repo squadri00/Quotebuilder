@@ -14,11 +14,25 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-gray-950 text-white">
+        @php
+            $platformSettings = \App\Models\PlatformSetting::get();
+            $logoFull = $platformSettings->logo_path && $platformSettings->logo_display_style === 'full';
+        @endphp
         <div class="min-h-screen flex flex-col items-center justify-center px-4">
             <div class="flex items-center gap-2 mb-8">
-                <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-lg font-bold text-white">{{ Str::upper(Str::substr(config('app.name'), 0, 1)) }}</span>
+                @if ($platformSettings->dark_logo_path || $platformSettings->logo_path)
+                    {{-- Fixed dark background here (no theme toggle on this
+                         screen), so this always wants the dark-mode logo
+                         variant specifically, same reasoning as the
+                         affiliate portal's dark sidebar. --}}
+                    <img src="{{ Storage::url($platformSettings->dark_logo_path ?: $platformSettings->logo_path) }}" alt="{{ $platformSettings->platform_name ?: config('app.name') }}" class="{{ $logoFull ? 'h-10 w-auto max-w-[220px] object-contain' : 'h-10 w-10 shrink-0 rounded-lg object-contain' }}">
+                @else
+                    <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-lg font-bold text-white">{{ Str::upper(Str::substr(config('app.name'), 0, 1)) }}</span>
+                @endif
                 <div>
-                    <p class="font-bold text-white leading-tight">{{ config('app.name') }}</p>
+                    @unless ($logoFull)
+                        <p class="font-bold text-white leading-tight">{{ $platformSettings->platform_name ?: config('app.name') }}</p>
+                    @endunless
                     <p class="text-xs text-gray-400 dark:text-gray-500 leading-tight uppercase tracking-wide">Super Admin</p>
                 </div>
             </div>
@@ -52,7 +66,9 @@
                 </form>
             </div>
 
-            <p class="mt-8 text-xs text-gray-500 dark:text-gray-400">This is a platform-level login, separate from business accounts.</p>
+            <a href="{{ url('/') }}" class="mt-8 text-sm font-medium text-gray-400 hover:text-white transition">&larr; Back to website</a>
+
+            <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">This is a platform-level login, separate from business accounts.</p>
         </div>
     </body>
 </html>
