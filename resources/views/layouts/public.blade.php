@@ -139,11 +139,10 @@
             x-transition
             x-cloak
             @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
-            {{-- bottom-24 (not bottom-6) so this sits clear above the
-                 Chantley chat widget bubble in the same corner (that
-                 widget is 56px tall, anchored 20px from the bottom —
-                 stacking directly on bottom-6 fully covered this button). --}}
-            class="fixed bottom-24 right-6 z-50 w-11 h-11 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg flex items-center justify-center transition duration-300"
+            {{-- Bottom-left (not bottom-right) so this never competes for
+                 space with the Chantley chat widget bubble, which is
+                 anchored bottom-right. --}}
+            class="fixed bottom-6 left-6 z-50 w-11 h-11 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg flex items-center justify-center transition duration-300"
             aria-label="Scroll to top">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
