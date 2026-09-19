@@ -87,6 +87,8 @@
             @yield('content')
         </main>
 
+        <script src="https://chantley.com/widget.js" data-chatbot="pub_hmyktf1dubu1rjhnyw2l7mpkwnv1" async></script>
+
         <footer class="mt-24" style="background-color: #2f327d;">
             <div class="max-w-6xl mx-auto px-6">
                 <div class="flex flex-col items-center py-12 text-white">
