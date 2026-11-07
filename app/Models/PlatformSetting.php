@@ -69,6 +69,10 @@ class PlatformSetting extends Model
         'affiliate_auto_approve_referrals',
         'affiliate_payout_currency',
         'affiliate_terms_url',
+        'head_code',
+        'body_code',
+        'custom_code_enabled',
+        'custom_code_areas',
     ];
 
     protected function casts(): array
@@ -80,6 +84,8 @@ class PlatformSetting extends Model
             'mail_port' => 'integer',
             'turnstile_secret_key' => 'encrypted',
             'maintenance_mode' => 'boolean',
+            'custom_code_enabled' => 'boolean',
+            'custom_code_areas' => 'array',
             'affiliate_program_enabled' => 'boolean',
             'affiliate_claim_renew_on_activity' => 'boolean',
             'affiliate_auto_approve_partners' => 'boolean',
@@ -100,6 +106,35 @@ class PlatformSetting extends Model
     {
         return $this->maintenance_message
             ?: "We're currently performing scheduled maintenance. Please check back soon.";
+    }
+
+    /** The parts of the site that can carry the custom code. */
+    public const CODE_AREAS = [
+        'public' => 'Public website pages (home, pricing, features, contact)',
+        'auth' => 'Sign-in, sign-up and password pages',
+        'app' => 'Business dashboard (after sign-in)',
+        'superadmin' => 'Super Admin area',
+    ];
+
+    /** Where the code goes when the Super Admin has never chosen. */
+    public const DEFAULT_CODE_AREAS = ['public', 'auth'];
+
+    /**
+     * The custom code for one spot ("head" = just before </head>, "body" = just before </body>) on one part of the site.
+     * Empty when the code is switched off, when it is not meant for that part of the site, or when nothing was entered.
+     * It is added as it was typed, on purpose: this is code only the Super Admin can set.
+     */
+    public function customCode(string $where, string $area): string
+    {
+        if (! $this->custom_code_enabled) {
+            return '';
+        }
+        $areas = $this->custom_code_areas ?? self::DEFAULT_CODE_AREAS;
+        if (! in_array($area, $areas, true)) {
+            return '';
+        }
+
+        return trim((string) ($where === 'head' ? $this->head_code : $this->body_code));
     }
 
     public static function get(): self

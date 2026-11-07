@@ -39,6 +39,7 @@
         <style>
             html { scroll-behavior: smooth; }
         </style>
+        @include('partials.custom-code', ['where' => 'head', 'area' => 'public'])
     </head>
     <body class="font-display antialiased bg-white text-gray-700 dark:bg-gray-900 dark:text-gray-300">
         <div x-data="{ open: false }" class="w-full">
@@ -151,5 +152,6 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
             </svg>
         </button>
+        @include('partials.custom-code', ['where' => 'body', 'area' => 'public'])
     </body>
 </html>

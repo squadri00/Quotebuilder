@@ -77,6 +77,41 @@
             </div>
         </x-card>
 
+        <x-card class="break-inside-avoid mb-6">
+            <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Custom code</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Add your own code to every page, for example a site-verification meta tag, analytics, or a widget. It is added exactly as you type it. Only a Super Admin can change it, so only paste code you trust. Leave a box empty to add nothing.</p>
+            <input type="hidden" name="custom_code_form" value="1">
+
+            <div>
+                <x-input-label for="head_code" value="Before the closing head tag (&lt;/head&gt;)" />
+                <textarea id="head_code" name="head_code" rows="4" spellcheck="false" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 font-mono text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder='<meta name="example" content="value">'>{{ old('head_code', $settings->head_code) }}</textarea>
+                <x-input-error :messages="$errors->get('head_code')" class="mt-2" />
+            </div>
+
+            <div class="mt-4">
+                <x-input-label for="body_code" value="Before the closing body tag (&lt;/body&gt;)" />
+                <textarea id="body_code" name="body_code" rows="4" spellcheck="false" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 font-mono text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder='<script src="https://example.com/script.js" async></script>'>{{ old('body_code', $settings->body_code) }}</textarea>
+                <x-input-error :messages="$errors->get('body_code')" class="mt-2" />
+            </div>
+
+            <fieldset class="mt-4">
+                <legend class="text-sm font-medium text-gray-700 dark:text-gray-300">Add the code to</legend>
+                @php $chosenAreas = old('custom_code_areas', $settings->custom_code_areas ?? \App\Models\PlatformSetting::DEFAULT_CODE_AREAS); @endphp
+                @foreach (\App\Models\PlatformSetting::CODE_AREAS as $key => $label)
+                    <label class="mt-2 flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                        <input type="checkbox" name="custom_code_areas[]" value="{{ $key }}" class="mt-0.5 rounded border-gray-300 dark:border-gray-700 text-indigo-600" @checked(in_array($key, (array) $chosenAreas, true))>
+                        <span>{{ $label }}</span>
+                    </label>
+                @endforeach
+                <x-input-error :messages="$errors->get('custom_code_areas.*')" class="mt-2" />
+            </fieldset>
+
+            <label class="mt-4 flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input type="checkbox" name="custom_code_enabled" value="1" class="mt-0.5 rounded border-gray-300 dark:border-gray-700 text-indigo-600" @checked(old('custom_code_form') ? old('custom_code_enabled') : $settings->custom_code_enabled)>
+                <span>Custom code is on. Untick to switch it off everywhere without deleting it.</span>
+            </label>
+        </x-card>
+
         <x-card class="break-inside-avoid mb-6 {{ $settings->maintenance_mode ? 'border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30' : '' }}">
             <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Maintenance Mode</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">

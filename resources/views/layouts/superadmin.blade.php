@@ -22,6 +22,7 @@
         <link rel="apple-touch-icon" href="{{ asset('icons/superadmin-192.png') }}">
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @include('partials.custom-code', ['where' => 'head', 'area' => 'superadmin'])
     </head>
     <body class="font-sans antialiased">
         <div x-data="{ sidebarOpen: true, mobileNavOpen: false }" class="flex h-screen bg-gray-100 dark:bg-gray-900">
@@ -589,5 +590,6 @@
                 alert(msg);
             }
         </script>
+        @include('partials.custom-code', ['where' => 'body', 'area' => 'superadmin'])
     </body>
 </html>

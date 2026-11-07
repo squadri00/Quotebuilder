@@ -16,6 +16,7 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @include('partials.custom-code', ['where' => 'head', 'area' => 'auth'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
         @php
@@ -36,5 +37,6 @@
                 {{ $slot }}
             </div>
         </div>
+        @include('partials.custom-code', ['where' => 'body', 'area' => 'auth'])
     </body>
 </html>
